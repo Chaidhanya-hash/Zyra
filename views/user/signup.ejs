@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign up Page</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
+            rel="stylesheet">
+            <link rel="stylesheet" href="/styles/css/styles.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    
+<body class="bg-white  font-sans">
+  <!-- Header -->
+  <%- include ('header') %>
+
+  <%- include('alert') %> 
+  <!-- Form Section -->
+  <section class="flex justify-center items-center py-12 bg-gray-50">
+    <div class="bg-[#F3E0CF] rounded-lg shadow-lg p-8 w-[90%] max-w-md text-center">
+      <h2 class="text-center text-2xl font-semibold mb-6 text-[#4f322a]">Create an account</h2>
+      
+      <form class="space-y-4" action="/signup" method="post" id="register-form">
+        <input
+          type="text"
+          placeholder="Name"
+          name="name"
+          id="name"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          name="email"
+          id="email"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
+        />
+        <input
+          type="text"
+          placeholder="Mobile number"
+          id="mobile-number"
+          name="phone"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          name="password"
+          id="password"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
+        />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          name="confirm-password"
+          id="confirm-password"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
+        />
+        <button class="w-full bg-black text-white py-2 rounded-md text-center hover:bg-gray-800 transition" id="register-btn">
+            Signup
+        </button>
+        
+      </form>
+    </div>
+  </section>
+  
+     
+  <!-- Footer -->
+  <%- include ('footer') %>
+  
+  <!-- ----------------validation-------------------- -->
+  <script>
+    const registerForm = document.getElementById('register-form')
+    const name = document.getElementById('name')
+    const email = document.getElementById('email')
+    const mobileNumber = document.getElementById('mobile-number')
+    const password = document.getElementById('password')
+    const confirmPassword = document.getElementById('confirm-password')
+    const signupButton = document.getElementById('register-btn')
+
+    function checkEmail(email) {
+      const re = /\S+@\S+\.\s+/;
+      return re.test(email)
+    }
+    function validatePassword(password) {
+        if (password.length < 8) {
+            return false
+        }
+
+        if (!/[A-Z]/.test(password)) {
+           return false
+        }
+
+        if (!/[a-z]/.test(password)) {
+            return false
+        }
+
+        if (!/\d/.test(password)) {
+            return false
+        }
+        if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+            return false;
+        }
+        return true
+    }
+    function validatePhone(mobileNumber) {
+      const phoneRe = /^\d{10}$/;
+      return phoneRe.test(mobileNumber);
+    }
+
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault()
+       if (name.value.trim === "" || mobileNumber.value === "" || email.value === "" || password === "" || confirmPassword === "" ) {
+            Swal.fire({
+              title:"Error",
+              text:"All fields are required",
+              icon:"error"
+            })
+        }
+        else if ( name.value.length > 25 || name.value.length < 5 || !isNaN(name.value)) {
+            Swal.fire({
+              title: "Error",
+              text: "Name must not be empty ,Minimum 6 letters , must be within 30 charters long and should not contain numbers",
+              icon: "error"
+            });
+        } else if (!validatePhone(mobileNumber.value)) {
+            Swal.fire({
+              title: "Error",
+              text: "Phone number must be 10 digits",
+              icon: "error"
+            });
+        } else if (checkEmail(email.value)) {
+            Swal.fire({
+              title: "Error",
+              text: "Email must be valid",
+              icon: "error"
+            });
+        } else if (!validatePassword(password.value)) {
+            Swal.fire({
+              title: "Error",
+              text: "Enter a strong password",
+              icon: "error"
+            });
+        } else if (password.value != confirmPassword.value) {
+            Swal.fire({
+              title: "Error",
+              text: "Password Must be same",
+              icon: "error"
+            });
+        } else {
+            registerForm.submit()
+          }
+    })
+
+   
+   
+  </script>
+
+</body>
+</html>

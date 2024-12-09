@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zyra Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/styles/css/styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .custom-font {
+            font-family: 'Italianno', cursive;
+        }
+    </style>
+</head>
+
+<body class="bg-[#D6B8AE] min-h-screen flex flex-col">
+
+    <%- include('header') %>
+
+
+        <!-- Main Dashboard Section -->
+        <div class="flex flex-grow">
+
+            <!-- Sidebar -->
+            <aside class="bg-[#A1547E] text-white w-64 py-6 px-4 hidden lg:block">
+                <nav class="space-y-6">
+                    <a href="/admin/dashboard" class=" flex items-center space-x-4 py-2 px-3 bg-white text-black rounded-lg shadow-md">
+                        
+                        <span class="poppins-semibold" >Dashboard</span>
+                    </a>
+                    <a href="/admin/products" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span >Products</span>
+                    </a>
+                    <a href="/admin/category" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span >Category</span>
+                    </a>
+                    <a href="/admin/customers" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span>Customers</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span>Orders</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span>Coupons</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span>Banner</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+
+                        <span>Logout</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-6 bg-white">
+                <!-- Sales Summary -->
+                <section class="mb-8">
+                    <h2 class="text-xl font-semibold mb-4">Sales Summary</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Revenue -->
+                        <div class="bg-gray-100 p-4 rounded-lg text-center shadow-md">
+                            <h3 class="text-sm font-medium text-gray-500">Revenue</h3>
+                            <p class="text-xl font-bold">$7,825</p>
+                            <p class="text-red-500">-22%</p>
+                        </div>
+                        <!-- Orders -->
+                        <div class="bg-gray-100 p-4 rounded-lg text-center shadow-md">
+                            <h3 class="text-sm font-medium text-gray-500">Orders</h3>
+                            <p class="text-xl font-bold">920</p>
+                            <p class="text-red-500">-28%</p>
+                        </div>
+                        <!-- Products Sold -->
+                        <div class="bg-gray-100 p-4 rounded-lg text-center shadow-md">
+                            <h3 class="text-sm font-medium text-gray-500">Products Sold</h3>
+                            <p class="text-xl font-bold">15.5K</p>
+                            <p class="text-green-500">+46%</p>
+                        </div>
+                        <!-- Customers -->
+                        <div class="bg-gray-100 p-4 rounded-lg text-center shadow-md">
+                            <h3 class="text-sm font-medium text-gray-500">Total Customers</h3>
+                            <p class="text-xl font-bold">120</p>
+                            <p class="text-green-500">+40%</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Orders Update Chart -->
+                <section>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium">Orders Update</h3>
+                            <a href="#" class="text-sm text-blue-500">View Details</a>
+                        </div>
+                        <!-- Chart Placeholder -->
+                        <div class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                            Chart Placeholder
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-[#CBA195] py-4">
+            <div class="text-center text-sm text-black">
+                © Copyright Zyra All rights reserved
+            </div>
+        </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/styles/css/styles.css">
+</head>
+
+<body class="bg-white font-sans">
+
+  <%- include ('header') %>
+
+    <!-- Main Hero Section -->
+    <section class="hero-section relative bg-cover bg-center">
+      <div class="overlay absolute inset-0"></div>
+      <div class="relative flex items-end justify-end h-full text-white p-4">
+        <h1 class="jim-nightshade-regular text-3xl text-right  italic custom-shadow">
+          Unlock your natural glow
+        </h1>
+
+
+      </div>
+    </section>
+
+
+    <!-- Top Selling Brands Section -->
+    <section class="px-8 py-10">
+      <h2 class="kurale-regular text-2xl text-center mb-6">Top Selling Brands</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="brand-card bg-white shadow-md rounded-lg p-6 text-center ">
+          <img src="/styles/images/plum.png" alt="Brand 1" class="w-24 h-20 mx-auto mb-4">
+          <p class="kurale-regular text-2xl pb-4">Plum</p>
+        </div>
+        <div class="brand-card bg-white shadow-md rounded-lg p-6 text-center ">
+          <img src="/styles/images/aqualogica.jpeg" alt="Brand 2" class="w-24 mx-auto mb-4">
+          <p class="kurale-regular text-2xl pb-4">Aqualogica</p>
+        </div>
+        <div class="brand-card bg-white shadow-md rounded-lg p-6 text-center ">
+          <img src="/styles/images/ponds.jpeg" alt="Brand 3" class="w-24 h-20 mx-auto mb-4">
+          <p class="kurale-regular text-2xl pb-4">Ponds</p>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Trending Section -->
+    <section class="px-8 py-10">
+      <h2 class="kurale-regular text-2xl text-center mb-6">Trending</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
+        <!-- Product Card 1 -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <img src="/styles/images/aqualogica_facewash.jpg" alt="Aqualogica Hydrate Facewash" class="w-full h-56 object-contain">
+          <div class="p-4">
+            <h3 class="text-lg poppins-regular">Aqualogica Hydrate Facewash</h3>
+            <p class="text-xl text-gray-800 mt-2">Rs.249</p>
+            <p class="text-sm text-gray-500">Deep Cleansing & Hydration with coconut water & Hyaluronic Acid</p>
+          </div>
+        </div>
+    
+        <!-- Product Card 2 -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <img src="/styles/images/ponds_age.webp" alt="POND'S Age Miracle SPF 18" class="w-full h-56 object-contain">
+          <div class="p-4">
+            <h3 class="text-lg poppins-regular">POND'S Age Miracle SPF 18 Pa++ Day Cream</h3>
+            <p class="text-xl text-gray-800 mt-2">Rs.92</p>
+            <p class="text-sm text-gray-500">Pond's most advanced anti-aging technology, with Retinol-C Complex</p>
+          </div>
+        </div>
+    
+        <!-- Product Card 3 -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+          <img src="/styles/images/Lotus_sunscreen.jpg" alt="Lotus Safesun UltraRx" class="w-full h-56 object-contain">
+          <div class="p-4">
+            <h3 class="text-lg poppins-regular">Lotus Safesun UltraRx Matte Sunscreen SPF 50</h3>
+            <p class="text-xl text-gray-800 mt-2">Rs.404</p>
+            <p class="text-sm text-gray-500">Specially formulated for sensitive and acne-prone skin</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+
+    <!-- Brands Section -->
+    <section class="px-8 py-10 mx-auto">
+      <h2 class="kurale-regular text-2xl text-center mb-6">Brands</h2>
+      <div class="flex flex-wrap justify-center gap-16">
+        <img src="styles/images/aqualogica_logo.jpeg" alt="Brand Logo 1" class="w-20">
+        <img src="styles/images/plum_logo.webp" alt="Brand Logo 2" class="w-20">
+        <img src="styles/images/Mamaearth_logo.jpeg" alt="Brand Logo 3" class="w-20">
+        <img src="styles/images/ponds_logo.png" alt="Brand Logo 4" class="w-20">
+        <img src="styles/images/Biotique_logo.jpeg" alt="Brand Logo 4" class="w-20">
+        <img src="styles/images/Lotus_logo.webp" alt="Brand Logo 4" class="w-20">
+      </div>
+    </section>
+    <!-- Responsive Card Section -->
+    <div class="bg-[#F2DFD0] p-6 rounded-lg max-w-3xl mx-auto mb-8">
+      <div class="text-center">
+        <h2 class="text-lg md:text-xl font-medium text-gray-800">
+          When the sun shines, we'll shine together
+        </h2>
+        <p class="text-sm md:text-base text-gray-600 mt-2">
+          Stay up to date with our latest launches and offers!
+        </p>
+      </div>
+      <div class="flex flex-col md:flex-row justify-center items-center mt-6 space-y-4 md:space-y-0 md:space-x-10">
+        <!-- Free Delivery -->
+        <div class="flex flex-col items-center text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h18M3 3v6h18V3M3 9l2 9h14l2-9H3z" />
+          </svg>
+
+          <p class="text-sm md:text-base">Free delivery</p>
+        </div>
+
+        <!-- Best Products -->
+        <div class="flex flex-col items-center text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-6 h-6">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+          <p class="text-sm md:text-base">Only the best products</p>
+        </div>
+
+        <!-- Easy Returns -->
+        <div class="flex flex-col items-center text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-6 h-6">
+            <path
+              d="M12 2L1 6v12l11 4 11-4V6zM6.54 16.94l.7-3.93h3.11l.7 3.93L12 14.93l1.25 2.01.7-3.93h3.11l.7 3.93L20.06 12H16V8h-2v4H8V8H6v4H1.94z" />
+          </svg>
+          <p class="text-sm md:text-base">Easy returns</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <%- include ('footer') %>
+
+</body>
+
+</html>

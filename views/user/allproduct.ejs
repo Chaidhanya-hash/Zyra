@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amethysta&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="/styles/css/styles.css">
+</head>
+
+
+
+<body class="bg-gray-100">
+  <%- include('header') %>
+<!-- -------------------Breadcrumbs----------------------- -->
+<nav class="breadcrumbs text-sm text-gray-600">
+  <ul class="flex items-center space-x-2">
+    <li>
+      <a href="/" class="text-blue-500 hover:text-blue-700">Home</a>
+    </li>
+    <span class="text-gray-400">/</span>
+    <li>
+      <a href="/allproduct" class="text-blue-500 hover:text-blue-700">All Product</a>
+    </li>
+  </ul>
+</nav>
+
+  <section class="bg-white py-10">
+    <div class="container mx-auto px-6">
+        <h2 class="kurale-regular text-2xl text-center mb-6">All Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <% product.forEach((product) => { %>
+                <div class="bg-white shadow-md rounded-lg overflow-hidden mb-4">
+                    <!-- Product Image -->
+                    <a href="/productDetail/<%- product.id %>">
+                      <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-contain">
+                    </a>
+                    
+                    
+                    <!-- Product Details -->
+                    <div class="p-4">
+                        <!-- Product Name -->
+                        <h3 class="amethysta-regular text-lg text-center mb-2">
+                            <%= product.productName %>
+                        </h3>
+                        
+                        <!-- Product Description -->
+                        <p class="text-gray-600 text-sm mb-4 text-center">
+                            <%= product.productDescription %>
+                        </p>
+                        
+                        <!-- Product Price and Heart Icon -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-bold text-gray-800">
+                                ₹<%= product.productPrice %>
+                            </span>
+                            
+                            <!-- Heart Icon -->
+                            <button class="text-gray-500 hover:text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6.5 3.5 5 5.5 5c1.54 0 3.04.99 3.57 2.36h1.87C15.46 5.99 16.96 5 18.5 5 20.5 5 22 6.5 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <!------------------------------------ Pagination Controls -------------------------------->
+<div class="flex justify-center mt-3">
+  <ul class="flex space-x-2">
+      <% if (currentPage > 1) { %>
+          <li>
+              <a href="/allproduct/?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>" 
+                 class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                 Previous
+              </a>
+          </li>
+      <% } %>
+      <% for (let i = 1; i <= totalPages; i++) { %>
+          <li>
+              <a href="/allproduct/?page=<%= i %>&limit=<%= limit %>&search=<%= search %>" 
+                 class="px-4 py-2 text-sm rounded 
+                        <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
+                 <%= i %>
+              </a>
+          </li>
+      <% } %>
+      <% if (currentPage < totalPages) { %>
+          <li>
+              <a href="/allproduct/?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>" 
+                 class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                 Next
+              </a>
+          </li>
+      <% } %>
+  </ul>
+</div>
+
+    
+</section>
+
+
+
+
+  <%- include('footer') %>
+  <script>
+    console.log(product);
+  </script>
+</body>
+</html>

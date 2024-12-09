@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - Zyra Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/styles/css/styles.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-[#D6B8AE] min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <%- include('header') %>
+
+    <!-- Main Content -->
+    <div class="flex flex-grow">
+        <!-- Sidebar -->
+        <aside class="bg-[#A1547E] text-white w-64 py-6 px-4 hidden lg:block">
+            <nav class="space-y-6">
+                <a href="/admin/dashboard" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700  rounded-lg ">
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/products" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                    <span >Products</span>
+                </a>
+                <a href="/admin/category" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg ">
+                    <span>Category</span>
+                </a>
+                <a href="/admin/customers" class="flex items-center space-x-4 py-2 px-3 bg-white text-black bg-[#F7D4D4] rounded-lg">
+                    <span class="poppins-semibold">Customers</span>
+                </a>
+                <a href="/orders" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                    <span>Orders</span>
+                </a>
+                <a href="/coupons" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                    <span>Coupons</span>
+                </a>
+                <a href="/banner" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                    <span>Banner</span>
+                </a>
+                <a href="/logout" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Customers Section -->
+        <main class="flex-1 p-6 bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold">Customers</h2>
+                <div class="flex items-center">
+                    <input type="text" placeholder="Search For User" class="border border-[#A1547E] rounded-l-lg px-4 py-2 text-base w-64">
+                    <button class="bg-[#A1547E] text-white px-6 py-2 rounded-r-lg">Search</button>
+                </div>
+            </div>
+        
+            <!-- Customers Table -->
+            <div class="bg-[#D6B8AE] rounded-lg shadow-lg overflow-hidden">
+                <table class="w-full text-left text-base"> <!-- Increased text size to "text-base" -->
+                    <thead class="bg-[#A1547E] text-white">
+                        <tr>
+                            <th class="py-4 px-5">SL.No</th> <!-- Increased padding -->
+                            <th class="py-4 px-5">Name</th>
+                            <th class="py-4 px-5">Email</th>
+                            <th class="py-4 px-5">Phone</th>
+                            <th class="py-4 px-5">Status</th>
+                            <th class="py-4 px-5">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-[#F7D4D4]">
+                        <% user.forEach((user, index) => { %>
+                            <tr class="border-b hover:bg-gray-100">
+                                <!-- Serial Number -->
+                                <td class="px-5 py-3 text-center text-lg"> <!-- Increased padding and text size -->
+                                    <%= index + 1 + ((page - 1) * 8) %>
+                                </td>
+                                <!-- User Name -->
+                                <td class="px-5 py-3 text-lg">
+                                    <%= user.name %>
+                                </td>
+                                <!-- Email -->
+                                <td class="px-5 py-3 text-lg">
+                                    <%= user.email %>
+                                </td>
+                                <!-- Phone -->
+                                <td class="px-5 py-3 text-lg">
+                                    <%= user.phone %>
+                                </td>
+                                <!-- Status -->
+                                <td class="px-5 py-3 text-lg">
+                                    <% if (user.isActive) { %>
+                                        <span class="inline-block px-4 py-2 text-lg font-medium text-green-700 bg-green-100 rounded">
+                                            Active
+                                        </span>
+                                    <% } else { %>
+                                        <span class="inline-block px-4 py-2 text-lg font-medium text-red-700 bg-red-100 rounded">
+                                            Blocked
+                                        </span>
+                                    <% } %>
+                                </td>
+                                <!-- Action -->
+                                <td class="px-5 py-3 text-center text-lg">
+                                    <a href="/admin/customerstatus?id=<%= user.id %>&&status=<%= user.isActive %>" 
+                                       class="text-red-600 hover:text-red-800">
+                                        <!-- Heroicons 'X-circle' icon -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2.29 6.29a1 1 0 00-1.42 1.42l2.3 2.29-2.3 2.29a1 1 0 001.42 1.42l2.29-2.29 2.29 2.29a1 1 0 001.42-1.42l-2.29-2.29 2.29-2.29a1 1 0 00-1.42-1.42l-2.29 2.29-2.29-2.29z" />
+                                        </svg>
+                                    </a>
+                                </td>
+                                
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+        
+                <!-- Pagination -->
+                <div class="pagination-controls flex justify-center mt-6">
+                    <ul class="flex space-x-3">
+                        <!-- Previous Button -->
+                        <% if (currentPage > 1) { %>
+                            <li>
+                                <a href="/admin/customers?=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>" 
+                                   class="px-5 py-3 text-lg bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+                                    Previous
+                                </a>
+                            </li>
+                        <% } %>
+        
+                        <!-- Page Numbers -->
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li>
+                                <a href="/admin/customers?=<%= i %>&limit=<%= limit %>&search=<%= search %>" 
+                                   class="px-5 py-3 text-lg border border-gray-300 rounded 
+                                   <%= currentPage == i ? 'bg-green-500 text-white' : 'bg-gray-100 hover:bg-gray-200' %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+        
+                        <!-- Next Button -->
+                        <% if (currentPage < totalPages) { %>
+                            <li>
+                                <a href="/admin/customers?=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>" 
+                                   class="px-5 py-3 text-lg bg-gray-100 border border-gray-300 rounded hover:bg-gray-200">
+                                    Next
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </main>
+        
+    </div>
+
+    <!-- Footer -->
+    <%- include('footer') %>
+
+</body>
+
+</html>

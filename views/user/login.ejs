@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
+        rel="stylesheet">
+        <link rel="stylesheet" href="/styles/css/styles.css">
+</head>
+
+<body class="bg-white font-sans">
+
+    <!-- Navbar -->
+    <%- include ('header') %>
+    <%- include('alert') %>
+
+
+    <!-- Login Section -->
+<section class="flex items-center justify-center h-screen bg-[white]">
+    <div class="bg-[#F3E0CF] p-8 rounded-lg shadow-md w-[90%] md:w-[400px]">
+        <h2 class="text-center text-2xl font-semibold mb-6 text-[#4f322a]">Login</h2>
+
+        <!-- Login Form -->
+        <form action="/login" method="POST" class="space-y-4">
+            <!-- Email Input -->
+            <div class="mb-4">
+                <label for="email" class="block text-[#4f322a] font-medium mb-1">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d4a799]"
+                    
+                />
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-4">
+                <label for="password" class="block text-[#4f322a] font-medium mb-1">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d4a799]"
+                    
+                />
+            </div>
+
+            <!-- Forgot Password -->
+            <div class="text-right mb-4">
+                <a href="/forgot-password" class="text-sm text-[#2516F1] hover:underline">Forgot Password?</a>
+            </div>
+
+            <!-- Login Button -->
+            <button
+                type="submit"
+                class="w-full bg-black text-white py-2 rounded-md text-center hover:bg-gray-800 transition"
+            >
+                Login
+            </button>
+
+            <!-- Divider -->
+            <div class="text-center my-4 text-gray-500">or</div>
+            
+        </form>
+        <!-- Google Login -->
+        <a href="/auth/google">
+            <button
+            class="w-full flex items-center justify-center bg-white border border-gray-300 py-2 rounded-md text-center hover:bg-gray-100 transition"
+        >
+            <img src="/styles/images/google_logo.png" alt="Custom Image" class="w-5 h-5 mr-2" />
+            Google
+        </button>
+        </a>
+        <!-- New User -->
+        <div class="text-center mt-4">
+            <span class="text-sm text-gray-600">New User? </span>
+            <a href="/signup" class="text-sm text-[#2516F1] hover:underline">Create an account</a>
+        </div>
+    </div>
+</section>
+
+
+
+    <%- include ('footer') %>
+      
+    <script>
+    
+
+    </script>
+
+</body>
+
+</html>
