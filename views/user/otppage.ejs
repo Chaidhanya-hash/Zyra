@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OTP Page</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-pink-50 font-sans">
+
+<div class="bg-pink-50 font-sans">
   <!-- Navbar -->
   <%- include ('header') %>
-
+  <%- include('alert') %>
 
   <!-- OTP Section -->
 <main class="flex justify-center items-center min-h-[60vh] px-4">
@@ -50,7 +43,7 @@
   <!-- Footer -->
   <%- include ('footer') %>
 
-</body>
+</div>
 
 <script>
   const otpInputs = document.querySelectorAll('.otp-input');

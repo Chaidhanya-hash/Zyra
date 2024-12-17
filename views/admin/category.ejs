@@ -1,31 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+</style>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category - Zyra Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="/styles/css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
-
-<body class="bg-[#D6B8AE] min-h-screen flex flex-col">
+<div class="bg-[#D6B8AE] min-h-screen flex flex-col">
 
     <!-- Header -->
     <%- include('header') %>
@@ -58,7 +37,7 @@
                 <a href="/banner" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
                     <span>Banner</span>
                 </a>
-                <a href="/logout" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                <a href="/admin/logout" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
                     <span>Logout</span>
                 </a>
             </nav>
@@ -117,8 +96,8 @@
                                     <% } %>
                                 </td>
                                 <td class="px-6 py-6 text-center flex items-center justify-center gap-4">
-                                    <a href="/admin/editcategory" id="edit-collection-modal" class="text-blue-500 hover:underline" 
-                                       data-name="<%= category.categoryName %>" data-id="<%= category.id %>">✏️</a>
+                                    <a href="#" id="edit-collection-modal" class="text-blue-500 hover:underline" 
+                                       data-name="<%= category.categoryName %>" data-id="<%= category.id %>" onclick="editcat()">✏️</a>
                                     <a href="/admin/categorystatus?id=<%= category.id %>&status=<%= category.isActive %>" 
                                        class="text-yellow-500 hover:underline">⚫</a>
                                 </td>
@@ -192,10 +171,10 @@
 
         <!-- Modal Body -->
         <div class="p-4" id="editCollection">
-            <form action="/admin/addcategory" method="post">
+            <form action="/admin/editcategory" method="post">
                 <div class="mb-4">
                     <label for="categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
-                    <input type="hidden" id="editCollectionId">
+                    <input type="hidden" name="categoryId" id="editCollectionId">
                     <input
                         type="text"
                         name="categoryName"
@@ -220,18 +199,20 @@
 
 
         //-------------------edit category via forEach--------------------
+        
+            const editCollection = document.querySelectorAll('#edit-collection-modal');
+                editCollection.forEach((ele)=>{
+                    ele.addEventListener('click',function(){
+                        const name = this.getAttribute('data-name');
+                        const id = this.getAttribute('data-id');
+                        document.getElementById('editCollectionName').value = name;
+                        document.getElementById('editCollectionId').value = id;
 
-        const editCollection = document.querySelectorAll('#edit-collection-modal')
-        editCollection.forEach((ele)=>{
-            ele.addEventListener('click',function(){
-                
-                const name = this.getAttribute('data-name');
-                const id = this.getAttribute('data-id');
-                document.getElementById('editCollectionName').value = name;
-                document.getElementById('editCollectionId').value = id;
-
-            })
-        })
+                    })
+                })
+        
+        
+    
 
         //---------------------validation-------------------------
 
@@ -302,13 +283,13 @@
         });
 
         //-----------------------Modal for edit category----------------------
-
-        document.getElementById("edit-collection-modal").addEventListener("click", () => {
+        function editcat(){
             document.getElementById("editmodal").classList.remove("hidden");
-        });
+        }
+        
 
         document.getElementById("editcloseModal").addEventListener("click", () => {
-            document.getElementById("modal").classList.add("hidden");
+            document.getElementById("editmodal").classList.add("hidden");
         });
 
         // Close the modal when clicking outside the modal box
@@ -319,6 +300,5 @@
         });
         
     </script>
-</body>
 
-</html>
+</div>

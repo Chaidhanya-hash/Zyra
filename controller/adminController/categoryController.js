@@ -18,6 +18,7 @@ const category = async (req,res) =>{
         const count = await categorySchema.countDocuments({categoryName:{$regex: search, $options: 'i'}})
 
         res.render('admin/category',{
+            title:'Category',
             category,
             totalPages: Math.ceil(count/limit),
             currentPage: page,
@@ -82,7 +83,9 @@ const editCategory = async (req,res) =>{
     
     try {
         const {categoryId, categoryName} = req.body;
+        console.log(categoryId);
         const editCategory = await categorySchema.findByIdAndUpdate(categoryId, {categoryName : categoryName});
+        
         if(editCategory != null){
             req.flash('success','Category Successfully edited');
             res.redirect('/admin/category');

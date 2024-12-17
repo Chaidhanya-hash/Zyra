@@ -1,0 +1,426 @@
+<style>
+    .address-card.selected {
+        border: 2px solid #DB4444;
+    }
+
+    .payment-method.selected {
+        border-color: #007bff;
+    }
+</style>
+
+
+<%- include('header') %>
+
+<div class="container mx-auto mt-5 mb-5 main-checkout">
+    <div>
+        <!----------------------------- Shipping Address ------------------------------>
+        <div class="shipping-address-container mb-4">
+            <div class="shipping-head flex justify-between items-center border-b pb-2">
+                <h2 class="text-xl font-bold">Shipping Address</h2>
+                <div class="text-right">
+                    <% if (userDetails.address.length < 3) { %>
+                        <a href="#" id="add-address-btn" title="Add New Address" 
+                            class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                            onclick="openModal()">
+                            Add Address
+                        </a>
+                    <% } else { %>
+                        <span class="text-gray-500">Maximum 3 addresses</span>
+                    <% } %>
+                </div>
+            </div>
+            <div class="address-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                <% if (!userDetails.address || userDetails.address.length === 0) { %>
+                    <p class="mt-5 text-gray-500">No Address Found. Please add an Address.</p>
+                <% } else { %>
+                    <% userDetails.address.forEach((address, index) => { %>
+                        <div class="address-card border p-4 rounded shadow hover:shadow-lg cursor-pointer" onclick="selectAddress(this, '<%= index %>')">
+                            <div class="address-info space-y-2">
+                                <div class="checkout-icons flex justify-end space-x-2">
+                                    <a href="/editAddress/<%= index %>" title="Edit Address" class="text-blue-500 hover:text-blue-700">
+                                        ✏️
+                                    </a>
+                                    <a href="#" class="delete-address text-red-500 hover:text-red-700" data-address-index="<%= index %>" title="Delete Address">
+                                        ❌
+                                    </a>
+                                </div>
+                                <h3 class="font-bold">
+                                    <%= address.building %>,
+                                </h3>
+                                <p class="text-gray-600">
+                                    <%= address.phonenumber %>
+                                </p>
+                                <p class="text-gray-600">
+                                    <%= address.city %>, <%= address.state %>, <%= address.country %>
+                                </p>
+                                <p class="text-gray-600">
+                                    <%= address.pincode %>
+                                </p>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+
+        <!----------------------------- Billing Info ------------------------------>
+        <div class="billing-info-container border p-4 rounded shadow">
+            <div class="header flex items-center mb-4">
+                <div class="icon text-2xl mr-2">📄</div>
+                <h2 class="text-xl font-bold">Billing Info</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="mb-3">
+                    <label class="block text-gray-700 font-medium mb-2" for="billing-name">Name</label>
+                    <input type="text" class="form-input w-full border rounded px-4 py-2" name="customer_name" placeholder="Enter name" value="<%= user.name %>">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 font-medium mb-2" for="billing-email-address">Email Address</label>
+                    <input type="email" class="form-input w-full border rounded px-4 py-2" name="customer_email" placeholder="Enter email" value="<%= user.email %>" readonly>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-gray-700 font-medium mb-2" for="billing-phone">Phone</label>
+                    <input type="text" class="form-input w-full border rounded px-4 py-2" name="phonenumber" placeholder="Enter Phone no." value="<%= user.phone %>">
+                </div>
+            </div>
+        </div>
+
+        <!---------------------------- Payment Options ------------------------------->
+        <div class="payment-methods mt-8">
+            <h2 class="text-xl font-bold mb-4">Payment method :</h2>
+            <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="payment-method flex items-center border p-4 rounded shadow cursor-pointer hover:shadow-lg" onclick="selectPaymentMethod(this, 0)">
+                    <i class="bi bi-cash text-2xl mr-4"></i>
+                    <span>Cash on Delivery</span>
+                </div>
+                <div class="payment-method flex items-center border p-4 rounded shadow cursor-pointer hover:shadow-lg" onclick="selectPaymentMethod(this, 1)">
+                    <i class="bi bi-wallet-fill text-2xl mr-4"></i>
+                    <span>Wallet</span>
+                    
+                </div>
+                <div class="payment-method flex items-center border p-4 rounded shadow cursor-pointer hover:shadow-lg" onclick="selectPaymentMethod(this, 2)">
+                    <i class="bi bi-paypal text-2xl mr-4"></i>
+                    <span>Razorpay</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!----------------------------- Order Summary ------------------------------>
+<div class="order-summary">
+    <!-------------- coupon management ---------------->
+    <div class="coupon">
+        <form class="cart-form">
+            <div class="coupon-icon flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6 text-yellow-500" viewBox="0 0 16 16">
+                    <path d="M8 0a2 2 0 0 1 2 2v1H6V2a2 2 0 0 1 2-2zm3 3v1h2.5a1.5 1.5 0 0 1 0 3H11v2h2.5a1.5 1.5 0 0 1 0 3H11v1a2 2 0 0 1-2 2v-4H7v4a2 2 0 0 1-2-2v-1H2.5a1.5 1.5 0 0 1 0-3H5V7H2.5a1.5 1.5 0 0 1 0-3H5V3h6zm-2 8H6v2h3v-2z" />
+                </svg>
+                <h3 class="text-lg font-semibold">Apply Coupon</h3>
+            </div>
+            <div class="flex gap-2 mt-4 items-center">
+                <input type="text" id="couponCode" class="input-coupon border rounded-lg px-3 py-2 w-full focus:ring focus:ring-yellow-200 focus:outline-none" name="couponCode" placeholder="Enter coupon code">
+                <button type="button" id="applyCouponBtn" onclick="applyCoupon()" class="btn bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Apply</button>
+            </div>
+        </form>
+        <div id="couponBadge" class="pt-3 hidden">
+            <span class="text-green-500">Coupon Applied: <span id="appliedCouponCode"></span></span>
+            <button type="button" class="btn bg-red-500 text-white text-sm px-2 py-1 rounded-lg hover:bg-red-600 ml-2" onclick="removeCoupon()">Remove</button>
+        </div>
+    </div>
+
+    <div class="card bg-[#F4E3D3] text-black rounded-lg shadow-lg mt-6">
+        <div class="card-header px-4 py-3 border-b border-gray-700">
+            <h5 class="text-lg font-semibold">Order Summary</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table-auto w-full text-left text-black">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="py-2">Product</th>
+                            <th class="py-2">Price</th>
+                            <th class="py-2">Discount</th>
+                            <th class="py-2">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(product) { %>
+                            <tr class="border-b border-gray-700">
+                                <td class="py-2">
+                                    <%= product.productName %> x 1
+                                </td>
+                                <td class="py-2">
+                                    <%= product.productPrice %>
+                                </td>
+                                <td class="py-2">
+                                    <%= product.productDiscount %>
+                                </td>
+                                <td class="py-2">
+                                    <% totalAmount = product.productPrice - product.productPrice * (product.productDiscount / 100) %>
+                                    <%= totalAmount %>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                    <thead>
+                        <tr class="border-t border-gray-700">
+                            <th class="py-2">Sub total</th>
+                            <th></th>
+                            <th></th>
+                            <th class="py-2">
+                                <%= Math.round(totalAmount - totalAmount * (12 / 100)) %>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="py-2">GST</th>
+                            <th></th>
+                            <th>12%</th>
+                            <th class="py-2">
+                                <%= Math.round(totalAmount * (12 / 100)) %>
+                            </th>
+                        </tr>
+                        <% if(totalAmount < 1000 ){ %>
+                            <tr>
+                                <th class="py-2">Shipping Charge</th>
+                                <th></th>
+                                <th></th>
+                                <th class="py-2">50</th>
+                            </tr>
+                        <% } %>
+                        <tr class="coupon-row hidden">
+                            <th class="py-2">Coupon</th>
+                            <th></th>
+                            <th></th>
+                            <th class="coupon-discount py-2"></th>
+                        </tr>
+                        <tr>
+                            <th class="py-2">Total</th>
+                            <th></th>
+                            <th></th>
+                            <th class="total-payable-amount py-2">
+                                <%= totalAmount %>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="mt-6">
+                <% if(totalAmount > 1000 ){ %>
+                    <div class="free-delivery flex items-center bg-green-500 text-white px-4 py-3 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6 mr-2" viewBox="0 0 16 16">
+                            <path d="M5.5 9.5a.5.5 0 0 1 .5-.5H7v-1H5.5a.5.5 0 0 1-.5-.5V7h3v5H6a.5.5 0 0 1-.5-.5v-2z" />
+                            <path d="M6.5 1a.5.5 0 0 0-.5.5v3.293l-.146-.147a.5.5 0 0 0-.708.708l1 1a.5.5 0 0 0 .708 0l1-1a.5.5 0 0 0-.708-.708L7 4.793V1.5a.5.5 0 0 0-.5-.5z" />
+                            <path d="M3 5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3zm11 6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v4z" />
+                        </svg>
+                        <div>
+                            Your order is eligible for FREE Delivery.
+                        </div>
+                    </div>
+                <% } %>
+                <div class="mt-6 flex gap-4">
+                    <a href="/cart">
+                        <button class="btn bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
+                    </a>
+                    <form action="" method="post" id="place-order-form">
+                        <button type="submit" class="btn bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                            data-amount="<%= totalAmount %>" data-username="<%= user.name %>"
+                            data-mail="<%= user.email %>" data-phone="<%= user.phone %>"
+                            data-id="<%= product._id %>" id="place-order-btn">Place order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ---------------------------------- Address Adding Modal Box ---------------------------------------- -->
+<div class="fixed inset-0 z-50 flex items-center justify-center hidden" id="addressModal">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md border-4 border-[#F4E3D3]">
+        <div class="flex items-center justify-between p-4 border-b">
+            <h5 class="text-lg font-medium">Add New Address</h5>
+            <button type="button" class="text-gray-400 hover:text-gray-600" onclick="closeModal('addressModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-4">
+            <form method="post" id="checkAddress" action="/checkout-address">
+                <div class="mb-4">
+                    <label for="building" class="block text-sm font-medium text-gray-700">Flat, House no., Building, Company, Apartment</label>
+                    <input type="text" name="building" id="building" placeholder="Enter your address" 
+                        class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="street" class="block text-sm font-medium text-gray-700">Area, Street, Sector, Village</label>
+                    <input type="text" name="street" id="street" placeholder="Enter your Area" 
+                        class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="city" class="block text-sm font-medium text-gray-700">Town/City</label>
+                    <input type="text" name="city" id="city" placeholder="Enter your City" 
+                        class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="mb-4">
+                        <label for="phonenumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="text" name="phonenumber" id="phonenumber" placeholder="Contact Number" 
+                            class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="pincode" class="block text-sm font-medium text-gray-700">Pincode</label>
+                        <input type="text" name="pincode" id="pincode" placeholder="Enter your Pincode" 
+                            class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="landmark" class="block text-sm font-medium text-gray-700">Land Mark</label>
+                    <input type="text" name="landmark" id="landmark" placeholder="Enter Nearest Landmark" 
+                        class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div class="mb-4">
+                        <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                        <input type="text" name="state" id="state" placeholder="Enter your state" 
+                            class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+                        <input type="text" name="country" id="country" placeholder="Enter your Country" 
+                            class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                </div>
+                <div class="flex items-center justify-end p-4 border-t">
+                    <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" onclick="closeModal('addressModal')">Close</button>
+                    <button type="submit" class="px-4 py-2 ml-3 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600">Save</button>
+                </div>
+            </form>
+        </div>
+                      
+    </div>
+</div>
+</div>
+
+<%- include('footer') %>
+
+<script>
+    function openModal() {
+        document.getElementById('addressModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('addressModal').classList.add('hidden');
+    }
+
+    function selectAddress(element, index) {
+        const cards = document.querySelectorAll('.address-card');
+        cards.forEach(card => card.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedAddressIndex = index;
+    }
+
+    function selectPaymentMethod(element, method) {
+        const methods = document.querySelectorAll('.payment-method');
+        methods.forEach(methodElement => methodElement.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedPaymentMethod = method;
+    }
+
+
+    //------------------ Validation for the add address modal --------------------
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+            const checkAddress = document.getElementById('checkAddress');
+            const building = document.getElementsByName('building')[0];
+            const street = document.getElementsByName('street')[0];
+            const city = document.getElementsByName('city')[0];
+            const phone = document.getElementsByName('phonenumber')[0];
+            const pincode = document.getElementsByName('pincode')[0];
+            const landmark = document.getElementsByName('landmark')[0];
+            const state = document.getElementsByName('state')[0];
+            const country = document.getElementsByName('country')[0];
+
+            function validatePhone(phone) {
+                const phoneRe = /^\d{10}$/;
+                return phoneRe.test(phone);
+            }
+            function validatePincode(pincode) {
+                const pincodeRe = /^\d{6}$/;
+                return pincodeRe.test(pincode);
+            }
+            checkAddress.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (building.value.trim() === "" || !isNaN(building.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Building field must not be empty and Not a Number.",
+                        icon: "error"
+                    });
+                } else if (building.value.length > 50 || building.value.length < 4) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Building field must be Greater than 4 letters and less than 50 letters.",
+                        icon: "error"
+                    });
+                } else if (street.value.trim() === "" || !isNaN(street.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Street field must not be empty and Not a Number.",
+                        icon: "error"
+                    });
+                } else if (street.value.length > 50 || street.value.length < 4) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Street Field Must be Greater than 4 Letters and less than 50 letters.",
+                        icon: "error"
+                    });
+                } else if (city.value.trim() === "" || !isNaN(city.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "City field must not be empty and Not a Number.",
+                        icon: "error"
+                    });
+                } else if (city.value.length > 25 || city.value.length < 4) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "City field must be Greater than 4 Words and less than 25 Words.",
+                        icon: "error"
+                    });
+                } 
+                // else if (!validatePhone(phone)) {
+                //     Swal.fire({
+                //         title: "Error",
+                //         text: "Phone number must be 10 digits.",
+                //         icon: "error"
+                //     });
+                // } 
+                else if (!validatePincode(pincode.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Pincode must be 6 digits.",
+                        icon: "error"
+                    });
+                } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Landmark field must not be empty.",
+                        icon: "error"
+                    });
+                } else if (state.value.trim() === "" || !isNaN(state.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "State field must not be empty.",
+                        icon: "error"
+                    });
+                } else if (country.value.trim() === "" || !isNaN(country.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Country field must not be empty.",
+                        icon: "error"
+                    });
+                } else {
+                    checkAddress.submit();
+                }
+            });
+        });
+</script>

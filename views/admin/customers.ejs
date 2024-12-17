@@ -1,34 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+</style>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customers - Zyra Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&family=Jim+Nightshade&family=Kurale&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Italianno&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="/styles/css/styles.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
-</head>
 
-<body class="bg-[#D6B8AE] min-h-screen flex flex-col">
-
+<div class="bg-[#D6B8AE] min-h-screen flex flex-col">
     <!-- Header -->
     <%- include('header') %>
-
+    <%- include('alert') %>
     <!-- Main Content -->
     <div class="flex flex-grow">
         <!-- Sidebar -->
@@ -55,7 +35,7 @@
                 <a href="/banner" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
                     <span>Banner</span>
                 </a>
-                <a href="/logout" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
+                <a href="/admin/logout" class="flex items-center space-x-4 py-2 px-3 hover:bg-gray-700 rounded-lg">
                     <span>Logout</span>
                 </a>
             </nav>
@@ -65,10 +45,10 @@
         <main class="flex-1 p-6 bg-white">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-semibold">Customers</h2>
-                <div class="flex items-center">
-                    <input type="text" placeholder="Search For User" class="border border-[#A1547E] rounded-l-lg px-4 py-2 text-base w-64">
-                    <button class="bg-[#A1547E] text-white px-6 py-2 rounded-r-lg">Search</button>
-                </div>
+                <form action="/admin/customers" method="get" class="flex items-center gap-2">
+                    <input type="text" name="search" placeholder="Search" class="border border-gray-300 rounded-lg px-4 py-2">
+                    <input type="submit" value="Search" class="bg-[#A1547E] text-white px-4 py-2 rounded-lg cursor-pointer">
+                </form>
             </div>
         
             <!-- Customers Table -->
@@ -173,7 +153,4 @@
 
     <!-- Footer -->
     <%- include('footer') %>
-
-</body>
-
-</html>
+</div>

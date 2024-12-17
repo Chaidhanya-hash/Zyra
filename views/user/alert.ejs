@@ -29,3 +29,12 @@
         </div>
     </div>
 <% } %>
+
+<!-- -------------------------after 5 sec flash will disable-------------------- -->
+
+<script>
+    const alertDuration = 5000;
+    setTimeout(() => {
+        document.getElementsByClassName('alert-container')[0].style.display = 'none';
+    },alertDuration)
+</script>

@@ -9,7 +9,7 @@ const product = async (req,res) =>{
     try {
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 8;
+        const limit = parseInt(req.query.limit) || 4;
 
         const products = await productSchema.find({productName: {$regex: search, $options: 'i'}})
             .limit(limit)
@@ -19,6 +19,7 @@ const product = async (req,res) =>{
         const count = await productSchema.countDocuments({productName: {$regex: search, $options:'i'}})
 
         res.render('admin/products',{
+            title:'Products',
             products,
             totalPages: Math.ceil(count/limit),
             currentPage: page,
@@ -39,6 +40,7 @@ const addProduct = async (req,res) =>{
         const productCollection = await categorySchema.find()
         
         res.render('admin/addproduct',{
+            title:'Products',
             productCollection
         })
     }
@@ -111,6 +113,7 @@ const editProduct = async (req,res) =>{
         
         if(product) {
             res.render('admin/editproduct',{
+                title:'Edit Product',
                 product
             })
         } else {
@@ -199,8 +202,8 @@ const status = async(req,res)=>{
 
 const deleteProduct = async (req,res)=>{
     try {
-        // const id = req.params.id;
-        // const img = await productSchema.findById(id);
+         const id = req.params.id;
+         const img = await productSchema.findById(id);
         
         // if(!img){
         //     req.flash('error','Product not found!');
@@ -222,7 +225,7 @@ const deleteProduct = async (req,res)=>{
         })
 
         const product = await productSchema.findByIdAndDelete(id);
-        if(!product){
+        if(product){
             req.flash('success','Product removed Successfully');
             res.redirect('/admin/products');
         } else {

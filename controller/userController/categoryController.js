@@ -7,6 +7,8 @@ const categoryget = async(req,res)=>{
     try {
         const category = await categorySchema.find({isActive: true});
         res.render('user/category',{
+            title:'Category',
+            user:req.session.user,
             category
         });
     }
@@ -24,6 +26,7 @@ const allProduct = async(req,res)=>{
         const category = await categorySchema.find({isActive:true});
         const product = await productSchema.find({isActive:true});
 
+    
         
         // const product = await productSchema.find(productFilter)
         //     .skip((page-1) *limit)
@@ -32,6 +35,8 @@ const allProduct = async(req,res)=>{
         const count = await productSchema.countDocuments({product})
         
         res.render('user/allproduct',{
+            title:"All products",
+            user:req.session.user,
             product,
             category,
             search,

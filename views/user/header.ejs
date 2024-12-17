@@ -20,19 +20,51 @@
                 <img src="/styles/images/search lens_logo.webp" alt="Search Icon"
                     class="h-5 w-5 text-gray-500 cursor-pointer" />
             </div>
-
+            
             <!-- Heart Icon -->
             <img src="/styles/images/free-heart-icon-3510-thumb.png" alt="Heart Icon"
                 class="h-6 w-6 cursor-pointer" />
-
             <!-- Cart Icon -->
-            <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart Icon"
-                class="h-6 w-6 cursor-pointer" />
+            <% if(user) { %>
+                <a href="/cart">
+                    <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart Icon"
+                    class="h-6 w-6 cursor-pointer" />
+                </a>
+            <% } else { %>
+                <a href="#" onclick="CartClick(event)">
+                    <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart Icon"
+                    class="h-6 w-6 cursor-pointer" />
+                </a>
+           <% } %>
+            
         </div>
 
         <!-- Login/Signup -->
         <div class="space-x-4">
-            <button class="text-[#000000] hover:underline">LOGIN/SIGNUP</button>
+         <% if(user) { %>
+            <a href="/profile" class="text-[#000000] hover:underline">My Profile</a>
+         <% } else { %>
+            <a href="/login" class="text-[#000000] hover:underline">LOGIN/SIGNUP</a>
+         <% } %>
         </div>
     </div>
 </header>
+
+<script>
+    //------------------Only login user can access cart-----------------
+    function CartClick(event) {
+            event.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please Login',
+                text: 'You need to login to access your cart.',
+                showCancelButton: true,
+                confirmButtonText: 'Login',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+        }
+</script>

@@ -29,6 +29,7 @@ const productDetail = async (req,res)=>{
 
             return res.render('user/productDetail',{
                         title: product.productName,
+                        user:req.session.user,
                         product,
                         similarProduct
                     })

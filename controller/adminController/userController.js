@@ -16,6 +16,7 @@ const customers = async (req,res)=>{
         const count = await userSchema.countDocuments({name: {$regex: search, $options: 'i'}});
 
         res.render('admin/customers',{
+            title:'Customers',
             user,
             totalPages: Math.ceil(count / limit),
             currentPage: page,

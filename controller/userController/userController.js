@@ -10,7 +10,15 @@ const auth = require('../../services/auth');
 
 
 const login =((req,res)=>{
-    res.render('user/login');
+    if(req.session.user){
+        res.redirect('/home');
+    } else {
+        res.render('user/login',{
+            title:'Login',
+            user:req.session.user
+        });
+    }
+    
 })
 
 const loginPost = async (req,res)=>{
@@ -24,6 +32,7 @@ const loginPost = async (req,res)=>{
             } else {
                 const password = await bcrypt.compare(req.body.password,test.password);
                 if(password){
+                    req.session.user = test.id
                     res.redirect('/home');
                 } else {
                     req.flash('error','Invalid email Id or password');
@@ -91,7 +100,10 @@ const googleAuthCallback = (req,res,next)=>{
 
 
 const signup =((req,res)=>{
-    res.render('user/signup');
+    res.render('user/signup',{
+        title:'Signup',
+        user:req.session.user
+    });
 })
 
 
@@ -140,6 +152,7 @@ const otp =(req,res)=>{
     try{
         res.render('user/otppage',{
             title: 'OTP verify',
+            user:req.session.user,
             email: req.session.email,
             otpTime: req.session.otptime,
 
@@ -210,7 +223,10 @@ const otpResend = (req,res)=>{
 
 
 const home =((req,res)=>{
-    res.render('user/homepage');
+    res.render('user/homepage',{
+        title: 'Home Page',
+        user:req.session.user
+    });
 })
 
 

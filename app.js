@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const session = require('express-session');
+const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const passport = require('passport');
 const port = 3000;
@@ -42,6 +43,12 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+//---------------------------layouts----------------------------
+
+app.use(expressLayouts);
+app.set('layout','./layouts/layout')
+
 //---------------------------flash message-------------------------
 
 app.use((req,res,next)=>{

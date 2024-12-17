@@ -1,8 +1,17 @@
 const express = require('express');
 const user = express.Router();
+
+const checkUser = require('../middleware/checkUserSession');
+const activeUser = require('../middleware/activeUserSession');
+
 const userController = require('../controller/userController/userController');
 const categoryController = require('../controller/userController/categoryController');
 const productController = require('../controller/userController/productController');
+const forgotPassword = require('../controller/userController/forgotPassword');
+const profileController = require('../controller/userController/profileController');
+const cartController = require('../controller/userController/cartController');
+const singleProductController = require('../controller/userController/singleProductController');
+const checkoutController = require('../controller/userController/checkOutController');
 //------------------------login---------------------
 
 user.get('/login',userController.login);
@@ -29,18 +38,74 @@ user.post('/otp',userController.otppost);
 
 user.get('/resendotp',userController.otpResend);
 
-//----------------------home-----------------------------
+//--------------------forgot password-------------------
 
-user.get('/home', userController.home)
+user.get('/forgotpassword',forgotPassword.forgotPassword);
 
-//----------------------category-----------------------
+user.post('/forgotpassword',forgotPassword.forgotPasswordPost);
 
-user.get('/category',categoryController.categoryget);
+user.get('/forgotPasswordOtp',forgotPassword.forgotPasswordOtp);
 
-//-------------------products----------------------
+user.post('/forgotPasswordOtp',forgotPassword.forgotPasswordOtpPost);
 
-user.get('/allproduct',categoryController.allProduct);
+user.post('/resetPassword',forgotPassword.resetPasswordPost);
 
-user.get('/productDetail/:id',productController.productDetail);
+user.get('/forgotpassword-resendotp',forgotPassword.forgotResend);
+
+//-----------------------------home-----------------------------
+
+user.get('/home',checkUser, userController.home)
+
+//---------------------------category----------------------------
+
+user.get('/category',checkUser, categoryController.categoryget);
+
+//-----------------------------products----------------------------
+
+user.get('/allproduct',checkUser, categoryController.allProduct);
+
+user.get('/productDetail/:id',checkUser, productController.productDetail);
+
+//------------------------Profile Routes-----------------------
+
+user.get('/profile',activeUser, profileController.profile);
+
+user.post('/update-profile',activeUser, profileController.updateProfile);
+
+user.post('/add-address',activeUser, profileController.addAddress);
+
+user.get('/remove-address/:index',activeUser, profileController.removeAddress);
+
+user.get('/edit-address/:index',activeUser, profileController.editAddress);
+
+user.post('/update-address/:index',activeUser, profileController.updateAddress);
+
+//------------------------------Cart------------------------------
+
+user.get('/cart',activeUser,cartController.cart);
+
+user.get('/add-to-cart/:id',activeUser,cartController.addToCartPost);
+
+user.delete('/remove-item/:id',activeUser,cartController.removeItem);
+
+user.post('/cart/increment',activeUser,cartController.increment);
+
+user.post('/cart/decrement',activeUser,cartController.decrement);
+
+//-----------------------checkout----------------------
+
+user.get('/checkOut',activeUser,checkoutController.checkout);
+
+user.post('/checkout-address',activeUser,checkoutController.addAddress);
+
+user.post('/place-order/:address/:payment',activeUser,checkoutController.placeOrder);
+
+
+
+//----------------------Single product order---------------
+
+user.get('/product-checkout/:id',activeUser,singleProductController.checkOut);
+
+
 
 module.exports = user;  
