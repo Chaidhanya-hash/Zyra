@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const nocache = require('nocache');
 const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
@@ -33,6 +34,7 @@ app.use(express.urlencoded({extended:true}));
 
 //--------------------middlewares---------------------------------
 
+app.use(nocache())
 app.use(session({
     secret:'my-secret-key',
     resave:false,

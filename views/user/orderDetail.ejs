@@ -1,0 +1,89 @@
+<%- include('header') %>
+
+<div id="content">
+    <!---------------------- Breadcrumbs ----------------------->
+    <nav class="order-details mb-4">
+        <ul class="flex items-center space-x-2 text-gray-600">
+            <li><a href="/orders" class="hover:underline text-blue-500">Order</a></li>
+            <span>/</span>
+            <li><a href="" class="hover:underline text-blue-500">Order Details</a></li>
+        </ul>
+    </nav>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Order Details</h1>
+
+    <div class="flex flex-col md:flex-row gap-6 mb-8">
+        <!-- Shipping Card -->
+        <div class="w-full md:w-1/2 bg-white shadow-md rounded-lg p-6">
+            <h4 class="text-lg font-semibold mb-4">Shipping Address</h4>
+            <div class="text-gray-600">
+                <% if (orderDetails.address) { %>
+                    <p>
+                        <strong>Name:</strong> <%= orderDetails.address.customer_name %><br>
+                        <strong>Address:</strong> <%= orderDetails.address.building %><br>
+                        <strong>Street:</strong> <%= orderDetails.address.street %><br>
+                        <strong>City:</strong> <%= orderDetails.address.city %><br>
+                        <strong>Pincode:</strong> <%= orderDetails.address.pincode %><br>
+                        <strong>Phone number:</strong> <%= orderDetails.address.phonenumber %>
+                    </p>
+                <% } else { %>
+                    <p class="text-red-500">Address Not Available</p>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Payment Card -->
+        <div class="w-full md:w-1/2 bg-white shadow-md rounded-lg p-6">
+            <h4 class="text-lg font-semibold mb-4">Payment Details</h4>
+            <div class="text-gray-600">
+                <p>
+                    <strong>Method:</strong> <span class="text-green-500"><%= orderDetails.paymentMethod %></span><br>
+                    <strong>Total Amount:</strong> <span class="text-blue-500"><%= orderDetails.totalPrice %></span><br>
+                    <strong>Status:</strong> <span class="font-semibold"><%= orderDetails.orderStatus %></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!----------------------------- Ordered Items Section --------------------------------->
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Ordered Items</h2>
+    <div class="space-y-4">
+        <% for (let i = 0; i < orderDetails.products.length; i += 4) { %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% for (let j = i; j < i + 4 && j < orderDetails.products.length; j++) { %>
+                    <% let item = orderDetails.products[j]; %>
+                    <div class="bg-white shadow-md rounded-lg p-4">
+                        <% if (item.product_image && item.product_image.length > 0) { %>
+                            <img src="<%= item.product_image %>" class="w-full h-32 object-cover rounded mb-4" alt="Product Image">
+                        <% } else { %>
+                            <img src="placeholder.jpg" class="w-full h-32 object-cover rounded mb-4" alt="Product Image">
+                        <% } %>
+                        <div class="text-gray-800">
+                            <h5 class="font-semibold text-lg mb-2"><%= item.product_name %></h5>
+                            <p class="text-sm"><strong>Qty:</strong> <%= item.product_quantity %></p>
+                            <p class="text-sm"><strong>Total:</strong> ₹<%= item.product_price * item.product_quantity %></p>
+                            <p class="text-sm">
+                                <strong>Status:</strong>
+                                <% if (orderDetails.orderStatus === 'Pending') { %>
+                                    <span class="bg-blue-500 text-white px-2 py-1 rounded">Pending</span>
+                                <% } else if (orderDetails.orderStatus === 'Confirmed') { %>
+                                    <span class="bg-green-500 text-white px-2 py-1 rounded">Confirmed</span>
+                                <% } else if (orderDetails.orderStatus === 'Returned') { %>
+                                    <span class="bg-red-500 text-white px-2 py-1 rounded">Returned</span>
+                                <% } else if (orderDetails.orderStatus === 'Delivered') { %>
+                                    <span class="bg-green-600 text-white px-2 py-1 rounded">Delivered</span>
+                                <% } else if (orderDetails.orderStatus === 'Cancelled') { %>
+                                    <span class="bg-yellow-500 text-black px-2 py-1 rounded">Cancelled</span>
+                                <% } else if (orderDetails.orderStatus === 'Shipped') { %>
+                                    <span class="bg-gray-500 text-white px-2 py-1 rounded">Shipped</span>
+                                <% } %>
+                            </p>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('footer') %>

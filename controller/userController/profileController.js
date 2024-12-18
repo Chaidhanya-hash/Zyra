@@ -118,6 +118,7 @@ const removeAddress = async ( req,res) =>{
 const editAddress = async (req,res) =>{
     const index = Number(req.params.index);
     const id = req.session.user;
+    const context = 'Profile';
     try {
         const getAddress = await userSchema.findById({_id : id},{ address: {$slice: [index,1] } });
 
@@ -126,7 +127,8 @@ const editAddress = async (req,res) =>{
                 title:'Edit Address',
                 data : getAddress.address[0],
                 index,
-                user: req.session.user
+                user: req.session.user,
+                context
             })
         } else {
             res.redirect('/profile');

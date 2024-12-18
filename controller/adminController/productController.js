@@ -110,11 +110,13 @@ const editProduct = async (req,res) =>{
     try {
         const id = req.params.id;
         const product = await productSchema.findById(id)
+        const category = await categorySchema.find();
         
         if(product) {
             res.render('admin/editproduct',{
                 title:'Edit Product',
-                product
+                product,
+                category
             })
         } else {
             req.flash('error','Unable to edit product')

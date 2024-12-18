@@ -1,0 +1,194 @@
+<style>
+    
+</style>
+
+
+<%- include('header') %>
+
+<%- include('alert') %>
+
+<div class="container mx-auto mt-10">
+    <h1 class="text-2xl font-bold text-center mb-6">My Orders</h1>
+    <% if(orderDetails.length != 0) { %>
+        <ul class="flex justify-center space-x-20 mb-6">
+            <li>
+                <a>
+                <button class=" px-4 py-2  bg-red-500 text-white rounded-md focus:outline-none hover:bg-red-600 hover:text-black border-2 hover:border-red-500" id="all-orders-tab" onclick="filterOrders('All')">
+                    All Orders
+                </button>
+                </a>
+            </li>
+            <li>
+                <a>
+                <button class="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none hover:bg-red-600 hover:text-black border-2 hover:border-red-500" id="returned-orders-tab" onclick="filterOrders('Returned')">
+                    Returned Orders
+                </button>
+                </a>
+            </li>
+            <li>
+                <a>
+                <button class="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none hover:bg-red-600 hover:text-black border-2 hover:border-red-500" id="canceled-orders-tab" onclick="filterOrders('Cancelled')">
+                    Canceled Orders
+                </button>
+                </a>
+            </li>
+            <li>
+                <a>
+                <button class="px-4 py-2 bg-red-500 text-white rounded-md focus:outline-none hover:bg-red-600 hover:text-black border-2 hover:border-red-500" id="delivered-orders-tab" onclick="filterOrders('Delivered')">
+                    Delivered Orders
+                </button>
+                </a>
+            </li>
+        </ul>
+
+        <div class="grid grid-cols-1 gap-6 mb-8" id="orderContainer">
+            <% orderDetails.forEach((item, index) => { %>
+              <div class="bg-[#F4E3D3] shadow-lg rounded-xl p-6 border-2 border-red-400" data-status="<%= item.orderStatus %>">
+                <% item.products.forEach((product, index) => { %>
+                  <div class="flex items-start space-x-6 mb-6">
+                    <img src="<%= product.product_image %>" class="w-24 h-24 rounded-lg object-cover">
+                    <div class="flex-1">
+                      <h5 class="text-lg font-semibold mb-2"><%= product.product_name %></h5>
+                      <p class="text-sm text-gray-700">Quantity: <b><%= product.product_quantity %></b></p>
+                      <p class="text-sm text-gray-700">Price: <b>&#8377; <%= product.product_price.toLocaleString() %></b></p>
+                    </div>
+                  </div>
+                  <hr class="border-red-200 my-4">
+                <% }) %>
+                <div class="grid grid-cols-5 gap-6">
+                  <div>
+                    <p class="text-sm text-gray-600">Order Placed</p>
+                    <h6 class="text-sm font-medium"><%= item.createdAt.toDateString() %></h6>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600">Order ID</p>
+                    <h6 class="text-sm font-medium"><%= item.order_id %></h6>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600">Order Status</p>
+                    <h6 class="text-sm font-medium">
+                      <% if(item.orderStatus === 'Pending') { %>
+                        <span class="text-blue-500"><%= item.orderStatus %></span>
+                      <% } else if(item.orderStatus === 'Confirmed') { %>
+                        <span class="text-green-500"><%= item.orderStatus %></span>
+                      <% } else if(item.orderStatus === 'Returned') { %>
+                        <span class="text-red-500"><%= item.orderStatus %></span>
+                      <% } else if(item.orderStatus === 'Delivered') { %>
+                        <span class="text-green-500"><%= item.orderStatus %></span>
+                      <% } else if(item.orderStatus === 'Cancelled') { %>
+                        <span class="text-yellow-500"><%= item.orderStatus %></span>
+                      <% } else if(item.orderStatus === 'Shipped') { %>
+                        <span class="text-gray-500"><%= item.orderStatus %></span>
+                      <% } %>
+                    </h6>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-600">Total Price</p>
+                    <h6 class="text-sm font-medium">&#8377; <%= item.totalPrice.toLocaleString() %></h6>
+                  </div>
+                  <div class="text-center">
+                    <a href="/orderDetail/<%= item._id %>" class="text-red-500 hover:text-red-600 transition">
+                        📝🧐
+                    </a>
+                  </div>
+                </div>
+                <div class="flex justify-end space-x-4 mt-6">
+                  <% if(item.paymentStatus === "Pending") { %>
+                    <button onclick="retryPayment('<%= item.id %>')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Retry Payment</button>
+                  <% } else if(item.orderStatus === 'Delivered') { %>
+                    <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" data-id="<%= item._id %>" onclick="returnOrder()">Return Order</button>
+                    <button onclick="downloadInvoice('<%= item._id %>')" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Invoice</button>
+                  <% } else if(item.orderStatus === 'Confirmed' || item.orderStatus === 'Shipped') { %>
+                    <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" id="cancelOrder" data-id="<%= item._id %>" onclick="cancelOrder()">Cancel Order</button>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+          
+    <% } else { %>
+        <div class="flex justify-center items-center flex-col space-y-4 mt-10">
+            <h2 class="text-xl text-gray-700">You have no orders</h2>
+            <a href="/home" class="px-6 py-2 bg-red-500 text-white rounded-md">Shop Now</a>
+        </div>
+    <% } %>
+</div>
+
+<%- include('footer') %>
+
+<!-------------------- Modal for Cancel Order ------------------------->
+
+<div id="cancelOrderModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md">
+        <div class="px-6 py-4 border-b">
+            <h5 class="text-lg font-semibold" id="cancelOrderModalLabel">Cancel Order</h5>
+        </div>
+        <div class="px-6 py-4">
+            <form>
+                <div class="mb-4">
+                    <label for="cancelReason" class="block text-sm font-medium text-gray-700">Reason for Cancellation</label>
+                    <textarea id="cancelReason" class="w-full mt-1 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm p-2" rows="3" required></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="px-6 py-4 border-t flex justify-end space-x-4">
+            <button type="button" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none" 
+                onclick="document.getElementById('cancelOrderModal').classList.add('hidden')">Close</button>
+            <a class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none" id="submitCancelOrder">Confirm</a>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    //----------------------- filter order ------------------------------
+    function filterOrders(status) {
+        const orders = document.querySelectorAll('.order-container');
+        orders.forEach(order => {
+            if (status === 'All' || order.getAttribute('data-status') === status) {
+                order.style.display = 'block';
+            } else {
+                order.style.display = 'none';
+            }
+        });
+    }
+
+    function cancelOrder(){
+        document.getElementById('cancelOrderModal').classList.remove('hidden');
+    }
+
+    
+
+    //----------------------- cancel order ------------------------------
+    document.querySelectorAll('#cancelOrder').forEach((btn) => {
+        btn.addEventListener('click', function () {
+            const orderId = this.getAttribute('data-id');
+            document.getElementById('submitCancelOrder').setAttribute('href', `/cancelOrder/${orderId}`);
+        });
+    });
+    document.getElementById('submitCancelOrder').addEventListener('click', function (event) {
+        event.preventDefault();
+        const href = this.getAttribute('href');
+        console.log(href);
+        fetch(href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reason: document.getElementById('cancelReason').value })
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/orders';
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Failed to cancel order",
+                    text: "Try Again"
+                });
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>

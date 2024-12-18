@@ -229,6 +229,20 @@ const home =((req,res)=>{
     });
 })
 
+//---------------------logout-----------------------
+
+const logout = async (req,res) =>{
+    try {
+        req.session.destroy(error =>{
+            if(error){
+                console.log(`error in logging out user ${error}`);
+            }
+        })
+    }
+    catch(error){
+        console.log(`error in user logout ${error}`);
+    }
+}
 
 module.exports ={
     login,
@@ -240,5 +254,6 @@ module.exports ={
     otppost,
     otpResend,
     loginPost,
-    home
+    home,
+    logout
 }

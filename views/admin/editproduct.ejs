@@ -25,12 +25,14 @@
                             <div class="mt-4">
                                 <label class="form-label block text-sm font-medium text-gray-700"
                                     for="productCollection">Category</label>
+                                    
                                 <select name="productCollection" id="productCollection"
                                     class="form-control bg-[#FFFFFF] text-black form-input w-full p-2 border rounded  focus:outline-none edit-product-disable"
-                                    disabled required>
-                                    <option value="" selected >
-                                        <%= product.productCategory %>
-                                    </option>
+                                     required>
+                                     <% category.forEach((category) => { %>
+                                        <option value="<%= category.categoryName %>" <% if (category.categoryName === product.productCategory) { %> selected <% } %>><%= category.categoryName %></option>
+                                      <% }) %>
+                                    
                                 </select>
                             </div>
 
@@ -222,7 +224,7 @@
                 });
             }
 
-            
+        
         
     </script>
 

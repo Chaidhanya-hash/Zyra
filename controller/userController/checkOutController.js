@@ -2,6 +2,7 @@ const productSchema = require('../../model/productSchema')
 const cartSchema = require('../../model/cartSchema')
 const userSchema = require('../../model/userSchema')
 const orderSchema = require('../../model/orderSchema')
+const {ObjectId} = require('mongodb');
 
 //----------------------checkout page rendering------------------
 
@@ -77,6 +78,99 @@ const addAddress = async (req, res) => {
     }
 }
 
+//-------------------------Edit Address----------------------
+
+const editAddress = async (req,res) =>{
+    const index = Number(req.params.index);
+    const id = req.session.user;
+    const context = 'Checkout';
+    try {
+        const getAddress = await userSchema.findOne({_id: id},{address: { $slice: [index,1] } });
+
+        if(getAddress){
+            res.render('user/editAddress',{
+                title:'Edit Address',
+                data:getAddress.address[0],
+                index,
+                user:req.session.user,
+                context
+            })
+        } else {
+            res.redirect('/checkOut');
+        }
+    }
+    catch(error){
+        console.log(`error in editing address from checkout page ${error}`);
+        req.flash('error','error while rendering Edit adress page, Please try again later');
+        res.redirect('/checkOut');
+    }
+}
+
+//-----------------updating existing address---------------------
+
+const updateAddress = async (req,res) =>{
+    const id = req.session.user;
+    const index = parseInt(req.params.index, 10);
+    const data = {
+        building : req.body.building,
+        street : req.body.street,
+        city : req.body.city,
+        state : req.body.state,
+        country : req.body.country,
+        pincode :req.body.pincode,
+        phoneNumber : req.body.phonenumber,
+        landmark : req.body.landmark
+    }
+    try {
+        const updateQuery = {};
+        updateQuery[`address.${index}`] = data;
+
+        const result = await userSchema.updateOne(
+            {_id: new ObjectId(id)},
+            {$set : updateQuery}
+        )
+
+        req.flash('success','Address updated succssfully');
+        res.redirect('/checkOut');
+    }
+    catch(error){
+        console.log(`error while editing the address ${error}`);
+        req.flash('error','Cannot update the address right now, Please try again later');
+        res.redirect('/checkOut');
+    }
+}
+
+//------------------------Delete address------------------------
+
+const removeAddress = async (req,res) =>{
+    try {
+        const userId = req.session.user;
+        const index = parseInt(req.params.index, 10);
+
+        const user = await userSchema.findById(userId).populate('address');
+        if(!user){
+            req.flash('error','user not found');
+            res.redirect('/login');
+        }
+
+        if(isNaN(index) || index < 0 || index >= user.address.length){
+            req.flash('error','Invalid address');
+            return res.redirect('/checkOut');
+        }
+
+        user.address.splice(index,1);
+        await user.save();
+
+        req.flash('success','Address deleted Successfully');
+        res.redirect('/checkOut');
+    }
+    catch(error) {
+        console.log(`error in removing address from checkout page ${error}`);
+        req.flash('error','Failed to delete address. Please try again later');
+        res.redirect('/checkOut');
+    }
+}
+
 //------------------------placing order---------------------
 
 const placeOrder = async (req,res) =>{
@@ -90,6 +184,7 @@ const placeOrder = async (req,res) =>{
         const {payment_status , couponCode} = req.body;
 
         const cartItems = await cartSchema.findOne({userId}).populate("items.productId");
+        
         if(!cartItems || !cartItems.items || cartItems.items.length === 0){
             return res.status(400).json({success: false, message:'Your cart is empty or could not be found. '});
         }
@@ -171,8 +266,30 @@ const placeOrder = async (req,res) =>{
     }
 }
 
+//-------------------order successfull page---------------------
+
+const orderPage = async (req,res) =>{
+    try {
+        const userId = req.session.user;
+        const user = await userSchema.findById(userId);
+
+        const orders = await orderSchema.findOne({customer_id: userId}).sort({createdAt: -1}).limit(1);
+        res.render('user/conform-order',{
+            title:'Order confirmed',
+            orders: orders
+        })
+    }
+    catch(error){
+        console.log(`error in rendering order conform page ${error}`);
+    }
+}
+
 module.exports = {
     addAddress,
     checkout,
-    placeOrder
+    placeOrder,
+    orderPage,
+    removeAddress,
+    editAddress,
+    updateAddress
 }

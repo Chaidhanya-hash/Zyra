@@ -37,7 +37,7 @@
                         <div class="address-card border p-4 rounded shadow hover:shadow-lg cursor-pointer" onclick="selectAddress(this, '<%= index %>')">
                             <div class="address-info space-y-2">
                                 <div class="checkout-icons flex justify-end space-x-2">
-                                    <a href="/editAddress/<%= index %>" title="Edit Address" class="text-blue-500 hover:text-blue-700">
+                                    <a href="/edit-Address-singlecheckout/<%= index %>" title="Edit Address" class="text-blue-500 hover:text-blue-700">
                                         ✏️
                                     </a>
                                     <a href="#" class="delete-address text-red-500 hover:text-red-700" data-address-index="<%= index %>" title="Delete Address">
@@ -304,6 +304,16 @@
 <%- include('footer') %>
 
 <script>
+    let selectedAddressIndex = null;
+    let selectedPaymentMethod = null;
+
+    const orderPlacementBtn = document.getElementById('place-order-btn');
+    let totalAmount = orderPlacementBtn.getAttribute('data-amount');
+    const username = orderPlacementBtn.getAttribute('data-username');
+    const email = orderPlacementBtn.getAttribute('data-email');
+    const phone = orderPlacementBtn.getAttribute('data-phone');
+    let productId = orderPlacementBtn.getAttribute('data-id');
+
     function openModal() {
         document.getElementById('addressModal').classList.remove('hidden');
     }
@@ -326,7 +336,67 @@
         selectedPaymentMethod = method;
     }
 
+    orderPlacementBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+            if (selectedAddressIndex === null) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Please select a shipping address.",
+                    text: "Select one"
+                });
+                return;
+            }
+            if (selectedPaymentMethod === null) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Please select a payment method.",
+                    text: "Select one"
+                });
+                return;
+            }
+            if (selectedPaymentMethod === 2) {
+                openRazorpayPayment();
+            } else {
+                placeOrder(selectedAddressIndex, selectedPaymentMethod , productId);
+            }
+    });
 
+        function placeOrder(addressIndex, paymentMethod , productId) {
+            const couponCode = document.getElementById('couponCode').value.trim();
+            const URL = `/singleOrder/${productId}/${addressIndex}/${paymentMethod}`;
+            fetch(URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    addressIndex: addressIndex,
+                    paymentMode: paymentMethod,
+                    productId : productId,
+                    couponCode: couponCode
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "/conform-order";
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Order Placement Failed",
+                            text: data.message,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Order Placement Failed',
+                        text: error.message,
+                    });
+                });
+        }
     //------------------ Validation for the add address modal --------------------
 
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -387,13 +457,13 @@
                         icon: "error"
                     });
                 } 
-                // else if (!validatePhone(phone)) {
-                //     Swal.fire({
-                //         title: "Error",
-                //         text: "Phone number must be 10 digits.",
-                //         icon: "error"
-                //     });
-                // } 
+                else if (!validatePhone(phone)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Phone number must be 10 digits.",
+                        icon: "error"
+                    });
+                } 
                 else if (!validatePincode(pincode.value)) {
                     Swal.fire({
                         title: "Error",
@@ -421,6 +491,40 @@
                 } else {
                     checkAddress.submit();
                 }
+            });
+        });
+
+    //----------------------- delete address ------------------------------
+
+    document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.delete-address');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const addressIndex = parseInt(this.getAttribute('data-address-index'));
+                    if (!isNaN(addressIndex) && addressIndex >= 0) {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/removeAddress/" + addressIndex;
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Address Index',
+                            text: 'The address index is invalid. Please try again.'
+                        });
+                    }
+                });
             });
         });
 </script>
