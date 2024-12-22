@@ -17,6 +17,7 @@
   <section class="bg-white py-10">
     <div class="container mx-auto px-6">
         <h2 class="kurale-regular text-2xl text-center mb-6">All Products</h2>
+        <%- include('filter') %>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <% product.forEach((product) => { %>
                 <div class="bg-white shadow-md rounded-lg overflow-hidden mb-4">
@@ -63,43 +64,7 @@
             <% }) %>
         </div>
     </div>
-
-    <!------------------------------------ Pagination Controls -------------------------------->
-<div class="flex justify-center mt-3">
-  <ul class="flex space-x-2">
-      <% if (currentPage > 1) { %>
-          <li>
-              <a href="/allproduct/?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>" 
-                 class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
-                 Previous
-              </a>
-          </li>
-      <% } %>
-      <% for (let i = 1; i <= totalPages; i++) { %>
-          <li>
-              <a href="/allproduct/?page=<%= i %>&limit=<%= limit %>&search=<%= search %>" 
-                 class="px-4 py-2 text-sm rounded 
-                        <%= currentPage == i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
-                 <%= i %>
-              </a>
-          </li>
-      <% } %>
-      <% if (currentPage < totalPages) { %>
-          <li>
-              <a href="/allproduct/?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>" 
-                 class="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
-                 Next
-              </a>
-          </li>
-      <% } %>
-  </ul>
-</div>
-
-    
 </section>
-
-
-
 
   <%- include('footer') %>
   

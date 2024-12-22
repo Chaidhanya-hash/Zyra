@@ -16,63 +16,63 @@
       </div>
     </section>
 
-
-    <!-- Top Selling Brands Section -->
-    <section class="px-8 py-10">
-      <h2 class="kurale-regular text-2xl text-center mb-6">Top Selling Brands</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="brand-card bg-white shadow-md rounded-lg p-6 text-center ">
-          <img src="/styles/images/plum.png" alt="Brand 1" class="w-24 h-20 mx-auto mb-4">
-          <p class="kurale-regular text-2xl pb-4">Plum</p>
-        </div>
-        <div class="brand-card bg-white shadow-md rounded-lg p-6 text-center ">
-          <img src="/styles/images/aqualogica.jpeg" alt="Brand 2" class="w-24 mx-auto mb-4">
-          <p class="kurale-regular text-2xl pb-4">Aqualogica</p>
-        </div>
-        <div class="brand-card bg-white shadow-md rounded-lg p-6 text-center ">
-          <img src="/styles/images/ponds.jpeg" alt="Brand 3" class="w-24 h-20 mx-auto mb-4">
-          <p class="kurale-regular text-2xl pb-4">Ponds</p>
-        </div>
+  <div class="relative">
+    <section class="bg-white py-10">
+      <div class="container mx-auto px-6">
+          <h2 class="kurale-regular text-2xl text-center mb-6">Our Products</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <% product.forEach((product) => { %>
+                  <div class="bg-white shadow-md rounded-lg overflow-hidden mb-4">
+                      <!-- Product Image -->
+                      <a href="/productDetail/<%- product.id %>">
+                        <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-contain">
+                      </a>
+                      
+                      
+                      <!-- Product Details -->
+                      <div class="p-4">
+                          <!-- Product Name -->
+                          <h3 class="amethysta-regular text-lg text-center mb-2">
+                              <%= product.productName %>
+                          </h3>
+                          
+                          <!-- Product Description -->
+                          <p class="text-gray-600 text-sm mb-4 text-center">
+                              <%= product.productDescription %>
+                          </p>
+                          
+                          <!-- Product Price and Heart Icon -->
+                          <div class="flex justify-between items-center">
+                              <span class="text-lg font-bold text-gray-800">
+                                  ₹<%= product.productPrice %>
+                              </span>
+                              <div>
+                              <!-- Cart Icon -->
+                              <a onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>','<%= user %>')">
+                                <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart Icon"
+                                class="h-6 w-6 cursor-pointer" />
+                              </a>
+                              </div>
+                              <div>
+                              <!-- Heart Icon -->
+                              <a class="text-gray-500 hover:text-red-500">
+                                <img src="/styles/images/free-heart-icon-3510-thumb.png" alt="Heart Icon"
+                                class="h-6 w-6 cursor-pointer " />
+                              </a>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+              <% }) %>
+          </div>
       </div>
-    </section>
-
-
-
-    <!-- Trending Section -->
-    <section class="px-8 py-10">
-      <h2 class="kurale-regular text-2xl text-center mb-6">Trending</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
-        <!-- Product Card 1 -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="/styles/images/aqualogica_facewash.jpg" alt="Aqualogica Hydrate Facewash" class="w-full h-56 object-contain">
-          <div class="p-4">
-            <h3 class="text-lg poppins-regular">Aqualogica Hydrate Facewash</h3>
-            <p class="text-xl text-gray-800 mt-2">Rs.249</p>
-            <p class="text-sm text-gray-500">Deep Cleansing & Hydration with coconut water & Hyaluronic Acid</p>
-          </div>
-        </div>
-    
-        <!-- Product Card 2 -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="/styles/images/ponds_age.webp" alt="POND'S Age Miracle SPF 18" class="w-full h-56 object-contain">
-          <div class="p-4">
-            <h3 class="text-lg poppins-regular">POND'S Age Miracle SPF 18 Pa++ Day Cream</h3>
-            <p class="text-xl text-gray-800 mt-2">Rs.92</p>
-            <p class="text-sm text-gray-500">Pond's most advanced anti-aging technology, with Retinol-C Complex</p>
-          </div>
-        </div>
-    
-        <!-- Product Card 3 -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <img src="/styles/images/Lotus_sunscreen.jpg" alt="Lotus Safesun UltraRx" class="w-full h-56 object-contain">
-          <div class="p-4">
-            <h3 class="text-lg poppins-regular">Lotus Safesun UltraRx Matte Sunscreen SPF 50</h3>
-            <p class="text-xl text-gray-800 mt-2">Rs.404</p>
-            <p class="text-sm text-gray-500">Specially formulated for sensitive and acne-prone skin</p>
-          </div>
-        </div>
-      </div>
-    </section>
+      
+  </section>
+  <!-- Show All Products Button -->
+ <a href="/allproduct" class="absolute bottom-1 right-10  text-blue-800  py-2 px-4 hover:underline transition-colors">
+      Show All Products
+  </a>
+</div>
     
 
     <!-- Brands Section -->

@@ -6,6 +6,7 @@ const sendOTP = require('../../services/emailsender');
 const generateOTP = require('../../services/generateotp');
 const passport = require('passport');
 const auth = require('../../services/auth');
+const productSchema = require('../../model/productSchema');
 
 
 
@@ -222,12 +223,23 @@ const otpResend = (req,res)=>{
 
 
 
-const home =((req,res)=>{
-    res.render('user/homepage',{
-        title: 'Home Page',
-        user:req.session.user
-    });
-})
+const home = async (req,res)=>{
+    try {
+        const product = await productSchema.find({isActive: true})
+            .limit(8)
+            .sort({createdAt: -1})
+
+        res.render('user/homepage',{
+            title: 'Home Page',
+            product,
+            user:req.session.user
+        });
+    } 
+    catch (error) {
+        console.log(`error in rendering home page ${error}`);
+    }
+    
+}
 
 //---------------------logout-----------------------
 
@@ -238,6 +250,7 @@ const logout = async (req,res) =>{
                 console.log(`error in logging out user ${error}`);
             }
         })
+        res.redirect('/home');
     }
     catch(error){
         console.log(`error in user logout ${error}`);

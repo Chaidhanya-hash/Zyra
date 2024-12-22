@@ -153,11 +153,11 @@ addProductForm.addEventListener('submit', (e) => {
             text: "Product name must be at least 4 characters long.",
         });
         isValid = false;
-    } else if (!/^[A-Za-z\s\+]+$/.test(productName.value)) {
+    } else if (!/^[A-Za-z0-9\s\+&]+$/.test(productName.value)) {
     Swal.fire({
         icon: "error",
         title: "Invalid Product Name",
-        text: "Product name must contain only alphabets and '+' sign.",
+        text: "Product name must contain only alphabets,numbers,'&' and '+' sign.",
     });
     isValid = false;
 }

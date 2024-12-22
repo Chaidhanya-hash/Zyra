@@ -83,6 +83,10 @@ user.get('/edit-address/:index',activeUser, profileController.editAddress);
 
 user.post('/update-address/:index',activeUser, profileController.updateAddress);
 
+user.get('/ressetprofile-password',activeUser,profileController.ressetPassword);
+
+user.post('/ressetprofile-password',activeUser,profileController.ressetPasswordPost);
+
 //------------------------------Cart------------------------------
 
 user.get('/cart',activeUser,cartController.cart);

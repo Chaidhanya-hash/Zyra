@@ -8,7 +8,7 @@ const category = async (req,res) =>{
     try {
         const search = req.query.search || ''
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 4;
+        const limit = parseInt(req.query.limit) || 8;
 
         const category = await categorySchema.find({categoryName: {$regex: search, $options :'i'}})
             .sort({updatedAt : -1})

@@ -1,6 +1,8 @@
 const userSchema = require('../../model/userSchema');
 const {ObjectId} = require('mongodb');
 
+const bcrypt = require('bcrypt');
+
 const profile = async (req,res)=>{
     try {
         const userId = req.session.user;
@@ -177,11 +179,55 @@ const updateAddress = async (req,res) =>{
     }
 }
 
+const ressetPassword = async (req,res) =>{
+    try {
+        const user = req.session.user;
+        if(!user){
+            req.flash('error','User not found please Login again');
+            res.redirect('/login');
+        }
+        res.render('user/passwordProfile',{
+            title:'Resset Password',
+            user:req.session.user
+        })
+    } 
+    catch (error) {
+        console.log(`error in rendering resset password  ${error}`);
+    }
+}
+
+const ressetPasswordPost = async (req,res) =>{
+    try {
+        const userId = req.session.user;
+        if(!userId){
+            req.flash('error','Cannot find user, Please login again');
+            res.redirect('/login');
+        }
+
+        const password = await bcrypt.hash(req.body.newpassword,10);
+        const update = await userSchema.updateOne({_id:userId},{password:password});
+        
+        if(update) {
+            req.flash('success','Password updated Successfully');
+            res.redirect('/profile');
+        } else {
+            req.flash('error','Error in changing Password');
+            res.redirect('/profile');
+        }
+
+    } 
+    catch (error) {
+        console.log(`errror in changing password from user profile ${error}`);
+    }
+}
+
 module.exports = {
     profile,
     updateProfile,
     addAddress,
     removeAddress,
     editAddress,
-    updateAddress
+    updateAddress,
+    ressetPassword,
+    ressetPasswordPost
 }

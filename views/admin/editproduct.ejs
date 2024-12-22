@@ -20,7 +20,7 @@
                                 for="productPrice">Price</label>
                             <input class="form-control text-black form-input w-full p-2 border rounded focus:outline-none"
                                 type="text" name="productPrice" id="productPrice" value="<%= product.productPrice %>"
-                                required>
+                                >
 
                             <div class="mt-4">
                                 <label class="form-label block text-sm font-medium text-gray-700"
@@ -40,7 +40,7 @@
                                 for="productQuantity">Stock</label>
                             <input class="form-control text-black form-input w-full p-2 border rounded focus:outline-none"
                                 type="text" name="productQuantity" id="productQuantity"
-                                value="<%= product.productQuantity %>" required>
+                                value="<%= product.productQuantity %>" >
                         </div>
 
                         <div>
@@ -48,13 +48,13 @@
                                 Discount in percentage</label>
                             <input class="form-control text-black form-input w-full p-2 border rounded focus:outline-none mt-1"
                                 type="number" name="productDiscount" min="0" max="100"
-                                value="<%= product.productDiscount %>" required>
+                                value="<%= product.productDiscount %>" >
 
                             <label for="productDescription"
                                 class="form-label block text-sm font-medium text-gray-700 mt-4">Description</label>
                             <textarea class="form-control text-black form-input w-full p-2 border rounded focus:outline-none mt-1"
                                 name="productDescription" id="productDescription"
-                                required><%= product.productDescription %></textarea>
+                                ><%= product.productDescription %></textarea>
                         </div>
                         
                         <div class="col-span-full flex justify-center mt-3">
@@ -224,7 +224,41 @@
                 });
             }
 
-        
+            const editProductForm = document.getElementById('edit-product-form')
+            const productPrice = document.getElementsByName('productPrice')[0];
+            const productQuantity = document.getElementsByName('productQuantity')[0];
+            const productDiscount = document.getElementsByName('productDiscount')[0];
+            const productDescription = document.getElementsByName('productDescription')[0];
+            editProductForm.addEventListener('submit', (e) => {
+                e.preventDefault()
+                let isValid = true
+                let errorMessage = ""
+                if (isNaN(productPrice.value) || parseFloat(productPrice.value) <= 0) {
+                    errorMessage = 'Product Price must be greater than zero and it should not contain any alphabets'
+                    isValid = false;
+                }
+                if (isNaN(productQuantity.value) || parseInt(productQuantity.value) <= 0) {
+                    errorMessage = 'Product quantity should be a number and it must be greater than zero'
+                    isValid = false;
+                }
+                if (isNaN(productDiscount.value) || parseInt(productDiscount.value) < 0 || parseInt(productDiscount.value) > 100) {
+                    errorMessage = 'Product Discount should be a number and it must be zero or Greater'
+                    isValid = false;
+                }
+                if (productDescription.value.length <= 10 || productDescription.value.length > 100 || productDescription.value.trim === "") {
+                    errorMessage = 'Product description must be between 10 to 100 word '
+                    isValid = false
+                }
+                if (isValid === false) {
+                    Swal.fire({
+                        title: "Invalid Inputs",
+                        text: errorMessage,
+                        icon: "error"
+                    })
+                } else {
+                    editProductForm.submit()
+                }
+            });
         
     </script>
 

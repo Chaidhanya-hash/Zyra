@@ -4,6 +4,7 @@ const adminController = require('../controller/adminController/adminController')
 const userController = require('../controller/adminController/userController');
 const categoryController = require('../controller/adminController/categoryController');
 const productController = require('../controller/adminController/productController');
+const orderController = require('../controller/adminController/orderController');
 const {upload} = require('../uploads/cloudinary');
 const { isAdmin } = require('../middleware/adminSession');
 
@@ -52,6 +53,14 @@ admin.post('/addcategory',isAdmin,categoryController.addCategoryPost);
 admin.get('/categorystatus',isAdmin,categoryController.status);
 
 admin.post('/editcategory',isAdmin,categoryController.editCategory);
+
+//------------------------orders-------------------------
+
+admin.get('/orders',isAdmin,orderController.orderPage);
+
+admin.post('/order/:orderId/status',isAdmin,orderController.orderStatus);
+
+admin.get('/order-view/:id',isAdmin,orderController.orderView);
 
 //-------------------------Logout--------------------------
 

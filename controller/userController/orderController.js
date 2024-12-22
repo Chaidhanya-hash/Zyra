@@ -70,10 +70,11 @@ const cancelOrder = async (req,res) =>{
                 console.log(`Invalid product data: ${JSON.stringify(product)}`);
                 return res.redirect('/orders');
             }
-        }
-
-        req.flash('success','Order cancelled Successfully');
-        res.redirect('/orders');
+        };
+        
+        res.status(200).send('Order cancelled successfully');
+        
+        
     }
     catch(error){
         console.log(`error in canceling order ${error}`);
