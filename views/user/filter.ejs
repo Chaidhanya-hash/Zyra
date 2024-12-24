@@ -6,65 +6,105 @@
         </button>
 
         <!-- Offcanvas -->
-        <div class="fixed top-0 left-0 h-full bg-white shadow-lg p-6 transform hidden transition-transform duration-300 ease-in-out" 
-            id="offcanvasFilter" tabindex="-1" aria-labelledby="offcanvasFilterLabel">
-            <div class="flex justify-between items-center mb-4">
-                <h5 class="text-lg font-semibold" id="offcanvasFilterLabel">Advanced Search</h5>
-                <button type="button" class="text-gray-600 hover:text-gray-800" onclick="closeFilter()">
-                    &times;
-                </button>
-            </div>
-            <div>
-                <form id="filterForm" action="/allproduct" method="GET">
-                    <!-- Min Price -->
-                    <div class="mb-4">
-                        <label for="minPrice" class="block text-sm font-medium text-gray-700">Min Price</label>
-                        <input type="number" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                            id="minPrice" name="minPrice" min="0" value="<%= query.minPrice || '' %>">
-                    </div>
+        <div 
+    class="fixed top-0 left-0 h-full w-80 max-w-full bg-white shadow-lg p-6 transform hidden transition-transform duration-300 ease-in-out" 
+    id="offcanvasFilter" 
+    tabindex="-1" 
+    aria-labelledby="offcanvasFilterLabel"
+>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h5 class="text-lg font-semibold text-gray-800" id="offcanvasFilterLabel">Advanced Search</h5>
+        <button 
+            type="button" 
+            class="text-gray-600 hover:text-gray-800 text-2xl" 
+            onclick="closeFilter()"
+        >
+            &times;
+        </button>
+    </div>
 
-                    <!-- Max Price -->
-                    <div class="mb-4">
-                        <label for="maxPrice" class="block text-sm font-medium text-gray-700">Max Price</label>
-                        <input type="number" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                            id="maxPrice" name="maxPrice" min="0" value="<%= query.maxPrice || '' %>">
-                    </div>
-
-                    <!-- Categories -->
-                    <div class="mb-4">
-                        <label class=" text-sm font-medium text-gray-700">Categories</label>
-                        <% category.forEach((cat) => { %>
-                            <div class="flex items-center">
-                                <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
-                                    id="category-<%= cat._id %>" name="productCategory" value="<%= cat.categoryName %>" 
-                                    <%= (query.productCategory && (Array.isArray(query.productCategory) ? query.productCategory : [query.productCategory]).includes(cat._id.toString())) ? 'checked' : '' %>>
-                                <label for="category-<%= cat._id %>" class="ml-2 text-sm text-gray-700">
-                                    <%= cat.categoryName %>
-                                </label>
-                            </div>
-                        <% }) %>
-                    </div>
-
-                    <!-- Sort By -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Sort By</label>
-                        <select name="sortBy" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="newArrivals" <%= query.sortBy === 'newArrivals' ? 'selected' : '' %>>New Arrivals</option>
-                            <option value="priceLowToHigh" <%= query.sortBy === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
-                            <option value="priceHighToLow" <%= query.sortBy === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
-                            <option value="nameAsc" <%= query.sortBy === 'nameAsc' ? 'selected' : '' %>>Name: A to Z</option>
-                            <option value="nameDesc" <%= query.sortBy === 'nameDesc' ? 'selected' : '' %>>Name: Z to A</option>
-                        </select>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="flex space-x-4">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Apply Filters</button>
-                        <button type="reset" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400">Reset</button>
-                    </div>
-                </form>
-            </div>
+    <!-- Filter Form -->
+    <form id="filterForm" action="/allproduct" method="GET">
+        <!-- Min Price -->
+        <div class="mb-6">
+            <label for="minPrice" class="block text-sm font-medium text-gray-700">Min Price</label>
+            <input 
+                type="number" 
+                class="w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                id="minPrice" 
+                name="minPrice" 
+                min="0" 
+                value="<%= query.minPrice || '' %>"
+            >
         </div>
+
+        <!-- Max Price -->
+        <div class="mb-6">
+            <label for="maxPrice" class="block text-sm font-medium text-gray-700">Max Price</label>
+            <input 
+                type="number" 
+                class="w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
+                id="maxPrice" 
+                name="maxPrice" 
+                min="0" 
+                value="<%= query.maxPrice || '' %>"
+            >
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700">Categories</label>
+            <% category.forEach((cat) => { %>
+                <div class="flex items-center mt-2">
+                    <input 
+                        type="checkbox" 
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                        id="category-<%= cat._id %>" 
+                        name="productCategory" 
+                        value="<%= cat.categoryName %>" 
+                        <%= (query.productCategory && (Array.isArray(query.productCategory) ? query.productCategory : [query.productCategory]).includes(cat._id.toString())) ? 'checked' : '' %>
+                    >
+                    <label for="category-<%= cat._id %>" class="ml-2 text-sm text-gray-700">
+                        <%= cat.categoryName %>
+                    </label>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Sort By -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700">Sort By</label>
+            <select 
+                name="sortBy" 
+                class="block w-full mt-2 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            >
+                <option value="newArrivals" <%= query.sortBy === 'newArrivals' ? 'selected' : '' %>>New Arrivals</option>
+                <option value="priceLowToHigh" <%= query.sortBy === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
+                <option value="priceHighToLow" <%= query.sortBy === 'priceHighToLow' ? 'selected' : '' %>>Price: High to Low</option>
+                <option value="nameAsc" <%= query.sortBy === 'nameAsc' ? 'selected' : '' %>>Name: A to Z</option>
+                <option value="nameDesc" <%= query.sortBy === 'nameDesc' ? 'selected' : '' %>>Name: Z to A</option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-between space-x-4 mt-6">
+            <button 
+                type="submit" 
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition ease-in-out"
+            >
+                Apply Filters
+            </button>
+            <button 
+                type="reset" 
+                class="w-full bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition ease-in-out"
+            >
+                Reset
+            </button>
+        </div>
+    </form>
+</div>
+
 
         
     </div>

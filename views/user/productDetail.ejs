@@ -16,132 +16,115 @@
       </li>
     </ul>
   </nav>
-    <div class="product-view grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
-        <!-- Left Section: Image Gallery -->
-        <div class="product-image-container flex gap-4">
-          <!-- Thumbnails (Left Side) -->
-          <div class="flex flex-col gap-4 mt-20">
-            <% product.productImage.forEach((img, index) => { %>
-              <div class="product-image-min cursor-pointer border rounded-lg p-1 hover:shadow-lg" onclick="changeImage('<%= img %>')">
-                <img
-                  src="<%= img %>"
-                  alt="Thumbnail <%= index + 1 %>"
-                  class="w-20 h-20 object-cover"
-                />
-              </div>
-            <% }) %>
-          </div>
-          <!-- Main Image (Right Side) -->
-          <div class="main-image border rounded-lg overflow-hidden flex-grow w-3/4 max-w-md mx-auto">
+  <div class="product-view grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+    <!-- Left Section: Image Gallery -->
+    <div class="product-image-container flex gap-4">
+      <!-- Thumbnails (Left Side) -->
+      <div class="thumbnails flex flex-col gap-4 mt-10 md:mt-20">
+        <% product.productImage.forEach((img, index) => { %>
+          <div class="product-image-min cursor-pointer border rounded-lg p-1 hover:shadow-lg transition duration-300" onclick="changeImage('<%= img %>')">
             <img
-              id="image-view"
-              src="<%= product.productImage[0] %>"
-              alt="Main Product Image"
-              class="w-full h-auto object-cover"
+              src="<%= img %>"
+              alt="Thumbnail <%= index + 1 %>"
+              class="w-20 h-20 object-cover"
             />
           </div>
-          
-        </div>
-      
-        <!-- Right Section: Product Details -->
-        <div class="product-details flex flex-col gap-6">
-          <!-- Product Title -->
-          <h1 class="kurale-regular text-2xl font-semibold text-gray-800">
-            <%= product.productName %>
-          </h1>
-          <div class="flex gap-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="yellow" viewBox="0 0 24 24" class="w-6 h-6">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="yellow" viewBox="0 0 24 24" class="w-6 h-6">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="yellow" viewBox="0 0 24 24" class="w-6 h-6">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-                <path fill-rule="evenodd" d="M11.998 2.25a.75.75 0 01.671.418l2.504 5.075 5.601.814a.75.75 0 01.416 1.279l-4.053 3.95.957 5.579a.75.75 0 01-1.088.791L12 17.963l-5.016 2.635a.75.75 0 01-1.088-.79l.957-5.58-4.053-3.95a.75.75 0 01.416-1.279l5.601-.814 2.504-5.075a.75.75 0 01.671-.418zm0 3.019L10.114 9.37a.75.75 0 01-.564.41l-4.573.665 3.31 3.228a.75.75 0 01.216.664l-.781 4.556 4.1-2.156a.75.75 0 01.698 0l4.1 2.156-.781-4.556a.75.75 0 01.216-.664l3.31-3.228-4.573-.665a.75.75 0 01-.564-.41L12 5.27z" clip-rule="evenodd" />
-              </svg>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="yellow" class="w-6 h-6">
-                <path fill-rule="evenodd" d="M11.998 2.25a.75.75 0 01.671.418l2.504 5.075 5.601.814a.75.75 0 01.416 1.279l-4.053 3.95.957 5.579a.75.75 0 01-1.088.791L12 17.963l-5.016 2.635a.75.75 0 01-1.088-.79l.957-5.58-4.053-3.95a.75.75 0 01.416-1.279l5.601-.814 2.504-5.075a.75.75 0 01.671-.418zm0 3.019L10.114 9.37a.75.75 0 01-.564.41l-4.573.665 3.31 3.228a.75.75 0 01.216.664l-.781 4.556 4.1-2.156a.75.75 0 01.698 0l4.1 2.156-.781-4.556a.75.75 0 01.216-.664l3.31-3.228-4.573-.665a.75.75 0 01-.564-.41L12 5.27z" clip-rule="evenodd" />
-              </svg>
-              <p class="text-blue-600">| 122 reviews</p>
-
-          </div>
-          <!-- Product Description -->
-          <div class="product-description text-gray-600">
-            <p>
-              <%= product.productDescription %>
+        <% }) %>
+      </div>
+      <!-- Main Image (Right Side) -->
+      <div class="main-image border rounded-lg overflow-hidden flex-grow max-w-sm mx-auto md:max-w-md">
+        <img
+          id="image-view"
+          src="<%= product.productImage[0] %>"
+          alt="Main Product Image"
+          class="w-full h-auto object-cover"
+        />
+      </div>
+    </div>
+  
+    <!-- Right Section: Product Details -->
+    <div class="product-details flex flex-col gap-6">
+      <!-- Product Title -->
+      <h1 class="kurale-regular text-2xl md:text-3xl font-semibold text-gray-800">
+        <%= product.productName %>
+      </h1>
+  
+      <!-- Ratings -->
+      <div class="flex items-center gap-1 text-yellow-500">
+        <% for (let i = 0; i < 5; i++) { %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="yellow" viewBox="0 0 24 24" class="w-6 h-6">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.91 1.18 6.91L12 17.77l-6.18 3.32L7 14.18 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+        <% } %>
+        <p class="text-blue-600 text-sm ml-2">| 122 reviews</p>
+      </div>
+  
+      <!-- Product Description -->
+      <div class="product-description text-gray-600 leading-relaxed">
+        <p>
+          <%= product.productDescription %>
+        </p>
+      </div>
+  
+      <!-- Price Section -->
+      <div>
+        <% if (product.productDiscount) { %>
+          <div class="detail-price flex items-center gap-4">
+            <p class="text-sm text-gray-500 line-through">
+              Rs. <%= product.productPrice %>
             </p>
+            <h4 class="text-lg text-red-500 font-semibold">
+              <%= product.productDiscount %>% Off
+            </h4>
           </div>
-          
-          <!-- Price Section -->
-          <div>
-            <% if (product.productDiscount) { %>
-              <div class="detail-price flex items-center gap-4">
-                <p class="text-sm text-gray-500 line-through">
-                  Rs. <%= product.productPrice %>
-                </p>
-                <h4 class="text-lg text-red-500 font-semibold">
-                  <%= product.productDiscount %>% Off
-                </h4>
-              </div>
-              <h3 class="text-2xl font-bold text-gray-800">
-                Rs. <%= product.productPrice - product.productPrice * (product.productDiscount / 100) %>
-              </h3>
-            <% } else { %>
-              <h3 class="text-lg font-semibold text-gray-800">
-                Rs. <%= product.productPrice %>
-              </h3>
-            <% } %>
-          </div>
-          
-          
-          
-          <!-- Quantity Selector -->
-      <div class="flex items-center mb-4">
-        <span class="text-gray-600 mr-4">Quantity</span>
+          <h3 class="text-2xl font-bold text-gray-800">
+            Rs. <%= product.productPrice - product.productPrice * (product.productDiscount / 100) %>
+          </h3>
+        <% } else { %>
+          <h3 class="text-2xl font-bold text-gray-800">
+            Rs. <%= product.productPrice %>
+          </h3>
+        <% } %>
+      </div>
+  
+      <!-- Quantity Selector -->
+      <div class="flex items-center gap-4">
+        <span class="text-gray-600 font-medium">Quantity</span>
         <div class="flex items-center space-x-2">
-          <button class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md">-</button>
-          <span class="text-gray-800">1</span>
-          <button class="bg-gray-200 text-gray-800 px-2 py-1 rounded-md">+</button>
+          <button class="bg-gray-200 text-gray-800 px-3 py-2 rounded-md hover:bg-gray-300 transition duration-200">-</button>
+          <span class="text-gray-800 font-semibold">1</span>
+          <button class="bg-gray-200 text-gray-800 px-3 py-2 rounded-md hover:bg-gray-300 transition duration-200">+</button>
         </div>
       </div>
+  
       <!-- Stock Information -->
-      <div class="product-description">
+      <div class="product-stock">
         <% if (product.productQuantity === 0) { %>
           <h4 class="text-red-600 font-semibold">Out of Stock</h4>
         <% } else if (product.productQuantity < 10) { %>
-          <h4 class="text-red-500">Only <%= product.productQuantity %> left in stock</h4>
+          <h4 class="text-red-500 font-medium">Only <%= product.productQuantity %> left in stock</h4>
         <% } %>
       </div>
-          <!-- Add to Cart and Buy Now Buttons -->
-          <div class="flex gap-4">
-            <a
-              onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>','<%= user %>')"
-              class="px-6 py-2 bg-blue-600 text-white cursor-pointer rounded-md hover:bg-blue-700 flex items-center"
-            >
-              <span>Add to Cart</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM1 2h2l.6 3h16.24l1.33-4H4.16L3.73 0H1v2zm2.46 5l1.24 6h13.28L22 7H3.46z" />
-              </svg>
-              
-          </a>
-            <a
-              href="/product-checkout/<%= product.id %>"
-              class="px-6 py-2 bg-[#FFF82E] text-gray-800 rounded-md hover:bg-yellow-300 flex items-center"
-            >
-              <span>Buy Now</span>
-              
-            </a>
-          </div>
-      
-          <!-- Delivery Information  -->
-          <div class="product-delivery flex flex-col gap-6 border-t pt-6">
-            
-        </div>
+  
+      <!-- Add to Cart and Buy Now Buttons -->
+      <div class="flex flex-wrap gap-4">
+        <a
+          onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>','<%= user %>')"
+          class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 flex items-center">
+          <span>Add to Cart</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM17 18c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm0 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zM1 2h2l.6 3h16.24l1.33-4H4.16L3.73 0H1v2zm2.46 5l1.24 6h13.28L22 7H3.46z" />
+          </svg>
+        </a>
+        <a
+          href="/product-checkout/<%= product.id %>"
+          class="px-6 py-2 bg-yellow-500 text-gray-800 rounded-md hover:bg-yellow-600 transition duration-300 flex items-center">
+          <span>Buy Now</span>
+        </a>
       </div>
     </div>
+  </div>
+  
       <%- include('similarProducts') %>
       
       <script>

@@ -5,72 +5,66 @@
 <% if (cart && cart.items.length > 0) { %>
     <div class="cart-card">
         <div class="bg-white shadow-md rounded-lg">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
                 <!-- Cart Items Section -->
-                <div class="md:col-span-2 p-4">
-                    <div class="mb-4">
-                        <div class="flex justify-between items-center">
-                            <h4 class="text-xl font-bold">Shopping Cart</h4>
-                            <div><%= cart.items.length %> items</div>
-                        </div>
+                <div class="md:col-span-2 bg-white rounded-lg shadow-sm p-4">
+                    <div class="mb-6 flex justify-between items-center">
+                        <h4 class="text-xl font-bold text-gray-800">Shopping Cart</h4>
+                        <div class="text-gray-600"><%= cart.items.length %> items</div>
                     </div>
                     <% cart.items.forEach((item, index) => { %>
-                        <div class="border-t border-gray-300 py-4">
-                            <div class="flex items-center">
-                                <div class="w-1/6">
-                                    <img class="h-16 w-16 object-cover" src="<%= item.productId.productImage[0] %>" 
-                                        alt="<%= item.productId.productName %>">
+                        <div class="border-t border-gray-200 py-4">
+                            <div class="flex items-center justify-between space-x-4">
+                                <div class="w-1/5">
+                                    <img class="h-20 w-20 object-cover rounded-lg" src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
                                 </div>
-                                <div class="w-2/6 px-4">
-                                    <div class="text-lg font-semibold"><%= item.productId.productName %></div>
-                                    <div class="text-gray-500 text-sm">Category: <%= item.productId.productCollection %></div>
+                                <div class="w-2/5 px-4">
+                                    <div class="text-lg font-semibold text-gray-800"><%= item.productId.productName %></div>
+                                    <div class="text-sm text-gray-500">Category: <%= item.productId.productCategory %></div>
                                 </div>
-                                <div class="w-2/6 flex items-center space-x-2">
-                                    <button class="px-2 py-1 border rounded" onclick="decrement('<%= item.productId._id %>')">-</button>
-                                    <input type="text" class="w-10 text-center border rounded" 
-                                        value="<%= item.productCount %>" readonly>
-                                    <button class="px-2 py-1 border rounded" onclick="increment('<%= item.productId._id %>')">+</button>
+                                <div class="w-1/5 flex items-center space-x-2">
+                                    <button class="px-3 py-1 border rounded bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="decrement('<%= item.productId._id %>')">-</button>
+                                    <input type="text" class="w-12 text-center border rounded" value="<%= item.productCount %>" readonly>
+                                    <button class="px-3 py-1 border rounded bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="increment('<%= item.productId._id %>')">+</button>
                                 </div>
-                                <div class="w-1/6 text-right text-gray-700,mr-6">
-                                    <i class="fa-solid fa-indian-rupee-sign"></i>
-                                    <%= item.productPrice.toFixed(2) %>
+                                <div class="w-1/5 text-right text-gray-700">
+                                    <i class="fa-solid fa-indian-rupee-sign"></i> <%= item.productPrice.toFixed(2) %>
                                 </div>
-                                <div class="w-1/7 text-right">
-                                    
-                                    <a href="#" class="text-red-500 delete-link hover:text-red-700" data-id="<%= item.productId._id %>">
+                                <div class="w-1/6 text-right">
+                                    <a href="#" class="text-red-500 hover:text-red-700 delete-link" data-id="<%= item.productId._id %>">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6" viewBox="0 0 16 16">
                                             <path d="M5.5 1a1 1 0 0 0-1 1H2a1 1 0 1 0 0 2h12a1 1 0 1 0 0-2h-2.5a1 1 0 0 0-1-1h-4zM3.5 4h9l-.5 10a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1L3.5 4zm2.5 3a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V7zm3 0a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V7zm3 0a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V7z"/>
-                                          </svg>
+                                        </svg>
                                     </a>
-                                    
                                 </div>
                             </div>
                         </div>
                     <% }) %>
-                    <div class="mt-4">
-                        <a href="/home" class="text-blue-500 hover:underline">&larr; Back to shop</a>
+                    <div class="mt-6">
+                        <a href="/home" class="text-blue-500 hover:underline">← Back to shop</a>
                     </div>
                 </div>
-
+    
                 <!-- Summary Section -->
-                <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
-                    <h5 class="text-lg font-bold mb-4">Summary</h5>
-                    <hr class="border-gray-300 mb-4">
-                    <div class="space-y-2">
+                <div class="bg-gray-100 p-6 rounded-lg shadow-sm">
+                    <h5 class="text-xl font-bold text-gray-800 mb-6">Summary</h5>
+                    <hr class="border-gray-300 mb-6">
+                    <div class="space-y-4">
                         <% cart.items.forEach((item, index) => { %>
-                            <div class="flex justify-between text-sm">
+                            <div class="flex justify-between items-center text-sm text-gray-700">
                                 <span><%= item.productId.productName %> x <%= item.productCount %></span>
-                                <span class="text-gray-500"><%= item.productId.productDiscount %> %</span>
-                                <span>
-                                    <i class="fa-solid fa-indian-rupee-sign"></i>
-                                    <%= item.productPrice - item.productPrice * (item.productId.productDiscount / 100) %>
+                                <span class="text-gray-500"><%= item.productId.productDiscount %>%</span>
+                                <span class="font-semibold">
+                                    <i class="fa-solid fa-indian-rupee-sign"></i> 
+                                    <%= (item.productPrice - item.productPrice * (item.productId.productDiscount / 100)).toFixed(2) %>
                                 </span>
                             </div>
                         <% }) %>
                     </div>
-                    <hr class="border-gray-300 mt-4">
-                    <div class="mt-4">
-                        <h6 class="font-semibold">Delivery</h6>
+                    <hr class="border-gray-300 mt-6">
+                    
+                    <div class="mt-6">
+                        <h6 class="font-semibold text-gray-800">Delivery</h6>
                         <% if (cart.totalPrice > 1000) { %>
                             <p class="text-sm text-gray-500">Shipping Charge: Free</p>
                         <% } else { %>
@@ -79,20 +73,25 @@
                             </p>
                         <% } %>
                     </div>
-                    <hr class="border-gray-300 mt-4">
-                    <div class="mt-4 flex justify-between">
+                    <hr class="border-gray-300 mt-6">
+                    
+                    <div class="mt-6 flex justify-between items-center text-sm text-gray-700">
                         <span>GST (12%)</span>
                         <span>
-                            <i class="fa-solid fa-indian-rupee-sign"></i> <%= Math.round(cart.payableAmount * (12 / 100)) %>
+                            <i class="fa-solid fa-indian-rupee-sign"></i> 
+                            <%= (Math.round(cart.payableAmount * (12 / 100))).toFixed(2) %>
                         </span>
                     </div>
-                    <div class="mt-4 flex justify-between font-semibold">
+                    
+                    <div class="mt-6 flex justify-between font-semibold text-gray-800">
                         <span>Total Price</span>
                         <span>
-                            <i class="fa-solid fa-indian-rupee-sign"></i> <%= cart.payableAmount.toFixed(2) %>
+                            <i class="fa-solid fa-indian-rupee-sign"></i> 
+                            <%= cart.payableAmount.toFixed(2) %>
                         </span>
                     </div>
-                    <div class="mt-4">
+                
+                    <div class="mt-6">
                         <% let allInStock = true; %>
                         <% cart.items.forEach((item) => { %>
                             <% if (item.productId.productQuantity <= 0) { %>
@@ -100,18 +99,17 @@
                             <% } %>
                         <% }) %>
                         <% if (allInStock) { %>
-                            <a href="/checkOut" 
-                               class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
-                                Checkout
-                            </a>
+                            <a href="/checkOut" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg text-center hover:bg-blue-700 transition ease-in-out duration-300">Checkout</a>
                         <% } else { %>
                             <p class="text-sm text-red-500">One or more products are out of stock</p>
                         <% } %>
                     </div>
                 </div>
+                
             </div>
         </div>
     </div>
+    
 <% } else { %>
     <!-- Empty Cart Section -->
     <div class="flex flex-col items-center justify-center py-10">

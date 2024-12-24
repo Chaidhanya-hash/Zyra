@@ -1,71 +1,83 @@
-<div class="bg-gray-100">
+<div >
   <%- include('header') %>
   <%- include('alert') %>
-<!-- -------------------Breadcrumbs----------------------- -->
-<nav class="breadcrumbs text-sm text-gray-600">
-  <ul class="flex items-center space-x-2">
-    <li>
-      <a href="/" class="text-blue-500 hover:text-blue-700">Home</a>
-    </li>
-    <span class="text-gray-400">/</span>
-    <li>
-      <a href="/allproduct" class="text-blue-500 hover:text-blue-700">All Product</a>
-    </li>
-  </ul>
-</nav>
 
-  <section class="bg-white py-10">
-    <div class="container mx-auto px-6">
-        <h2 class="kurale-regular text-2xl text-center mb-6">All Products</h2>
-        <%- include('filter') %>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <% product.forEach((product) => { %>
-                <div class="bg-white shadow-md rounded-lg overflow-hidden mb-4">
-                    <!-- Product Image -->
-                    <a href="/productDetail/<%- product.id %>">
-                      <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="w-full h-48 object-contain">
-                    </a>
-                    
-                    
-                    <!-- Product Details -->
-                    <div class="p-4">
-                        <!-- Product Name -->
-                        <h3 class="amethysta-regular text-lg text-center mb-2">
-                            <%= product.productName %>
-                        </h3>
-                        
-                        <!-- Product Description -->
-                        <p class="text-gray-600 text-sm mb-4 text-center">
-                            <%= product.productDescription %>
-                        </p>
-                        
-                        <!-- Product Price and Heart Icon -->
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-bold text-gray-800">
-                                ₹<%= product.productPrice %>
-                            </span>
-                            <div>
-                            <!-- Cart Icon -->
-                            <a onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>','<%= user %>')">
-                              <img src="https://cdn-icons-png.flaticon.com/512/34/34568.png" alt="Cart Icon"
-                              class="h-6 w-6 cursor-pointer" />
-                            </a>
-                            </div>
-                            <div>
-                            <!-- Heart Icon -->
-                            <a class="text-gray-500 hover:text-red-500">
-                              <img src="/styles/images/free-heart-icon-3510-thumb.png" alt="Heart Icon"
-                              class="h-6 w-6 cursor-pointer " />
-                            </a>
-                          </div>
-                        </div>
-                    </div>
-                </div>
-            <% }) %>
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs text-sm text-gray-600 py-4 px-6 ">
+    <ul class="flex items-center space-x-2">
+      <li>
+        <a href="/" class="text-blue-500 hover:text-blue-700">Home</a>
+      </li>
+      <span class="text-gray-400">/</span>
+      <li>
+        <a href="/allproduct" class="text-blue-500 hover:text-blue-700">All Products</a>
+      </li>
+    </ul>
+  </nav>
+
+  <%- include('filter') %>
+  <!-- Product Section -->
+  <section class="bg-white py-10 px-10 sm:px-12 lg:px-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <% product.forEach((product) => { %>
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <!-- Product Image -->
+          <a href="/productDetail/<%- product.id %>">
+            <img
+              src="<%= product.productImage[0] %>"
+              alt="<%= product.productName %>"
+              class="w-full h-48 object-contain "
+            />
+          </a>
+
+          <!-- Product Details -->
+          <div class="p-6">
+            <!-- Product Name -->
+            <h3 class="text-lg font-semibold text-center text-gray-900 mb-2">
+              <%= product.productName %>
+            </h3>
+
+            <!-- Product Description -->
+            <p class="text-gray-600 text-sm text-center mb-4">
+              <%= product.productDescription %>
+            </p>
+
+            <!-- Product Price and Actions -->
+            <div class="flex justify-between items-center">
+              <!-- Price -->
+              <span class="text-lg font-bold text-gray-900">
+                ₹<%= product.productPrice %>
+              </span>
+
+              <!-- Actions -->
+              <div class="flex items-center space-x-4">
+                <!-- Cart Icon -->
+                <a
+                  onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>','<%= user %>')"
+                >
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/34/34568.png"
+                    alt="Cart Icon"
+                    class="h-6 w-6 cursor-pointer hover:scale-110 transition-transform"
+                  />
+                </a>
+
+                <!-- Heart Icon -->
+                <a class="text-gray-500 hover:text-red-500">
+                  <img
+                    src="/styles/images/free-heart-icon-3510-thumb.png"
+                    alt="Heart Icon"
+                    class="h-6 w-6 cursor-pointer hover:scale-110 transition-transform"
+                  />
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
+      <% }) %>
     </div>
-</section>
+  </section>
 
   <%- include('footer') %>
-  
 </div>
+

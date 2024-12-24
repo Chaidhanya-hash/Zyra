@@ -8,72 +8,78 @@
 
 
     <!-- Login Section -->
-<section class="flex items-center justify-center h-screen bg-[white]">
-    <div class="bg-[#F3E0CF] p-8 rounded-lg shadow-md w-[90%] md:w-[400px]">
-        <h2 class="text-center text-2xl font-semibold mb-6 text-[#4f322a]">Login</h2>
-
-        <!-- Login Form -->
-        <form action="/login" method="POST" class="space-y-4">
-            <!-- Email Input -->
-            <div class="mb-4">
-                <label for="email" class="block text-[#4f322a] font-medium mb-1">Email</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d4a799]"
-                    
-                />
-            </div>
-
-            <!-- Password Input -->
-            <div class="mb-4">
-                <label for="password" class="block text-[#4f322a] font-medium mb-1">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#d4a799]"
-                    
-                />
-            </div>
-
-            <!-- Forgot Password -->
-            <div class="text-right mb-4">
-                <a href="/forgotpassword" class="text-sm text-[#2516F1] hover:underline">Forgot Password?</a>
-            </div>
-
-            <!-- Login Button -->
-            <button
-                type="submit"
-                class="w-full bg-black text-white py-2 rounded-md text-center hover:bg-gray-800 transition"
-            >
-                Login
-            </button>
-
+    <section class="flex items-center justify-center h-screen bg-[white]">
+        <div class="bg-black p-8 rounded-lg shadow-lg w-[90%] md:w-[400px]">
+            <!-- Login Heading -->
+            <h2 class="text-center text-3xl font-bold mb-8 text-[#d4a799]">Login</h2>
+    
+            <!-- Login Form -->
+            <form action="/login" method="POST" class="space-y-6">
+                <!-- Email Input -->
+                <div>
+                    <label for="email" class="block text-[#d4a799] font-medium mb-2">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        class="w-full px-4 py-3 border border-gray-500 rounded-md bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#d4a799]"
+                        required
+                    />
+                </div>
+    
+                <!-- Password Input -->
+                <div>
+                    <label for="password" class="block text-[#d4a799] font-medium mb-2">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        class="w-full px-4 py-3 border border-gray-500 rounded-md bg-black text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#d4a799]"
+                        required
+                    />
+                </div>
+    
+                <!-- Forgot Password -->
+                <div class="text-right">
+                    <a href="/forgotpassword" class="text-sm text-[#2516F1] hover:underline">Forgot Password?</a>
+                </div>
+    
+                <!-- Login Button -->
+                <button
+                    type="submit"
+                    class="w-full bg-white text-black py-3 rounded-md text-center font-semibold hover:bg-gray-200 transition"
+                >
+                    Login
+                </button>
+            </form>
+    
             <!-- Divider -->
-            <div class="text-center my-4 text-gray-500">or</div>
-            
-        </form>
-        <!-- Google Login -->
-        <a href="/auth/google">
-            <button
-            class="w-full flex items-center justify-center bg-white border border-gray-300 py-2 rounded-md text-center hover:bg-gray-100 transition"
-        >
-            <img src="/styles/images/google_logo.png" alt="Custom Image" class="w-5 h-5 mr-2" />
-            Google
-        </button>
-        </a>
-        <!-- New User -->
-        <div class="text-center mt-4">
-            <span class="text-sm text-gray-600">New User? </span>
-            <a href="/signup" class="text-sm text-[#2516F1] hover:underline">Create an account</a>
+            <div class="relative flex items-center justify-center my-6">
+                <div class="w-full border-t border-gray-600"></div>
+                <span class="absolute bg-black px-3 text-gray-500">or</span>
+            </div>
+    
+            <!-- Google Login -->
+            <a href="/auth/google">
+                <button
+                    class="w-full flex items-center justify-center bg-white border border-gray-500 py-3 rounded-md font-medium hover:bg-gray-200 transition"
+                >
+                    <img src="/styles/images/google_logo.png" alt="Google Logo" class="w-5 h-5 mr-3" />
+                    Google
+                </button>
+            </a>
+    
+            <!-- New User -->
+            <div class="text-center mt-6">
+                <span class="text-sm text-gray-400">New User? </span>
+                <a href="/signup" class="text-sm text-[#2516F1] font-medium hover:underline">Create an account</a>
+            </div>
         </div>
-    </div>
-</section>
-
+    </section>
+    
+    
 
 
     <%- include ('footer') %>
