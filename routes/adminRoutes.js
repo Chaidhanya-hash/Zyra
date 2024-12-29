@@ -7,6 +7,7 @@ const productController = require('../controller/adminController/productControll
 const orderController = require('../controller/adminController/orderController');
 const couponController = require('../controller/adminController/couponController');
 const offerController = require('../controller/adminController/offerController');
+const saleController = require('../controller/adminController/saleController');
 
 const {upload} = require('../uploads/cloudinary');
 const { isAdmin } = require('../middleware/adminSession');
@@ -74,6 +75,16 @@ admin.post('/addcoupon', isAdmin, couponController.addCoupon);
 admin.post('/editcoupon/:id', isAdmin, couponController.editCoupon);
 
 admin.get('/statuscoupon', isAdmin, couponController.toggleCouponStatus);
+
+//---------------------sales report------------------------
+
+admin.get('/salesReport',isAdmin , saleController.salePage);
+
+admin.get('/getsalesbymonth', isAdmin, saleController.getSalesByMonth);
+
+admin.post('/fetch-sales-data',isAdmin, saleController.getOrderDetails);
+
+admin.post('/downloadPDF',isAdmin,saleController.downloadPDF);
 
 //-----------------------------offer------------------------
 

@@ -1,4 +1,6 @@
-
+const orderSchema = require('../../model/orderSchema')
+const productSchema = require('../../model/productSchema')
+const userSchema = require('../../model/userSchema')
 
 
 //--------------admin login  get request-----------------
@@ -37,6 +39,11 @@ const loginPost = (req,res)=>{
     }
 }
 
+
+
+
+
+//----------------logout---------------------------
 
 const logout = async(req,res) =>{
     req.session.destroy((err)=>{
