@@ -15,15 +15,38 @@
         <!-- Search Bar, Heart, and Cart -->
         <div class="flex items-center space-x-6 ml-auto mr-4">
             <!-- Search Bar -->
-            <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm">
-                <input type="text" placeholder="Search" class="outline-none text-gray-500 text-sm w-full" />
-                <img src="/styles/images/search lens_logo.webp" alt="Search Icon"
-                    class="h-5 w-5 text-gray-500 cursor-pointer" />
-            </div>
+            <form action="">
+                <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm">
+                    <input 
+                        type="text" 
+                        placeholder="Search"
+                        name="search" 
+                        class="outline-none text-gray-500 text-sm w-full"
+                    />
+                    <button type="submit">
+                        <img 
+                            src="/styles/images/search lens_logo.webp" 
+                            alt="Search Icon" 
+                            class="h-5 w-5 text-gray-500 cursor-pointer"
+                        />
+                    </button>
+                </div>
+            </form>
             
             <!-- Heart Icon -->
-            <img src="/styles/images/free-heart-icon-3510-thumb.png" alt="Heart Icon"
-                class="h-6 w-6 cursor-pointer filter invert" />
+             <% if(user) { %>
+                <a href="/wishlist">
+                    <img src="/styles/images/free-heart-icon-3510-thumb.png" alt="Heart Icon"
+                        class="h-6 w-6 cursor-pointer filter invert" />
+                </a>
+             <% } else { %>
+                <a href="#" onclick="wishlistClick(event)">
+                    <img src="/styles/images/free-heart-icon-3510-thumb.png" alt="Heart Icon"
+                        class="h-6 w-6 cursor-pointer filter invert" />
+                </a>
+
+             <% } %>
+             
             <!-- Cart Icon -->
             <% if(user) { %>
                 <a href="/cart">
@@ -59,6 +82,22 @@
                 icon: 'warning',
                 title: 'Please Login',
                 text: 'You need to login to access your cart.',
+                showCancelButton: true,
+                confirmButtonText: 'Login',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/login';
+                }
+            });
+        }
+
+        function wishlistClick(event) {
+            event.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Please Login',
+                text: 'You need to login to access your Wishlist.',
                 showCancelButton: true,
                 confirmButtonText: 'Login',
                 cancelButtonText: 'Cancel'

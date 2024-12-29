@@ -7,6 +7,7 @@ const generateOTP = require('../../services/generateotp');
 const passport = require('passport');
 const auth = require('../../services/auth');
 const productSchema = require('../../model/productSchema');
+const wishlistSchema = require('../../model/wishlistSchema');
 
 
 
@@ -225,13 +226,16 @@ const otpResend = (req,res)=>{
 
 const home = async (req,res)=>{
     try {
+        const userId = req.session.user;
         const product = await productSchema.find({isActive: true})
             .limit(8)
             .sort({createdAt: -1})
 
+        const wishlist = await wishlistSchema.findOne({ userID: userId });
         res.render('user/homepage',{
             title: 'Home Page',
             product,
+            wishlist,
             user:req.session.user
         });
     } 

@@ -1,0 +1,93 @@
+<%- include('header') %>
+
+<div class=" max-w-screen-lg mx-auto mt-5">
+    <div class=" flex flex-wrap -mx-4 gap-16 ">
+    <!-- Sidebar -->
+    <div class="w-full lg:w-[23%] ">
+        <div class="bg-gray-200 shadow-lg rounded-lg p-4 user-side-div">
+            <div class="card-sidebar">
+                <h2 class="text-lg font-semibold flex items-center space-x-2 mb-4">
+                    <span>Menu</span>
+                </h2>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/profile" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/orders" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
+                            <span>My Orders</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/wallet" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
+                           
+                            <span>Wallet</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ressetprofile-password" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
+                            
+                            <span>Reset Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/logout" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
+                            
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+  
+    <!-- Wallet Balance Section -->
+    <div class="w-full lg:w-2/3">
+      <div class="wallet-box bg-white shadow-md rounded-md p-6 text-center">
+        <i class="bi bi-wallet-fill history-icon text-4xl text-blue-500"></i>
+        <h1 class="text-2xl font-bold mt-2">Your Wallet</h1>
+        <p class="text-gray-700 mt-2">Available Balance</p>
+        <h3 class="text-2xl font-semibold text-red-600">
+          ₹ <%= (wallet.balance).toFixed(2) %>
+        </h3>
+      </div>
+    </div>
+  
+    <!-- Transaction History -->
+    <div class="transaction w-full">
+      <div class="transaction-history bg-white shadow-md rounded-md p-6">
+        <h1 class="text-2xl font-bold mb-4">Transaction History</h1>
+        <% if(wallet.transaction.length > 0) { %>
+          <div class="transaction-head grid grid-cols-4 text-center font-semibold border-b pb-2 mb-4">
+            <div class="flex-row">Date</div>
+            <div class="flex-row">Type</div>
+            <div class="flex-row">Order Id</div>
+            <div class="flex-row">Amount</div>
+          </div>
+          <% wallet.transaction.forEach(element => { %>
+            <div class="transaction-row grid grid-cols-4 text-center py-2 border-b">
+              <div class="flex-row text-gray-700">
+                <%= element.transaction_date.toDateString() %>
+              </div>
+              <div class="flex-row text-gray-700">
+                <%= element.transactionType %>
+              </div>
+              <div class="flex-row text-gray-700 font-medium">
+                #<%= element.order_id %>
+              </div>
+              <div class="flex-row text-gray-900 font-bold">
+                ₹ <%= element.wallet_amount %>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <h3 class="no-history text-lg font-semibold text-gray-500 text-center">No Transactions Yet</h3>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+  <%- include('footer') %>
+  

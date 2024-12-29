@@ -5,6 +5,9 @@ const userController = require('../controller/adminController/userController');
 const categoryController = require('../controller/adminController/categoryController');
 const productController = require('../controller/adminController/productController');
 const orderController = require('../controller/adminController/orderController');
+const couponController = require('../controller/adminController/couponController');
+const offerController = require('../controller/adminController/offerController');
+
 const {upload} = require('../uploads/cloudinary');
 const { isAdmin } = require('../middleware/adminSession');
 
@@ -61,6 +64,26 @@ admin.get('/orders',isAdmin,orderController.orderPage);
 admin.post('/order/:orderId/status',isAdmin,orderController.orderStatus);
 
 admin.get('/order-view/:id',isAdmin,orderController.orderView);
+
+//----------------------Coupons--------------------------
+
+admin.get('/coupons/:id?', isAdmin, couponController.getCoupons);
+
+admin.post('/addcoupon', isAdmin, couponController.addCoupon);
+
+admin.post('/editcoupon/:id', isAdmin, couponController.editCoupon);
+
+admin.get('/statuscoupon', isAdmin, couponController.toggleCouponStatus);
+
+//-----------------------------offer------------------------
+
+admin.get('/offer', isAdmin, offerController.getOffer);
+
+admin.post('/addOffer',isAdmin,offerController.addOffer);
+
+admin.post('/editOffer',isAdmin,offerController.editOffer);
+
+admin.get('/offerStatus',isAdmin,offerController.offerStatus);
 
 //-------------------------Logout--------------------------
 

@@ -184,6 +184,43 @@
     </div>
 </div>
 
+<!-- -----------------Modal for return order----------------------------- -->
+
+<div id="modalreturnOrder" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full">
+        <div class="flex items-center justify-between border-b p-4">
+            <h5 class="text-lg font-semibold" id="returnOrderLabel">Return Order</h5>
+            <button type="button" class="text-gray-500 hover:text-gray-700" aria-label="Close" onclick="document.getElementById('modalreturnOrder').classList.add('hidden')">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="p-6">
+            <form id="returnOrderForm">
+                <!-- Hidden Input for Order ID -->
+                <input type="hidden" id="orderId" name="orderId" value="">
+                <!-- Reason for Return -->
+                <div class="mb-4">
+                    <label for="returnReason" class="block text-sm font-medium text-gray-700">Reason for Return</label>
+                    <textarea
+                        id="returnReason"
+                        name="returnReason"
+                        rows="3"
+                        class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Write your reason here..."
+                        required></textarea>
+                </div>
+                <!-- Submit Button -->
+                <button
+                    type="submit"
+                    class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Submit Return
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -203,6 +240,9 @@
         document.getElementById('cancelOrderModal').classList.remove('hidden');
     }
 
+    function returnOrder() {
+        document.getElementById('modalreturnOrder').classList.remove('hidden');
+    }
     
 
     //----------------------- cancel order ------------------------------
@@ -245,4 +285,41 @@
         })
         .catch(error => console.error('Error:', error));
     });
+
+    //----------------------------Return Order----------------------------
+
+    document.addEventListener('DOMContentLoaded', () => {
+                const returnOrderModal = document.getElementById('modalreturnOrder');
+                document.querySelectorAll('[data-id]').forEach(button =>{
+                    button.addEventListener('click',(event) => {
+                        const orderId = button.getAttribute('data-id');
+                        document.getElementById('orderId').value = orderId;
+                    })
+                })
+                document.getElementById('returnOrderForm').addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const orderId = document.getElementById('orderId').value;
+                    const returnReason = document.getElementById('returnReason').value;
+                    try {
+                        const response = await fetch('/returnOrder', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ orderId, returnReason }),
+                        });
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            Swal.fire('Success', 'Order return request submitted successfully', 'success').then(() => {
+                                returnOrderModal.querySelector('.btn-close').click();
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', result.message, 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'An error occurred while submitting the return request', 'error');
+                    }
+                });
+            });
 </script>

@@ -1,5 +1,5 @@
 
-<div class="bg-[#D6B8AE] min-h-screen flex flex-col">
+<div class=" min-h-screen flex flex-col">
     <!-- Header -->
     <%- include('header') %>
     <%- include('alert') %>
@@ -41,10 +41,15 @@
         </a>
 
         <!-- Coupons -->
-        <a href="#" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
+        <a href="/admin/coupons" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
             <span class="text-sm font-medium">Coupons</span>
         </a>
 
+        <!-- Offer -->
+        <a href="/admin/offer" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
+            <span class="text-sm font-medium">Offers</span>
+        </a>
+        
         <!-- Banner -->
         <a href="#" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
             <span class="text-sm font-medium">Banner</span>
@@ -68,7 +73,7 @@
             </div>
         
             <!-- Orders Table -->
-            <div class="bg-[#D6B8AE] rounded-lg shadow-lg overflow-hidden">
+            <div class=" rounded-lg shadow-lg overflow-hidden">
                 <table class="w-full text-left text-base"> <!-- Increased text size to "text-base" -->
                     <thead class="bg-gradient-to-r from-gray-200 to-gray-600 text-black">
                         <tr>
@@ -112,7 +117,7 @@
                                 </td>
                                 <!-- Action -->
                                 <td class="px-5 py-3 border-b border-gray-200  text-sm">
-                                    <% if (order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Returned') { %>
+                                    <% if (order.orderStatus !=='Delivered' && order.orderStatus !== 'Cancelled' && order.orderStatus !== 'Returned') { %>
                                         <select 
                                             class="status-dropdown block w-full px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 sm:text-sm"
                                             onchange="updateOrderStatus('<%= order._id %>', this.value)">

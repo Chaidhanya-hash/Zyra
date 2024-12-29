@@ -1,5 +1,7 @@
+const { status } = require('express/lib/response');
 const orderSchema = require('../../model/orderSchema');
 const productSchema = require('../../model/productSchema');
+const walletSchema = require('../../model/walletSchema');
 
 //--------------------------user orders page-------------------------
 
@@ -63,6 +65,31 @@ const cancelOrder = async (req,res) =>{
             return res.redirect('/orders');
         }
 
+        if (order.paymentMethod === 'razorpay' || order.paymentMethod === 'Wallet' ) {
+            const userWallet = await walletSchema.findOne({ userID: order.customer_id });
+            if (userWallet) {
+                userWallet.balance = (userWallet.balance || 0) + order.totalPrice;
+                userWallet.transaction.push({
+                    wallet_amount: order.totalPrice,
+                    order_id: order.order_id,
+                    transactionType: 'Credited',
+                    transaction_date: new Date()
+                });
+                await userWallet.save();
+            } else {
+                await walletSchema.create({
+                    userID: order.customer_id,
+                    balance: order.totalPrice,
+                    transaction: [{
+                        wallet_amount: order.totalPrice,
+                        order_id: order.order_id,
+                        transactionType: 'Credited',
+                        transaction_date: new Date()
+                    }]
+                });
+            }
+        }
+
         for(let product of order.products){
             if(product.product_id && product.product_quantity !== undefined){
                 await productSchema.findByIdAndUpdate(product.product_id, { $inc: {productQuantity: product.product_quantity } });
@@ -78,12 +105,57 @@ const cancelOrder = async (req,res) =>{
     }
     catch(error){
         console.log(`error in canceling order ${error}`);
+        req.flash('error', 'Cannot cancel this order right now, please try again');
         res.redirect('/orders');
     }
+}
+
+//---------------------------Return order-----------------------
+
+const returnOrder = async (req,res) => {
+    try {
+        const {orderId, returnReason} = req.body;
+
+        if (!orderId || !returnReason) {
+            return res.status(400).json({ status: 'error', message: 'Order ID and return reason are required' });
+        }
+
+        const order = await orderSchema.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ status: 'error', message: 'Order not found' });
+        }
+
+        if (order.orderStatus === 'Returned' || order.orderStatus === 'Cancelled') {
+            return res.status(400).json({ status: 'error', message: 'Order is already returned or cancelled' });
+        }
+
+        order.orderStatus = 'Returned';
+        order.returnReason = returnReason;
+        await order.save();
+
+        for (let product of order.products) {
+            if (product.product_id && product.product_quantity !== undefined) {
+                await productSchema.findByIdAndUpdate(product.product_id, { $inc: { productQuantity: product.product_quantity } });
+            } else {
+                console.error(`Invalid product data: ${JSON.stringify(product)}`);
+                req.flash('error', 'Error updating product quantity');
+                return res.redirect('/orders');
+            }
+        }
+
+        return res.status(200).json({ status: 'success', message: 'Order return request submitted successfully' });
+    }
+    catch(error) {
+        console.log(`Error in processing return request ${error}`);
+        return res.status(500).json({ status: 'error', message: 'An error occurred while processing the return request'})
+    }
+
 }
 
 module.exports = {
     orderPage,
     orderDetails,
-    cancelOrder
+    cancelOrder,
+    returnOrder
 }

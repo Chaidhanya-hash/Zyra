@@ -2,7 +2,11 @@ const productSchema = require('../../model/productSchema')
 const cartSchema = require('../../model/cartSchema')
 const userSchema = require('../../model/userSchema')
 const orderSchema = require('../../model/orderSchema')
+const couponSchema = require('../../model/couponSchema');
+
 const {ObjectId} = require('mongodb');
+
+const Razorpay = require('razorpay');
 
 //----------------------checkout page rendering------------------
 
@@ -181,7 +185,18 @@ const placeOrder = async (req,res) =>{
         let couponDiscount = 0;
         let paymentId = "";
 
-        const {payment_status , couponCode} = req.body;
+        const {razorpay_payment_id, razorpay_order_id, razorpay_signature, payment_status , couponCode} = req.body;
+
+        if (couponCode) {
+            const coupon = await couponSchema.findOne({ code: couponCode });
+            if (coupon && coupon.isActive) {
+                couponDiscount = coupon.discountValue;
+            }
+        }
+
+        if (paymentMode === 2){
+            paymentId = razorpay_payment_id;
+        }
 
         const cartItems = await cartSchema.findOne({userId}).populate("items.productId");
         
@@ -284,6 +299,102 @@ const orderPage = async (req,res) =>{
     }
 }
 
+//---------------------------------Razor Pay---------------------------------
+
+const paymentRender = (req,res) => {
+    try {
+
+        const totalAmount = req.params.amount;
+        if(!totalAmount) {
+            return res.status(400).json({ error: 'Amount parameter is missing'});
+        }
+
+        const instance = new Razorpay({
+            key_id: 'rzp_test_KDYrLJHnu3O9Ip',
+            key_secret: 'bcOjtnHN19lrbqBWdS35Ee7J'
+        });
+
+        const options = {
+            amount: totalAmount * 100,
+            currency: "INR",
+            receipt: "receipt#1"
+        }
+
+        instance.orders.create(options, (error,order) =>{
+            if (error) {
+                console.log(`Failed to create order ${error}`);
+                return res.status(500).json({ error: `Failed to create order ${error.message}`});
+            }
+
+            return res.status(200).json({ orderID: order.id})
+        })
+
+    }
+    catch(error){
+        console.log(`Error on orders in checkout ${error}`);
+        return res.status(500).json({ error: 'Internal server error'});
+    }
+}
+
+//-------------------------------coupon--------------------------------
+
+const coupon = async (req, res) => {
+    try {
+        const couponName = req.body.couponCode;
+        const userId = req.session.user;
+
+        if (!userId) {
+            req.flash('error', "User is not found, please login again");
+            return res.redirect('/login');
+        }
+
+        const coupon = await couponSchema.findOne({ code: couponName });
+        if (!coupon) {
+            return res.status(404).json({ error: "Coupon not found" });
+        }
+
+        if (!coupon.isActive || coupon.expiryDate < new Date()) {
+            return res.status(400).json({ error: "Coupon expired" });
+        }
+
+        // check if coupon already used
+        const Used  = await orderSchema.findOne({customer_id:userId,couponCode:couponName,orderStatus: { $in: ['Delivered', 'Shipped'] }})
+
+        // if already used return an error
+        if(Used){
+            return res.status(404).json({ error: "Coupon Already Used" });
+        }
+
+        const cart = await cartSchema.findOne({ userId });
+        if (!cart) {
+            return res.status(400).json({ error: "Cart not found" });
+        }
+
+        const total = cart.payableAmount;
+        let discountedTotal = total;
+
+        if (total < coupon.minimumOrderAmount) {
+            return res.status(400).json({ error: "Minimum purchase limit not reached. Please add more items to your cart." });
+        }
+
+        const couponDiscount = coupon.discountValue;
+        if (coupon.discountType === "Fixed") {
+            discountedTotal = total - couponDiscount;
+        } else if (coupon.discountType === "Percentage") {
+            const discountAmount = (couponDiscount / 100) * total;
+            discountedTotal = total - discountAmount;
+        }
+
+        cart.payableAmount = discountedTotal;
+        await cart.save();
+
+        res.status(200).json({ total: discountedTotal, couponDiscount });
+    } catch (err) {
+        console.log(`Error in apply coupon: ${err}`);
+        res.status(500).json({ error: "An error occurred while applying the coupon." });
+    }
+};
+
 module.exports = {
     addAddress,
     checkout,
@@ -291,5 +402,7 @@ module.exports = {
     orderPage,
     removeAddress,
     editAddress,
-    updateAddress
+    updateAddress,
+    paymentRender,
+    coupon
 }

@@ -1,7 +1,7 @@
 const userSchema = require('../../model/userSchema');
 const productSchema = require('../../model/productSchema');
 const orderSchema = require('../../model/orderSchema');
-
+const couponSchema = require('../../model/couponSchema');
 
 
 const checkOut = async (req,res) =>{
@@ -70,11 +70,16 @@ const singleOrder = async (req,res) =>{
         let couponDiscount = 0;
         let paymentId = "";
 
-        const {payment_status} = req.body;
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, payment_status, couponCode} = req.body;
+
+        if (paymentMode === 2) {
+            paymentId = razorpay_payment_id;
+        }
 
         const product = await productSchema.findById(productId);
         if(!product){
-            return req.flash('error','Your peoduct is empty or couldnot be found');
+            console.log(`Product not found for ID: ${productId}`);
+            return res.status(400).json({ success: false, message: 'Your product is empty or could not be found.'})
         }
 
         const paymentDetails = ["Cash on delivery", "Wallet", "razorpay"];
@@ -138,8 +143,54 @@ const singleOrder = async (req,res) =>{
     }
 }
 
+//---------------------------appling coupon in single checkout page------------------------
+
+const coupon = async (req, res) => {
+    try {
+        const couponName = req.body.couponCode;
+
+        const total = req.body.totalAmount;
+        const userId = req.session.user;
+
+        if (!userId) {
+            req.flash('error', "User is not found, please login again");
+            return res.redirect('/login');
+        };
+
+        const coupon = await couponSchema.findOne({ code: couponName });
+        if (!coupon) {
+            return res.status(404).json({ error: "Coupon not found" });
+        };
+
+        if (!coupon.isActive || coupon.expiryDate < new Date()) {
+            return res.status(400).json({ error: "Coupon expired" });
+        };
+
+        let discountedTotal = total;
+
+        if (total < coupon.minimumOrderAmount) {
+            return res.status(400).json({ error: "Minimum purchase limit not reached." });
+        };
+
+        const couponDiscount = coupon.discountValue;
+
+        if (coupon.discountType === "Fixed") {
+            discountedTotal = total - couponDiscount;
+        } else if (coupon.discountType === "Percentage") {
+            const discountAmount = (couponDiscount / 100) * total;
+            discountedTotal = total - discountAmount;
+        };
+
+        res.status(200).json({ total: discountedTotal, couponDiscount });
+    } catch (err) {
+        console.log(`Error in apply coupon: ${err}`);
+        res.status(500).json({ error: "An error occurred while applying the coupon." });
+    }
+};
+
 module.exports = {
     checkOut,
     editAddress,
-    singleOrder
+    singleOrder,
+    coupon
 }

@@ -171,6 +171,7 @@ const editProductPost = async (req,res) =>{
         await productSchema.findByIdAndUpdate(id,{
             productPrice: req.body.productPrice,
             productQuantity: req.body.productQuantity,
+            productCategory:req.body.productCategory,
             productDiscount: req.body.productDiscount,
             productDescription: req.body.productDescription,
             productImage: newImages

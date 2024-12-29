@@ -112,16 +112,16 @@
             <h2 class="text-xl font-bold mb-4">Payment method :</h2>
             <div class="payment-options grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="payment-method flex items-center border p-4 rounded shadow cursor-pointer hover:shadow-lg" onclick="selectPaymentMethod(this, 0)">
-                    <i class="bi bi-cash text-2xl mr-4"></i>
+                    
                     <span>Cash on Delivery</span>
                 </div>
                 <div class="payment-method flex items-center border p-4 rounded shadow cursor-pointer hover:shadow-lg" onclick="selectPaymentMethod(this, 1)">
-                    <i class="bi bi-wallet-fill text-2xl mr-4"></i>
+                    
                     <span>Wallet</span>
                     
                 </div>
                 <div class="payment-method flex items-center border p-4 rounded shadow cursor-pointer hover:shadow-lg" onclick="selectPaymentMethod(this, 2)">
-                    <i class="bi bi-paypal text-2xl mr-4"></i>
+                    
                     <span>Razorpay</span>
                 </div>
             </div>
@@ -228,11 +228,18 @@
                                 <td class="py-2">₹ 50</td>
                             </tr>
                         <% } %>
+                        <tr class="coupon-row" style="display: none;">
+                            <th>Coupon</th>
+                            <th></th>
+                            <th></th>
+                            <th class="coupon-discount">
+                            </th>
+                        </tr>
                         <tr>
                             <th class="py-2 font-bold">Total</th>
                             <td></td>
                             <td></td>
-                            <td class="py-2 font-bold text-lg">
+                            <td class="py-2 font-bold text-lg total-payable-amount">
                                 ₹ <%= totalAmount %>
                             </td>
                         </tr>
@@ -345,7 +352,7 @@
 </div>
 
 <%- include('footer') %>
-
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     let selectedAddressIndex = null;
     let selectedPaymentMethod = null;
@@ -403,6 +410,141 @@
                 placeOrder(selectedAddressIndex, selectedPaymentMethod , productId);
             }
     });
+
+        function openRazorpayPayment() {
+            const URL = `/payment-render/${totalAmount}`;
+            fetch(URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error("Cannot render the payment page");
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.orderID) {
+                        const options = {
+                            key: "rzp_test_KDYrLJHnu3O9Ip",
+                            amount: totalAmount * 100,
+                            currency: "INR",
+                            name: "Zyra",
+                            order_id: data.orderID,
+                            handler: function (response) {
+                                const couponCode = document.getElementById('couponCode').value.trim();
+                                const URL = `/singleOrder/${productId}/${selectedAddressIndex}/${selectedPaymentMethod}`;
+                                fetch(URL, {
+                                    method: "POST",
+                                    headers: {
+                                        'Content-Type': "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature,
+                                        couponCode: couponCode
+                                    })
+                                }).then((res) => {
+                                    if (res.redirected)
+                                        window.location.href = res.url
+                                    if (!res.ok) {
+                                        throw new Error("Order placement failed");
+                                    }
+                                    return res.json();
+                                }).then(data => {
+                                    if (data.success) {
+                                        window.location.href = "/conform-order";
+                                    } else {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Order Placement Failed",
+                                            text: data.message
+                                        });
+                                    }
+                                }).catch(err => {
+                                    console.error("Error on Razorpay payment callback:", err);
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: "An error occurred while processing the order."
+                                    });
+                                });
+                            },
+                            prefill: {
+                                name: username,
+                                email: email,
+                                contact: phone
+                            },
+                            notes: {
+                                address: "Razorpay Corporate Office"
+                            },
+                            theme: {
+                                color: "#6351CE"
+                            }
+                        };
+                        const rzp1 = new Razorpay(options);
+                        rzp1.on('payment.failed', function (response) {
+                            const couponCode = document.getElementById('couponCode').value.trim();
+                            const URL = `/place-order/${selectedAddressIndex}/${selectedPaymentMethod}`;
+                            fetch(URL, {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': "application/json"
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.error.metadata.payment_id,
+                                    razorpay_order_id: response.error.metadata.order_id,
+                                    razorpay_signature: response.error.metadata.signature,
+                                    payment_status: "Pending",
+                                    couponCode: couponCode
+                                })
+                            })
+                                .then((res) => {
+                                    if (res.redirected) {
+                                        window.location.href = res.url;
+                                    } else if (!res.ok) {
+                                        throw new Error("Order placement failed");
+                                    } else {
+                                        return res.json();
+                                    }
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        
+                                    } else {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Order Placement Failed",
+                                            text: data.message
+                                        });
+                                    }
+                                })
+                                .catch(err => {
+                                    console.error("Error on payment failure callback:", err);
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: "An error occurred while processing the order."
+                                    });
+                                });
+                        });
+                        rzp1.open();
+                    } else {
+                        throw new Error("Order ID not received");
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error on loading payment method",
+                        text: error.message
+                    });
+                    console.error("Error during payment initiation:", error);
+                });
+        }
 
         function placeOrder(addressIndex, paymentMethod , productId) {
             const couponCode = document.getElementById('couponCode').value.trim();
@@ -537,5 +679,77 @@
             });
         });
 
-    
+        //--------------------------coupon management-----------------------------------
+
+        async function applyCoupon() {
+            const couponCode = document.getElementById('couponCode').value.trim();
+
+            if (!couponCode) {
+                showError("Please enter a coupon code.");
+                return;
+            }
+            try {
+                const res = await fetch('/singleCoupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ couponCode , totalAmount })
+                });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    showError(error.error || "An error occurred while applying the coupon.");
+                    return;
+                }
+
+                const couponData = await res.json();
+                updateOrderSummary(couponData.total, couponData.couponDiscount);
+                showCouponBadge(couponCode);
+            } catch (error) {
+                document.getElementById('couponCode').value = '';
+                showError("An error occurred while applying the coupon.....");
+                console.log(`apply coupon error ${error}`);
+            }
+        }
+
+        function updateOrderSummary(newPayableAmount, couponDiscount) {
+            // Update the payable amount in the order summary
+            const payableAmountElement = document.querySelector('td.total-payable-amount');
+            payableAmountElement.innerText = newPayableAmount.toFixed(2);
+            
+            
+            const couponRow = document.querySelector('.coupon-row');
+            if (couponDiscount > 0) {
+                couponRow.style.display = 'table-row';
+                const couponElement = document.querySelector('.coupon-discount');
+                if (couponElement) {
+                    couponElement.innerText = couponDiscount.toFixed(2);
+                }
+            } else {
+                couponRow.style.display = 'none';
+            }
+            totalAmount = newPayableAmount;
+        }
+
+        function showCouponBadge(couponCode) {
+            const couponBadge = document.getElementById('couponBadge');
+            const appliedCouponCode = document.getElementById('appliedCouponCode');
+            couponBadge.style.display = 'block';
+            appliedCouponCode.innerText = couponCode;
+        }
+
+        function removeCoupon() {
+            document.getElementById('couponCode').value = '';
+            document.getElementById('couponBadge').style.display = 'none';
+            location.reload();
+        }
+
+        function showError(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: message
+            });
+        }
 </script>

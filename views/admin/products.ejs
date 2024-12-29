@@ -48,8 +48,13 @@
         </a>
 
         <!-- Coupons -->
-        <a href="#" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
+        <a href="/admin/coupons" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
             <span class="text-sm font-medium">Coupons</span>
+        </a>
+
+        <!-- Offer -->
+        <a href="/admin/offer" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
+            <span class="text-sm font-medium">Offers</span>
         </a>
 
         <!-- Banner -->
@@ -89,6 +94,7 @@
                     <thead class="bg-gradient-to-r from-gray-200 to-gray-600 text-black">
                         <tr>
                             <th class="py-4 px-5 text-center">SL.No</th>
+                            <th class="py-4 px-5 text-center">Image Preview</th>
                             <th class="py-4 px-5 text-center">Product</th>
                             <th class="py-4 px-5 text-center">Price</th>
                             <th class="py-4 px-5 text-center">Stock</th>
@@ -103,6 +109,7 @@
                         <% products.forEach((product, index) => { %>
                             <tr class="border-b hover:bg-gray-100 transition">
                                 <td class="py-4 px-5 text-center text-gray-700"><%= index + 1 + ((page - 1) * 8) %></td>
+                                <td class="py-4 px-5 text-center text-gray-700"><img src="<%= product.productImage[0] %>" class="w-20 h-20 object-cover mx-auto rounded-md"></td>
                                 <td class="py-4 px-5 text-center text-gray-700"><%= product.productName %></td>
                                 <td class="py-4 px-5 text-center text-gray-700">₹<%= product.productPrice %></td>
                                 <td class="py-4 px-5 text-center text-gray-700"><%= product.productQuantity %></td>
@@ -114,7 +121,7 @@
                                         <span class="px-3 py-1 text-sm font-medium text-red-700 bg-red-100 rounded-full">Unlisted</span>
                                     <% } %>
                                 </td>
-                                <td class="py-4 px-5 flex justify-center gap-4 text-lg">
+                                <td class="py-4 px-5 flex text-center gap-4 text-lg">
                                     <a href="/admin/editproduct/<%= product.id %>" class="text-blue-600 hover:text-blue-800 transition">✏️</a>
                                     <a href="/admin/productstatus?id=<%= product.id %>&status=<%= product.isActive %>" class="text-yellow-500 hover:text-yellow-700 transition">⚫</a>
                                     <a href="/admin/products/<%= product.id %>" class="sweet-alert-delete text-red-600 hover:text-red-800 transition">❌</a>

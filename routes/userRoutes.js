@@ -15,6 +15,8 @@ const cartController = require('../controller/userController/cartController');
 const singleProductController = require('../controller/userController/singleProductController');
 const checkoutController = require('../controller/userController/checkOutController');
 const orderController = require('../controller/userController/orderController');
+const wishlistController = require('../controller/userController/wishlistController');
+const walletController = require('../controller/userController/walletController');
 //------------------------login---------------------
 
 user.get('/login',userController.login);
@@ -87,6 +89,10 @@ user.get('/ressetprofile-password',activeUser,profileController.ressetPassword);
 
 user.post('/ressetprofile-password',activeUser,profileController.ressetPasswordPost);
 
+//----------------------------------wallet-----------------------------
+
+user.get('/wallet', activeUser , walletController.walletPage);
+
 //------------------------------Cart------------------------------
 
 user.get('/cart',activeUser,cartController.cart);
@@ -99,6 +105,14 @@ user.post('/cart/increment',activeUser,cartController.increment);
 
 user.post('/cart/decrement',activeUser,cartController.decrement);
 
+//----------------------------Wishlist-------------------------
+
+user.get('/wishlist', activeUser, wishlistController.wishlistpage);
+
+user.get('/add-wishlist/:id', activeUser, wishlistController.addWishlist );
+
+user.delete('/delete-wish/:id', activeUser , wishlistController.deleteWishlist );
+
 //-----------------------checkout----------------------
 
 user.get('/checkOut',activeUser,checkoutController.checkout);
@@ -109,6 +123,10 @@ user.post('/place-order/:address/:payment',activeUser,checkoutController.placeOr
 
 user.get('/conform-order',activeUser,checkoutController.orderPage);
 
+user.post('/payment-render/:amount',activeUser,checkoutController.paymentRender);
+
+user.post('/applycoupon', activeUser, checkoutController.coupon);
+
 //----------------------Single product order---------------
 
 user.get('/product-checkout/:id',activeUser,singleProductController.checkOut);
@@ -116,6 +134,8 @@ user.get('/product-checkout/:id',activeUser,singleProductController.checkOut);
 user.get('/edit-Address-singlecheckout/:index',activeUser,singleProductController.editAddress);
 
 user.post('/singleOrder/:id/:address/:payment',activeUser,singleProductController.singleOrder);
+
+user.post('/singleCoupon', activeUser , singleProductController.coupon);
 
 //-----------address in checkout--------------
 
@@ -132,6 +152,8 @@ user.get('/orders', activeUser, orderController.orderPage);
 user.get('/orderDetail/:id', activeUser, orderController.orderDetails);
 
 user.post('/cancelOrder/:id', activeUser, orderController.cancelOrder);
+
+user.post('/returnOrder', activeUser, orderController.returnOrder);
 
 //-----------------logout--------------------------
 

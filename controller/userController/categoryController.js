@@ -1,6 +1,7 @@
 const userSchema = require('../../model/userSchema');
 const categorySchema = require('../../model/categorySchema');
 const productSchema = require('../../model/productSchema');
+const wishlistSchema = require('../../model/wishlistSchema');
 
 
 const categoryget = async(req,res)=>{
@@ -24,10 +25,12 @@ const allProduct = async(req,res)=>{
         const sortBy = req.query.sortBy || 'newArrivals';
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 0;
+        const limit = parseInt(req.query.limit) || 12;
         const userId = req.session.user;
 
         const category = await categorySchema.find({isActive:true});
+
+        const wishlist = await wishlistSchema.findOne({ userID: userId });
         
 
         let selectedCategories = req.query.productCategory
@@ -73,7 +76,7 @@ const allProduct = async(req,res)=>{
         
         
         
-        const count = await productSchema.countDocuments({productQuery})
+        const count = await productSchema.countDocuments(productQuery)
         
         res.render('user/allproduct',{
             title:"All products",
@@ -84,6 +87,7 @@ const allProduct = async(req,res)=>{
             search,
             totalPages: Math.ceil(count / limit),
             currentPage:page,
+            wishlist,
             page,
             limit
         })
