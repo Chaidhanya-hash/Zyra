@@ -1,3 +1,13 @@
+<style>
+    .group:hover .group-hover\:block {
+        display: block;
+    }
+
+    .group-hover\:block {
+        transition: all 0.3s ease;
+    }
+</style>
+
 <!-- Header -->
 <header class="bg-black py-1">
     <div class="container mx-auto flex items-center">
@@ -8,7 +18,31 @@
         <nav class="ml-8 flex space-x-6">
             <a href="/home" class="text-white hover:underline">Home</a>
             
-            <a href="/category" class="text-white hover:underline">Categories</a>
+            <div class="relative group">
+                <button class="text-white hover:underline flex items-center">
+                    Categories
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-50">
+                    <div class="py-1" role="menu" aria-orientation="vertical">
+                        <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                            <% categories.forEach(category => { %>
+                                <% if (category.isActive) { %>
+                                    <a href="/category/<%= category._id %>" 
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                                       role="menuitem">
+                                        <%= category.categoryName %>
+                                    </a>
+                                <% } %>
+                            <% }) %>
+                        <% } else { %>
+                            <span class="block px-4 py-2 text-sm text-gray-500">No categories available</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
             <a href="#" class="text-white hover:underline">About Us</a>
         </nav>
 
@@ -77,6 +111,7 @@
 
 <script>
     //------------------Only login user can access cart-----------------
+    
     function CartClick(event) {
             event.preventDefault();
             Swal.fire({

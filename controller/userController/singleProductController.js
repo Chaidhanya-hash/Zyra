@@ -2,10 +2,12 @@ const userSchema = require('../../model/userSchema');
 const productSchema = require('../../model/productSchema');
 const orderSchema = require('../../model/orderSchema');
 const couponSchema = require('../../model/couponSchema');
+const categorySchema = require('../../model/categorySchema');
 
 
 const checkOut = async (req,res) =>{
     try{
+        const categories = await categorySchema.find();
         const productId = req.params.id;
         if(!req.session.user){
             req.flash('error','User is not found, Please login again');
@@ -32,6 +34,7 @@ const checkOut = async (req,res) =>{
             title:'Checkout',
             user,
             search:'',
+            categories,
             product,
             userDetails: user
         })

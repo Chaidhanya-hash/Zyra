@@ -8,6 +8,7 @@ const passport = require('passport');
 const auth = require('../../services/auth');
 const productSchema = require('../../model/productSchema');
 const wishlistSchema = require('../../model/wishlistSchema');
+const categorySchema = require('../../model/categorySchema');
 
 
 
@@ -238,12 +239,15 @@ const home = async (req,res)=>{
             .limit(8)
             .sort({createdAt: -1})
 
+        const categories = await categorySchema.find();
+
         const wishlist = await wishlistSchema.findOne({ userID: userId });
         res.render('user/homepage',{
             title: 'Home Page',
             search,
             product,
             wishlist,
+            categories,
             user:req.session.user
         });
     } 

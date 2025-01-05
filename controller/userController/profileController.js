@@ -2,9 +2,11 @@ const userSchema = require('../../model/userSchema');
 const {ObjectId} = require('mongodb');
 
 const bcrypt = require('bcrypt');
+const categorySchema = require('../../model/categorySchema');
 
 const profile = async (req,res)=>{
     try {
+        const categories = await categorySchema.find();
         const userId = req.session.user;
         const userDetail = await userSchema.findById(userId);
 
@@ -21,6 +23,7 @@ const profile = async (req,res)=>{
             title:'My Profile',
             user:req.session.user,
             search:'',
+            categories,
             userDetail
         })
     }

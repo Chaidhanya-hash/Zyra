@@ -63,7 +63,7 @@ user.get('/home',checkUser, userController.home)
 
 //---------------------------category----------------------------
 
-user.get('/category',checkUser, categoryController.categoryget);
+user.get('/category/:id',checkUser, categoryController.category);
 
 //-----------------------------products----------------------------
 

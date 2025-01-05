@@ -1,4 +1,6 @@
+const categorySchema = require('../../model/categorySchema');
 const productSchema = require('../../model/productSchema')
+
 
 const mongoose = require('mongoose');
 
@@ -14,6 +16,7 @@ const productDetail = async (req,res)=>{
         }
 
         const product = await productSchema.findById(id);
+        const categories = await categorySchema.find();
 
         if(!product){
             
@@ -31,6 +34,7 @@ const productDetail = async (req,res)=>{
                         title: product.productName,
                         user:req.session.user,
                         search,
+                        categories,
                         product,
                         similarProduct
                     })

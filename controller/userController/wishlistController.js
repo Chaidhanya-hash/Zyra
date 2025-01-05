@@ -1,6 +1,7 @@
 const wishlistSchema = require('../../model/wishlistSchema');
 const productSchema = require('../../model/productSchema');
 const cartSchema = require('../../model/cartSchema');
+const categorySchema = require('../../model/categorySchema');
 
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
@@ -13,9 +14,10 @@ const wishlistpage = async(req,res)=>{
             req.flash('error', "User is Not Found , Please Login Again"  )
             return res.redirect('/login');
         }
+        const categories = await categorySchema.find();
         const wishlist = await wishlistSchema.findOne({ userID: req.session.user }).populate('products.productID')
         if(wishlist){
-            res.render('user/wishlist',{title : "Wishlist" ,products: wishlist.products ,search:'', user: req.session.user })
+            res.render('user/wishlist',{title : "Wishlist" ,products: wishlist.products ,search:'',categories, user: req.session.user })
         }else{
             res.render('user/wishlist', { title: "Wishlist", products: [] , user: req.session.user })
         }

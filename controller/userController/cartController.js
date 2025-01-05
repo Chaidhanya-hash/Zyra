@@ -3,6 +3,7 @@ const cartSchema = require('../../model/cartSchema');
 
 const {ObjectId} = require('mongodb');
 const { product } = require('../adminController/productController');
+const categorySchema = require('../../model/categorySchema');
 
 //-------------------------------cart Page-------------------------
 
@@ -12,6 +13,7 @@ const cart = async (req,res) =>{
         return res.redirect('/login');
     }
     try{
+        const categories = await categorySchema.find();
         const cart = await cartSchema.findOne({userId: req.session.user}).populate('items.productId')
         var totalPrice = 0;
         var totalPriceWithOutDiscount = 0;
@@ -44,6 +46,7 @@ const cart = async (req,res) =>{
             totalPrice,
             cartItemCount,
             search:'',
+            categories,
             totalPriceWithOutDiscount,
             alertMessage: req.flash('error'),
             user: req.session.user

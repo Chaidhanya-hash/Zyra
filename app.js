@@ -77,7 +77,11 @@ app.get('/',(req,res)=>{
     }
 })
 
+//------------404 page rendering------------
 
+app.use('*',(req,res) =>{
+    res.render('pageNotFound',{title:"Page not found"})
+})
 
 //-------------Server Listening---------------
 

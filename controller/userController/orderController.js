@@ -5,11 +5,13 @@ const walletSchema = require('../../model/walletSchema');
 
 const PDFDocument = require('pdfkit-table');
 const Razorpay = require('razorpay');
+const categorySchema = require('../../model/categorySchema');
 
 //--------------------------user orders page-------------------------
 
 const orderPage = async (req,res) =>{
     try {
+        const categories = await categorySchema.find();
         const user = req.session.user;
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 5;
@@ -29,6 +31,7 @@ const orderPage = async (req,res) =>{
 
         res.render('user/orders',{
             title:"Orders",
+            categories,
             search:'',
             currentPage: page,
             totalPages: Math.ceil(count/limit),
@@ -47,6 +50,7 @@ const orderPage = async (req,res) =>{
 //------------------------order Details-----------------------
 
 const orderDetails = async (req,res) =>{
+    const categories = await categorySchema.find();
     const user = req.session.user;
     const order_id = req.params.id;
     try {
@@ -54,6 +58,7 @@ const orderDetails = async (req,res) =>{
         res.render('user/orderDetail',{
             title:"Order Details",
             user,
+            categories,
             search:'',
             orderDetails
         })
