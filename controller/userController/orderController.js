@@ -3,19 +3,36 @@ const orderSchema = require('../../model/orderSchema');
 const productSchema = require('../../model/productSchema');
 const walletSchema = require('../../model/walletSchema');
 
+const PDFDocument = require('pdfkit-table');
+const Razorpay = require('razorpay');
+
 //--------------------------user orders page-------------------------
 
 const orderPage = async (req,res) =>{
     try {
         const user = req.session.user;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
         if(!user){
             req.flash('error','User not found, Please login again');
             return res.redirect('/login');
         }
 
-        const orderDetails = await orderSchema.find({ customer_id: user}).populate("products.product_id").sort({updatedAt: -1 })
+        
+
+        const orderDetails = await orderSchema.find({ customer_id: user})
+            .populate("products.product_id")
+            .sort({updatedAt: -1 })
+            .limit(limit)
+            .skip((page - 1) * limit)
+        const count = await orderSchema.countDocuments(orderDetails);
+
         res.render('user/orders',{
             title:"Orders",
+            search:'',
+            currentPage: page,
+            totalPages: Math.ceil(count/limit),
+            limit,
             user,
             orderDetails
         })
@@ -37,6 +54,7 @@ const orderDetails = async (req,res) =>{
         res.render('user/orderDetail',{
             title:"Order Details",
             user,
+            search:'',
             orderDetails
         })
     
@@ -153,9 +171,201 @@ const returnOrder = async (req,res) => {
 
 }
 
+//-------------------------Download Invoice--------------------------
+
+const Invoice = async (req, res) => {
+    try {
+        const user = req.session.user;
+        if (!user) {
+            req.flash('error', "User not found. Please login again.");
+            return res.redirect("/login");
+        }
+        const orderId = req.params.orderId;
+        const orderDetails = await orderSchema.findById(orderId).populate('products.product_id')
+        const doc = new PDFDocument();
+        const filename = Invoice.pdf;
+
+        res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+        res.setHeader("Content-Type", "application/pdf");
+
+        doc.pipe(res);
+
+        // Add header aligned to center
+        doc
+            .font("Helvetica-Bold")
+            .fontSize(36)
+            .text("Zyra Skincare", { align: "center", margin: 10 });
+        doc
+            .font("Helvetica-Bold")
+            .fillColor("grey")
+            .fontSize(8)
+            .text("When the sun shines we will shine together", {
+                align: "center",
+                margin: 10,
+            });
+        doc.moveDown();
+
+        doc.fontSize(10).fillColor("blue").text(`Invoice #${orderDetails.order_id}`);
+        doc.moveDown();
+        doc.moveDown();
+
+        doc
+            .fillColor("black")
+            .text(`Total products: ${orderDetails.totalQuantity}`);
+
+        doc
+            .fillColor("black")
+            .text(`Shipping Charge: ${orderDetails.totalPrice < 1500 ? "RS 50" : "Free"}`);
+        doc
+            .fontSize(10)
+            .fillColor("red")
+            .text(`Total Amount: Rs ${orderDetails.totalPrice.toLocaleString()}`);
+        doc.moveDown();
+
+        doc
+            .fontSize(10)
+            .fillColor("black")
+            .text(`Payment method: ${orderDetails.paymentMethod}`);
+        doc.text(`Order Date: ${orderDetails.createdAt.toDateString()}`);
+        doc.moveDown();
+        doc.moveDown();
+
+        doc
+            .fontSize(10)
+            .fillColor("black")
+            .text(`Order Status: ${orderDetails.orderStatus}`);
+        doc.moveDown();
+
+        doc
+            .fontSize(10)
+            .fillColor("black")
+            .text( `Address: Sulthan Bathery,Wayanad`);
+        doc.text(`Pincode: 673590`);
+        doc.text(`Phone: 859 075 4230`);
+        doc.moveDown();
+        doc.moveDown();
+
+        doc.fontSize(12).text("Invoice.", { align: "center", margin: 10 });
+        doc.moveDown();
+
+        const tableData = {
+            headers: ["Product Name", "Quantity", "Price", "Product Discount", "Coupon Discount", "Total"],
+            rows: orderDetails.products.map((product) => {
+                const productName = product.product_name || "N/A";
+                const quantity = product.product_quantity || 0;
+                const price = product.product_price || 0;
+                const discount = product.productDiscount || 0;
+                const coupondiscount = orderDetails.couponDiscount || 0
+
+                const total = Math.round((price * (1 - discount / 100) * quantity) - (coupondiscount).toFixed(2));
+
+                return [
+                    productName,
+                    quantity,
+                    `Rs ${price}`,
+                    `${discount} %`,
+                    `Rs${coupondiscount} `,
+                    `Rs ${total}`,
+                ];
+            }),
+        };
+
+        await doc.table(tableData, {
+            prepareHeader: () => doc.font("Helvetica-Bold").fontSize(10),
+            prepareRow: (row, i) => doc.font("Helvetica").fontSize(8),
+            hLineColor: "#b2b2b2",
+            vLineColor: "#b2b2b2",
+            textMargin: 2,
+        });
+
+        doc.moveDown();
+        doc.moveDown();
+        doc.moveDown();
+        doc.moveDown();
+        doc.fontSize(12).text("Thank You.", { align: "center", margin: 10 });
+        doc.moveDown();
+
+        doc.end();
+    } catch (err) {
+        console.log(`Error on downloading the invoice pdf ${err}`);
+        res.status(500).send("Error generating invoice");
+
+    }
+};
+
+//-----------------------------retryRazorPay--------------------------------------
+
+const razorpay = new Razorpay({
+    key_id: 'rzp_test_KDYrLJHnu3O9Ip',
+    key_secret: 'bcOjtnHN19lrbqBWdS35Ee7J'
+});
+
+const retryRazorPay = async (req, res) => {
+    
+    
+    try {
+        const { orderId } = req.body;
+        const order = await orderSchema.findById(orderId);
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount: Math.round(order.totalPrice * 100),
+            currency: "INR",
+            receipt: `receipt#${orderId}`
+        });
+
+        if (razorpayOrder) {
+            return res.status(200).json({
+                ...order.toObject(),
+                razorpayOrderId: razorpayOrder
+            });
+        } else {
+            return res.status(500).send('Razorpay order creation failed');
+        }
+    } catch (error) {
+        console.error(`Error from Razorpay retry: ${error}`);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+//----------------------retry payment----------------------------
+
+const retryPayment = async (req, res) => {
+    console.log("This one is working");
+    try {
+        const { orderId, paymentId, razorpayOrderId } = req.body;
+        const update = {
+            paymentId: paymentId,
+            paymentStatus: 'Success',
+            orderStatus: 'Confirmed'
+        };
+        const order = await orderSchema.findByIdAndUpdate(orderId, update, { new: true });
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+        for (let product of order.products) {
+            await productSchema.findByIdAndUpdate(product.product_id, {
+                $inc: { product_quantity: -product.product_quantity }
+            });
+        }
+        res.status(200).json(order);
+    } catch (error) {
+        console.error(`Error from retry payment backend: ${error}`);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+
+
 module.exports = {
     orderPage,
     orderDetails,
     cancelOrder,
-    returnOrder
+    returnOrder,
+    Invoice,
+    retryRazorPay,
+    retryPayment
 }

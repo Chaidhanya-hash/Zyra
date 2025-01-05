@@ -15,7 +15,7 @@ const wishlistpage = async(req,res)=>{
         }
         const wishlist = await wishlistSchema.findOne({ userID: req.session.user }).populate('products.productID')
         if(wishlist){
-            res.render('user/wishlist',{title : "Wishlist" ,products: wishlist.products ,  user: req.session.user })
+            res.render('user/wishlist',{title : "Wishlist" ,products: wishlist.products ,search:'', user: req.session.user })
         }else{
             res.render('user/wishlist', { title: "Wishlist", products: [] , user: req.session.user })
         }

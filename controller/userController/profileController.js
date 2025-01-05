@@ -20,6 +20,7 @@ const profile = async (req,res)=>{
         res.render('user/profile',{
             title:'My Profile',
             user:req.session.user,
+            search:'',
             userDetail
         })
     }

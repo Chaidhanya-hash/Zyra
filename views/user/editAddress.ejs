@@ -101,10 +101,10 @@
                             text: "Building field must not be empty and Not a Number.",
                             icon: "error"
                         });
-                    } else if ( building.value.length > 25 || building.value.length < 4) {
+                    } else if ( building.value.length > 50 || building.value.length < 4) {
                         Swal.fire({
                             title: "Error",
-                            text: "Building field must be Greater than 4 letters and less than 25 letters.",
+                            text: "Building field must be Greater than 4 letters and less than 50 letters.",
                             icon: "error"
                         });
                     }else if (street.value.trim() === "" || !isNaN(street.value) ) {

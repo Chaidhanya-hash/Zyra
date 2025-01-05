@@ -104,8 +104,8 @@
                         <div>
                             <p class="text-sm text-gray-600">Order Status</p>
                             <h6 class="text-sm font-medium">
-                                <% if(item.orderStatus === 'Pending') { %>
-                                    <span class="text-blue-500"><%= item.orderStatus %></span>
+                                <% if(item.orderStatus === 'Pending' || item.orderStatus === 'Failed') { %>
+                                    <span class="text-blue-500">Payment <%= item.orderStatus %></span>
                                 <% } else if(item.orderStatus === 'Confirmed' || item.orderStatus === 'Delivered') { %>
                                     <span class="text-green-500"><%= item.orderStatus %></span>
                                 <% } else if(item.orderStatus === 'Returned') { %>
@@ -130,13 +130,14 @@
         
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap justify-end space-x-4 mt-6">
-                        <% if(item.paymentStatus === "Pending") { %>
+                        <% if(item.paymentStatus === "Pending" || item.orderStatus === 'Failed') { %>
                             <button onclick="retryPayment('<%= item.id %>')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">Retry Payment</button>
                         <% } else if(item.orderStatus === 'Delivered') { %>
                             <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" data-id="<%= item._id %>" onclick="returnOrder()">Return Order</button>
                             <button onclick="downloadInvoice('<%= item._id %>')" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Invoice</button>
                         <% } else if(item.orderStatus === 'Confirmed' || item.orderStatus === 'Shipped') { %>
                             <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition" id="cancelOrder" data-id="<%= item._id %>" onclick="cancelOrder()">Cancel Order</button>
+                            <button onclick="downloadInvoice('<%= item._id %>')" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">Invoice</button>
                         <% } %>
                     </div>
                 </div>
@@ -153,6 +154,42 @@
         </div>
     <% } %>
 </div>
+
+<!-- -------------------------Pagination------------------------- -->
+
+<div class="pagination-controls flex justify-center mt-3 mb-8">
+    <ul class="flex space-x-2">
+      <% if (currentPage > 1) { %>
+        <li>
+          <a 
+            class="px-4 py-2  text-gray-800  hover:text-blue-600"
+            href="/orders/?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+            Previous
+          </a>
+        </li>
+      <% } %>
+  
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <li>
+          <a 
+            class="px-4 py-2 <%= currentPage == i ? 'bg-black text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' %> rounded-md"
+            href="/orders/?page=<%= i %>&limit=<%= limit %>">
+            <%= i %>
+          </a>
+        </li>
+      <% } %>
+  
+      <% if (currentPage < totalPages) { %>
+        <li>
+          <a 
+            class="px-4 py-2  text-gray-800  hover:text-blue-600"
+            href="/orders/?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+            Next
+          </a>
+        </li>
+      <% } %>
+    </ul>
+  </div>
 
 <%- include('footer') %>
 
@@ -223,6 +260,7 @@
 </div>
 
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     //----------------------- filter order ------------------------------
     function filterOrders(status) {
@@ -311,7 +349,7 @@
                         const result = await response.json();
                         if (result.status === 'success') {
                             Swal.fire('Success', 'Order return request submitted successfully', 'success').then(() => {
-                                returnOrderModal.querySelector('.btn-close').click();
+                                console.log('This is working');
                                 window.location.reload();
                             });
                         } else {
@@ -322,4 +360,117 @@
                     }
                 });
             });
+
+    //---------------------invoice----------------------------
+    async function downloadInvoice(orderId) {
+                const downloadUrl = `/download-invoice/${orderId}`;
+                try {
+                    const response = await fetch(downloadUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId: orderId })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `invoice-${orderId}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('There has been a problem with your fetch operation:', error);
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Failed to download invoice",
+                        text: "Try Again"
+                    });
+                }
+            }
+
+    //------------------------retryPayment--------------------------------
+    
+async function retryPayment(orderId) {
+    console.log('This is working');
+                try {
+                    const res = await fetch('/retryRazorPay', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId })
+                    });
+
+                    if (res.ok) {
+                        const retryPaymentData = await res.json();
+                        const options = {
+                            key: 'rzp_test_KDYrLJHnu3O9Ip',
+                            amount: retryPaymentData.amount,
+                            currency: "INR",
+                            name: "Zyra Skincare",
+                            order_id: retryPaymentData.razorpayOrderId.id,
+                            handler: async function (response) {
+                                try {
+                                    const resData = {
+                                        orderId,
+                                        razorpayOrderId: response.razorpay_order_id,
+                                        paymentId: response.razorpay_payment_id,
+                                    };
+                                    const payment = await fetch('/retryPayment', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(resData)
+                                    });
+
+                                    if (payment.ok) {
+                                        const paymentData = await payment.json();
+                                        window.location.href = "/conform-order";
+                                    } else {
+                                        const error = await payment.text();
+                                        showError(error);
+                                    }
+                                } catch (error) {
+                                    console.error(`Handler error: ${error}`);
+                                }
+                            },
+                            prefill: {
+                                name: retryPaymentData.address.customer_name,
+                                email: retryPaymentData.address.customer_email,
+                                contact: retryPaymentData.address.phone
+                            },
+                            notes: {
+                                address: retryPaymentData.address
+                            },
+                            theme: {
+                                color: "#3399cc"
+                            },
+                            "modal": {
+                                "ondismiss": function () {
+                                    window.location.href = '/orders';
+                                }
+                            }
+                        };
+                        const rzp1 = new Razorpay(options);
+                        rzp1.on('payment.failed', function (response) {
+                            showError('Payment Failure');
+                        });
+                        rzp1.open();
+                    } else {
+                        const error = await res.text();
+                        showError(error);
+                    }
+                } catch (error) {
+                    console.error(`Error from retry payment fetch: ${error}`);
+                }
+            }
 </script>

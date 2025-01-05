@@ -20,11 +20,9 @@ admin.post('/login',adminController.loginPost);
 
 //--------------------admin Dashboard-------------------------
 
-admin.get('/dashboard',isAdmin,(req,res)=>{
-    res.render('admin/dashboard',{
-        title:'Dashboard'
-    });
-})
+admin.get('/dashboard',isAdmin,adminController.dashboard);
+
+admin.get('/charts', isAdmin , adminController.salesChart);
 
 //----------------------customer details----------------------
 

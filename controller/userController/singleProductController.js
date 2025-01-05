@@ -31,6 +31,7 @@ const checkOut = async (req,res) =>{
         res.render('user/singleCheckout',{
             title:'Checkout',
             user,
+            search:'',
             product,
             userDetails: user
         })
@@ -67,11 +68,11 @@ const singleOrder = async (req,res) =>{
         const addressIndex = parseInt(req.params.address);
         const paymentMode = parseInt(req.params.payment);
         const productId = req.params.id;
-        let couponDiscount = 0;
+        
         let paymentId = "";
-
+        
         const { razorpay_payment_id, razorpay_order_id, razorpay_signature, payment_status, couponCode} = req.body;
-
+        
         if (paymentMode === 2) {
             paymentId = razorpay_payment_id;
         }
@@ -94,6 +95,15 @@ const singleOrder = async (req,res) =>{
             return res.status(400).json({success: false, message: 'Selected address is not valid'});
         }
 
+        const coupon = await couponSchema.findOne({ code: couponCode });
+        
+        if (coupon != null){
+            var couponDiscount = coupon.discountValue;
+        } else {
+            couponDiscount = 0;
+        }
+        
+
         const newOrder = new orderSchema({
             customer_id: userId,
             order_id: Math.floor(Math.random() * 1000000),
@@ -105,10 +115,10 @@ const singleOrder = async (req,res) =>{
                 product_price: product.productPrice,
                 product_discount: product.productDiscount,
                 product_image: product.productImage[0],
-                product_status: 'Confirmed'
+                product_status: payment_status === "Failed" ? "Failed" : "Confirmed"
             }],
             totalQuantity: 1,
-            totalPrice: product.productPrice - product.productPrice * (product.productDiscount /100),
+            totalPrice: product.productPrice - couponDiscount - product.productPrice * (product.productDiscount /100),
             couponDiscount: couponDiscount,
             address:{
                 customer_name: userDetails.name,
@@ -122,24 +132,32 @@ const singleOrder = async (req,res) =>{
                 landMark: userDetails.address[addressIndex].landmark
             },
             paymentMethod: paymentDetails[paymentMode],
-            orderStatus: payment_status === "Pending" ? "Pending" : "Confirmed",
+            orderStatus: payment_status === "Failed" ? "Failed" :(payment_status === "Pending" ? "Pending" : "Confirmed"),
             paymentId: paymentId,
             paymentStatus: payment_status,
-            isCancelled: false 
+            isCancelled: payment_status === "Failed" 
         });
 
         await newOrder.save();
 
-        product.productQuantity -= 1;
-        if(product.productQuantity <=0){
-            product.productQuantity = 0;
+        if (payment_status !== "Failed") {
+            product.productQuantity -= 1;
+            if(product.productQuantity <= 0){
+                product.productQuantity = 0;
+            }
+            await product.save();
         }
-
-        await product.save();
-        return res.status(200).json({success: true, message: 'Order Places Successfully'});
+        return res.status(200).json({
+            success: payment_status !== "Failed",
+            message: payment_status === "Failed" ? 'Payment failed but order recorded' : 'Order Placed Successfully'
+        });
     }
     catch(error){
         console.log(`error in single product ordering ${error}`);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while processing your order'
+        });
     }
 }
 
@@ -148,7 +166,7 @@ const singleOrder = async (req,res) =>{
 const coupon = async (req, res) => {
     try {
         const couponName = req.body.couponCode;
-
+        
         const total = req.body.totalAmount;
         const userId = req.session.user;
 

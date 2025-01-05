@@ -32,7 +32,7 @@ const schema = new mongoose.Schema({
         },
         product_status:{
             type: String,
-            enum:['Confirmed', 'Pending', 'Delivered', 'Returned', 'Cancelled'],
+            enum:['Confirmed','Failed', 'Pending', 'Delivered', 'Returned', 'Cancelled'],
             default:'Pending'
         }
     }],
@@ -79,7 +79,7 @@ const schema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum:['Pending', 'Shipped', 'Confirmed', 'Delivered', 'Cancelled', 'Returned']
+        enum:['Pending','Failed', 'Shipped', 'Confirmed', 'Delivered', 'Cancelled', 'Returned']
         
     }
 },{timestamps: true})

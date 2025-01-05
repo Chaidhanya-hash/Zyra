@@ -1,0 +1,54 @@
+<div class="container mx-auto px-4">
+    <div class="best-seller mt-4 mb-5 p-4 rounded shadow-sm bg-white">
+        <h1 class="mb-4 text-xl font-bold">Best Sellers</h1>
+
+        <!-- Best Seller Products -->
+        <section class="best-sellers-section mb-5">
+            <h4 class="section-title text-center mb-3 text-lg font-semibold">Best Seller Products</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <% if(bestProducts){ %>
+                    <% bestProducts.forEach((product, index) => { %>
+                        <% if (product) { %>
+                            <div class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+                                <!-- Optional: Display index -->
+                                <!-- <h5 class="text-sm font-medium">
+                                    <%= index + 1 %>
+                                </h5> -->
+                                <div class="mt-3">
+                                    <img src="<%= product.productImage[0] %>" class="w-32 h-32 object-cover rounded"
+                                        alt="<%= product.productName %>">
+                                </div>
+                                <div class="card-body text-center mt-3">
+                                    <h5 class="text-lg font-medium">
+                                        <%= product.productName %>
+                                    </h5>
+                                    <h5 class="text-lg font-bold text-green-600">
+                                        &#8377; <%= product.productPrice %>
+                                    </h5>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% }) %>
+                <% } else { %>
+                    <h1 class="text-center text-red-500 text-xl font-semibold">
+                        No Product Found
+                    </h1>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- Best Seller Category Section -->
+        <section class="best-sellers-section">
+            <h4 class="section-title text-center mb-3 text-lg font-semibold">Best Seller Category</h4>
+            <ul class="list-disc pl-5">
+                <% if(bestCategory) { %>
+                    <% for (let Category of bestCategory.keys()) { %>
+                        <li class="text-gray-700 text-base">
+                            <%= Category %>
+                        </li>
+                    <% } %>
+                <% } %>
+            </ul>
+        </section>
+    </div>
+</div>

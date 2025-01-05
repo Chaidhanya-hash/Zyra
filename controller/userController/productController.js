@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const productDetail = async (req,res)=>{
     try {
-        
+        const search = '';
         const id = req.params.id;
         
 
@@ -30,6 +30,7 @@ const productDetail = async (req,res)=>{
             return res.render('user/productDetail',{
                         title: product.productName,
                         user:req.session.user,
+                        search,
                         product,
                         similarProduct
                     })

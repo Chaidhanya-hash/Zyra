@@ -13,7 +13,8 @@ const forgotPassword = (req,res)=>{
         req.session.user = ''
         res.render('user/forgotpassword',{
             title:'Forgot Password',
-            user:req.session.user
+            user:req.session.user,
+            search : ''
         })
     }
     catch(error) {
@@ -61,8 +62,10 @@ const forgotPasswordOtp = async (req,res)=>{
         res.render('user/forgotPasswordOtp',{
             title:'Forget Password OTP',
             email:req.session.email,
+            search : '',
             otpTime:req.session.otptimer,
-            user:req.session.user
+            user:req.session.user,
+            
         })
     }
     catch(error){
@@ -75,7 +78,8 @@ const forgotPasswordOtpPost = async (req,res)=>{
         if(req.session.otp === req.body.otp){
             res.render('user/resetPassword',{
                 title:'Reset Password',
-                user:req.session.user
+                user:req.session.user,
+                search : ''
             })
         } else {
             req.flash('error','Invalid OTP');

@@ -279,6 +279,14 @@
                                     <% } %>
                                 </tbody>
                                 <thead>
+                                    <% if(cartDetails.payableAmount < 1000 ){ %>
+                                        <tr>
+                                            <th class="py-2">Shipping Charge</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th>50</th>
+                                        </tr>
+                                    <% } %>
                                     <tr >
                                         <th class="py-2">Sub total</th>
                                         <th></th>
@@ -288,14 +296,7 @@
                                         </th>
                                     </tr>
                                     
-                                    <% if(cartDetails.payableAmount < 1000 ){ %>
-                                        <tr>
-                                            <th class="py-2">Shipping Charge</th>
-                                            <th></th>
-                                            <th></th>
-                                            <th>50</th>
-                                        </tr>
-                                    <% } %>
+                                    
                                     <tr class="coupon-row border-t" style="display: none;">
                                         <th class="py-2">Coupon</th>
                                         <th></th>
@@ -370,7 +371,7 @@
                     <label for="building" class="block text-sm font-medium text-gray-700">
                         Flat, House no., Building, Company, Apartment
                     </label>
-                    <input type="text" name="building" id="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your address" required>
+                    <input type="text" name="building" id="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your address" >
                 </div>
                 
                 <!-- Street Input -->
@@ -378,7 +379,7 @@
                     <label for="street" class="block text-sm font-medium text-gray-700">
                         Area, Street, Sector, Village
                     </label>
-                    <input type="text" name="street" id="street" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your Area" required>
+                    <input type="text" name="street" id="street" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your Area" >
                 </div>
                 
                 <!-- City Input -->
@@ -386,7 +387,7 @@
                     <label for="city" class="block text-sm font-medium text-gray-700">
                         Town/City
                     </label>
-                    <input type="text" name="city" id="city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your City" required>
+                    <input type="text" name="city" id="city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your City" >
                 </div>
                 
                 <!-- Phone and Pincode Inputs -->
@@ -395,13 +396,13 @@
                         <label for="phonenumber" class="block text-sm font-medium text-gray-700">
                             Phone Number
                         </label>
-                        <input type="text" name="phonenumber" id="phonenumber" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Contact Number" required>
+                        <input type="text" name="phonenumber" id="phonenumber" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Contact Number" >
                     </div>
                     <div>
                         <label for="pincode" class="block text-sm font-medium text-gray-700">
                             Pincode
                         </label>
-                        <input type="text" name="pincode" id="pincode" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your Pincode" required>
+                        <input type="text" name="pincode" id="pincode" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your Pincode" >
                     </div>
                 </div>
                 
@@ -410,7 +411,7 @@
                     <label for="landmark" class="block text-sm font-medium text-gray-700">
                         Landmark
                     </label>
-                    <input type="text" name="landmark" id="landmark" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter Nearest Landmark" required>
+                    <input type="text" name="landmark" id="landmark" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter Nearest Landmark" >
                 </div>
                 
                 <!-- State and Country Inputs -->
@@ -419,13 +420,13 @@
                         <label for="state" class="block text-sm font-medium text-gray-700">
                             State
                         </label>
-                        <input type="text" name="state" id="state" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your State" required>
+                        <input type="text" name="state" id="state" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your State" >
                     </div>
                     <div>
                         <label for="country" class="block text-sm font-medium text-gray-700">
                             Country
                         </label>
-                        <input type="text" name="country" id="country" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your Country" required>
+                        <input type="text" name="country" id="country" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Enter your Country" >
                     </div>
                 </div>
         </div>
@@ -793,6 +794,112 @@
                         });
                     }
                 });
+            });
+        });
+
+    //------------------ Validation for the add address modal --------------------
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+            const checkAddress = document.getElementById('checkAddress');
+            const building = document.getElementsByName('building')[0];
+            const street = document.getElementsByName('street')[0];
+            const city = document.getElementsByName('city')[0];
+            const phone = document.getElementsByName('phonenumber')[0];
+            const pincode = document.getElementsByName('pincode')[0];
+            const landmark = document.getElementsByName('landmark')[0];
+            const state = document.getElementsByName('state')[0];
+            const country = document.getElementsByName('country')[0];
+
+            function validatePhone(phone) {
+                const phoneRe = /^\d{10}$/;
+                return phoneRe.test(phone);
+            }
+            function validatePincode(pincode) {
+                const pincodeRe = /^\d{6}$/;
+                return pincodeRe.test(pincode);
+            }
+            checkAddress.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (building.value.trim() === "" || !isNaN(building.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Building field must not be empty and Not a Number.",
+                        icon: "error"
+                    });
+                } else if (building.value.length > 50 || building.value.length < 4) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Building field must be Greater than 4 letters and less than 50 letters.",
+                        icon: "error"
+                    });
+                } else if (street.value.trim() === "" || !isNaN(street.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Street field must not be empty and Not a Number.",
+                        icon: "error"
+                    });
+                } else if (street.value.length > 50 || street.value.length < 4) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Street Field Must be Greater than 4 Letters and less than 50 letters.",
+                        icon: "error"
+                    });
+                } else if (city.value.trim() === "" || !isNaN(city.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "City field must not be empty and Not a Number.",
+                        icon: "error"
+                    });
+                } else if (city.value.length > 25 || city.value.length < 4) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "City field must be Greater than 4 Words and less than 25 Words.",
+                        icon: "error"
+                    });
+                } 
+                else if (!validatePhone(phone.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Phone number must be 10 digits.",
+                        icon: "error"
+                    });
+                } 
+                else if (!validatePincode(pincode.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Pincode must be 6 digits.",
+                        icon: "error"
+                    });
+                } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Landmark field must not be empty.",
+                        icon: "error"
+                    });
+                } else if (state.value.trim() === "" || !isNaN(state.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "State field must not be empty.",
+                        icon: "error"
+                    });
+                } else if (country.value.trim() === "" || !isNaN(country.value)) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Country field must not be empty.",
+                        icon: "error"
+                    });
+                } else {
+                    checkAddress.submit();
+                    Swal.fire({
+                        icon: "success",
+                        title:"Address added Successfully",
+                        showConfirmButton: false,
+                        timer: 1200,
+                    })
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000)
+                }
             });
         });
 </script>

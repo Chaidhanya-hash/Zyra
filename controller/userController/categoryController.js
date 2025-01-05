@@ -9,6 +9,7 @@ const categoryget = async(req,res)=>{
         const category = await categorySchema.find({isActive: true});
         res.render('user/category',{
             title:'Category',
+            search:'',
             user:req.session.user,
             category
         });
@@ -38,6 +39,7 @@ const allProduct = async(req,res)=>{
             : category.map(cat => cat.categoryName);
 
         let categoryIds = [];
+
         if(selectedCategories.length > 0){
             const categoryDocs = await categorySchema.find({ categoryName: {$in: selectedCategories } } );
             categoryIds = categoryDocs.map(cat => cat.categoryName);

@@ -127,6 +127,8 @@ user.post('/payment-render/:amount',activeUser,checkoutController.paymentRender)
 
 user.post('/applycoupon', activeUser, checkoutController.coupon);
 
+user.get('/failed-order', activeUser , checkoutController.failedOrder);
+
 //----------------------Single product order---------------
 
 user.get('/product-checkout/:id',activeUser,singleProductController.checkOut);
@@ -154,6 +156,14 @@ user.get('/orderDetail/:id', activeUser, orderController.orderDetails);
 user.post('/cancelOrder/:id', activeUser, orderController.cancelOrder);
 
 user.post('/returnOrder', activeUser, orderController.returnOrder);
+
+user.post('/download-invoice/:orderId', activeUser , orderController.Invoice);
+
+user.post('/retryRazorPay', activeUser,orderController.retryRazorPay);
+
+user.post('/retryPayment', activeUser ,orderController.retryPayment);
+
+
 
 //-----------------logout--------------------------
 

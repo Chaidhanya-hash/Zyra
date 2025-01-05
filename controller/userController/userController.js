@@ -17,7 +17,8 @@ const login =((req,res)=>{
     } else {
         res.render('user/login',{
             title:'Login',
-            user:req.session.user
+            user:req.session.user,
+            search : ''
         });
     }
     
@@ -59,7 +60,9 @@ const loginPost = async (req,res)=>{
 const googleAuth = (req,res)=>{
     try {
         passport.authenticate('google',{
-            scope:['email','profile']
+            scope:['email','profile'],
+            prompt: 'consent',
+            access_type: 'offline'
         })(req,res)
     }
     catch(error){
@@ -104,6 +107,7 @@ const googleAuthCallback = (req,res,next)=>{
 const signup =((req,res)=>{
     res.render('user/signup',{
         title:'Signup',
+        search : '',
         user:req.session.user
     });
 })
@@ -129,6 +133,7 @@ const signuppost =async (req,res)=>{
             res.redirect('/signup');
         } else{
             const OTP = generateOTP();
+            console.log(OTP);
             sendOTP(details.email,OTP);
             req.flash('success',`OTP send to the ${details.email}`);
 
@@ -154,6 +159,7 @@ const otp =(req,res)=>{
     try{
         res.render('user/otppage',{
             title: 'OTP verify',
+            search : '',
             user:req.session.user,
             email: req.session.email,
             otpTime: req.session.otptime,
@@ -227,6 +233,7 @@ const otpResend = (req,res)=>{
 const home = async (req,res)=>{
     try {
         const userId = req.session.user;
+        const search = req.query.search || '';
         const product = await productSchema.find({isActive: true})
             .limit(8)
             .sort({createdAt: -1})
@@ -234,6 +241,7 @@ const home = async (req,res)=>{
         const wishlist = await wishlistSchema.findOne({ userID: userId });
         res.render('user/homepage',{
             title: 'Home Page',
+            search,
             product,
             wishlist,
             user:req.session.user

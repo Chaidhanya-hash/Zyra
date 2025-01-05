@@ -76,7 +76,7 @@ const addAddress = async (req, res) => {
         await user.save();
 
         req.flash('success', 'New address added')
-        res.redirect('/checkOut')
+        //res.redirect('/checkOut')
     } catch (err) {
         console.log(`Error on adding new address from checkout ${err}`);
     }
@@ -177,15 +177,14 @@ const removeAddress = async (req,res) =>{
 
 //------------------------placing order---------------------
 
-const placeOrder = async (req,res) =>{
+const placeOrder = async (req, res) => {
     try {
         const userId = req.session.user;
         const addressIndex = parseInt(req.params.address);
         const paymentMode = parseInt(req.params.payment);
         let couponDiscount = 0;
         let paymentId = "";
-
-        const {razorpay_payment_id, razorpay_order_id, razorpay_signature, payment_status , couponCode} = req.body;
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, payment_status , couponCode } = req.body;
 
         if (couponCode) {
             const coupon = await couponSchema.findOne({ code: couponCode });
@@ -194,26 +193,25 @@ const placeOrder = async (req,res) =>{
             }
         }
 
-        if (paymentMode === 2){
+        if (paymentMode === 2) {
             paymentId = razorpay_payment_id;
         }
 
-        const cartItems = await cartSchema.findOne({userId}).populate("items.productId");
-        
-        if(!cartItems || !cartItems.items || cartItems.items.length === 0){
-            return res.status(400).json({success: false, message:'Your cart is empty or could not be found. '});
+        const cartItems = await cartSchema.findOne({ userId }).populate("items.productId");
+        if (!cartItems || !cartItems.items || cartItems.items.length === 0) {
+            return res.status(400).json({ success: false, message: 'Your cart is empty or could not be found.' });
         }
 
         const paymentDetails = ["Cash on delivery", "Wallet", "razorpay"];
-        if(paymentDetails[paymentMode] === "Cash on delivery"){
+        if(paymentDetails[paymentMode] === 'Cash on delivery'){
             if(cartItems.payableAmount > 1000){
-                return res.status(400).json({ success: false, message:"COD below 1000 only"});
+                return res.status(400).json({ success: false, message: 'COD below 1000 only.' });
             }
         }
 
         const products = [];
         let totalQuantity = 0;
-        cartItems.items.forEach((item)=>{
+        cartItems.items.forEach((item) => {
             products.push({
                 product_id: item.productId._id,
                 product_name: item.productId.productName,
@@ -228,8 +226,8 @@ const placeOrder = async (req,res) =>{
         });
 
         const userDetails = await userSchema.findById(req.session.user);
-        if(!userDetails || !userDetails.address || !userDetails.address[addressIndex]){
-            return res.status(400).json({success: false, message: 'Selected address is not valid'})
+        if (!userDetails || !userDetails.address || !userDetails.address[addressIndex]) {
+            return res.status(400).json({ success: false, message: 'Selected address is not valid.' });
         }
 
         const newOrder = new orderSchema({
@@ -256,30 +254,42 @@ const placeOrder = async (req,res) =>{
             paymentId: paymentId,
             paymentStatus: payment_status,
             isCancelled: false
-        })
-
+        });
         await newOrder.save();
 
-        for(const element of cartItems.items){
+        if(paymentDetails[paymentMode] === 'Wallet'){
+            const wallet = await walletSchema.findOne({ userID: userId });
+            if (!wallet || wallet.balance < cartItems.payableAmount) {
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+            }
+            wallet.balance -= cartItems.payableAmount;
+            wallet.transaction.push({
+                wallet_amount: cartItems.payableAmount,
+                transactionType: 'Debited',
+                transaction_date: new Date(),
+                order_id: newOrder.order_id,
+            });
+        await wallet.save();
+        }
+
+        for (const element of cartItems.items) {
             const product = await productSchema.findById(element.productId._id);
-            if(product){
+            if (product) {
                 product.productQuantity -= element.productCount;
-                if(product.productQuantity < 0){
+                if (product.productQuantity < 0) {
                     product.productQuantity = 0;
                 }
-
                 await product.save();
             }
         }
 
-        await cartSchema.deleteOne({userId : req.session.user});
-        return res.status(200).json({success :  true,message: 'Order Placed Successfully'});
+        await cartSchema.deleteOne({ userId: req.session.user });
+        return res.status(200).json({ success: true, message: 'Order placed successfully!' });
+    } catch (err) {
+        console.error(`Error on place order ${err}`);
+        return res.status(500).json({ success: false, message: `Error on placing order: ${err.message}` });
     }
-    catch(error){
-        console.log(`error in placing order ${error}`);
-        return res.status(500).json({success: false, message: `Error on placing order ${error.message}`});
-    }
-}
+};
 
 //-------------------order successfull page---------------------
 
@@ -395,6 +405,22 @@ const coupon = async (req, res) => {
     }
 };
 
+//------------------failed order page------------------
+
+const failedOrder = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        if (!userId) {
+            req.flash('error', 'USER is not found. Login again.');
+            return res.redirect('/login');
+        }
+        res.render('user/Failed-order', { title: "Order Failed" });
+    } catch (error) {
+        console.log(`Error while rendering the failed order page`, error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
 module.exports = {
     addAddress,
     checkout,
@@ -404,5 +430,6 @@ module.exports = {
     editAddress,
     updateAddress,
     paymentRender,
-    coupon
+    coupon,
+    failedOrder
 }

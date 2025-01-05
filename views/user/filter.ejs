@@ -53,24 +53,25 @@
         </div>
 
         <!-- Categories -->
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700">Categories</label>
-            <% category.forEach((cat) => { %>
-                <div class="flex items-center mt-2">
-                    <input 
-                        type="checkbox" 
-                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
-                        id="category-<%= cat._id %>" 
-                        name="productCategory" 
-                        value="<%= cat.categoryName %>" 
-                        <%= (query.productCategory && (Array.isArray(query.productCategory) ? query.productCategory : [query.productCategory]).includes(cat._id.toString())) ? 'checked' : '' %>
-                    >
-                    <label for="category-<%= cat._id %>" class="ml-2 text-sm text-gray-700">
-                        <%= cat.categoryName %>
-                    </label>
-                </div>
-            <% }) %>
+        <!-- Categories -->
+<div class="mb-6">
+    <label class="block text-sm font-medium text-gray-700">Categories</label>
+    <% category.forEach((cat) => { %>
+        <div class="flex items-center mt-2">
+            <input 
+                type="checkbox" 
+                class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
+                id="category-<%= cat._id %>" 
+                name="productCategory" 
+                value="<%= cat.categoryName %>" 
+                <%= (query.productCategory && (Array.isArray(query.productCategory) ? query.productCategory : [query.productCategory]).includes(cat.categoryName)) ? 'checked' : '' %>
+            >
+            <label for="category-<%= cat._id %>" class="ml-2 text-sm text-gray-700">
+                <%= cat.categoryName %>
+            </label>
         </div>
+    <% }) %>
+</div>
 
         <!-- Sort By -->
         <div class="mb-6">

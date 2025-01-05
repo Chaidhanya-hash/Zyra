@@ -43,6 +43,7 @@ const cart = async (req,res) =>{
             cart,
             totalPrice,
             cartItemCount,
+            search:'',
             totalPriceWithOutDiscount,
             alertMessage: req.flash('error'),
             user: req.session.user

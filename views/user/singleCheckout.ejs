@@ -209,25 +209,9 @@
                             <td></td>
                             <td></td>
                             <td class="py-2">
-                                ₹ <%= Math.round(totalAmount - totalAmount * (12 / 100)) %>
+                                ₹ <%= Math.round(totalAmount) %>
                             </td>
                         </tr>
-                        <tr>
-                            <th class="py-2">GST</th>
-                            <td></td>
-                            <td>12%</td>
-                            <td class="py-2">
-                                ₹ <%= Math.round(totalAmount * (12 / 100)) %>
-                            </td>
-                        </tr>
-                        <% if (totalAmount < 1000) { %>
-                            <tr>
-                                <th class="py-2">Shipping Charge</th>
-                                <td></td>
-                                <td></td>
-                                <td class="py-2">₹ 50</td>
-                            </tr>
-                        <% } %>
                         <tr class="coupon-row" style="display: none;">
                             <th>Coupon</th>
                             <th></th>
@@ -240,7 +224,9 @@
                             <td></td>
                             <td></td>
                             <td class="py-2 font-bold text-lg total-payable-amount">
-                                ₹ <%= totalAmount %>
+                                
+                            ₹ <%= totalAmount  %>
+                                
                             </td>
                         </tr>
                     </tfoot>
@@ -488,9 +474,8 @@
                         const rzp1 = new Razorpay(options);
                         rzp1.on('payment.failed', function (response) {
                             const couponCode = document.getElementById('couponCode').value.trim();
-                            const URL = `/place-order/${selectedAddressIndex}/${selectedPaymentMethod}`;
-                            fetch(URL, {
-                                method: "POST",
+                            fetch(`/singleOrder/${productId}/${selectedAddressIndex}/${selectedPaymentMethod}`, {
+                                method: 'POST',
                                 headers: {
                                     'Content-Type': "application/json"
                                 },
@@ -498,38 +483,30 @@
                                     razorpay_payment_id: response.error.metadata.payment_id,
                                     razorpay_order_id: response.error.metadata.order_id,
                                     razorpay_signature: response.error.metadata.signature,
-                                    payment_status: "Pending",
+                                    payment_status: "Failed",
                                     couponCode: couponCode
                                 })
                             })
-                                .then((res) => {
-                                    if (res.redirected) {
-                                        window.location.href = res.url;
-                                    } else if (!res.ok) {
-                                        throw new Error("Order placement failed");
-                                    } else {
-                                        return res.json();
+                            .then(res => res.json())
+                            .then(data => {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Payment Failed",
+                                    text: "Your payment was not successful. The order has been recorded as failed."
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = '/orders';
                                     }
-                                })
-                                .then(data => {
-                                    if (data.success) {
-                                        
-                                    } else {
-                                        Swal.fire({
-                                            icon: "error",
-                                            title: "Order Placement Failed",
-                                            text: data.message
-                                        });
-                                    }
-                                })
-                                .catch(err => {
-                                    console.error("Error on payment failure callback:", err);
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: "An error occurred while processing the order."
-                                    });
                                 });
+                            })
+                            .catch(err => {
+                                console.error("Error on payment failure callback:", err);
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: "An error occurred while processing the order."
+                                });
+                            });
                         });
                         rzp1.open();
                     } else {
@@ -642,7 +619,7 @@
                         icon: "error"
                     });
                 } 
-                else if (!validatePhone(phone)) {
+                else if (!validatePhone(phone.value)) {
                     Swal.fire({
                         title: "Error",
                         text: "Phone number must be 10 digits.",
@@ -675,6 +652,15 @@
                     });
                 } else {
                     checkAddress.submit();
+                    Swal.fire({
+                        icon: "success",
+                        title:"Address added Successfully",
+                        showConfirmButton: false,
+                        timer: 1200,
+                    })
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000)
                 }
             });
         });
