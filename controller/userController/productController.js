@@ -1,14 +1,14 @@
 const categorySchema = require('../../model/categorySchema');
-const productSchema = require('../../model/productSchema')
-
+const productSchema = require('../../model/productSchema');
 
 const mongoose = require('mongoose');
+const wishlistSchema = require('../../model/wishlistSchema');
 
 const productDetail = async (req,res)=>{
     try {
         const search = '';
         const id = req.params.id;
-        
+        const userId = req.session.user;
 
         if(!mongoose.Types.ObjectId.isValid(id)) {
             req.flash('error','Invalid Product Id');
@@ -17,6 +17,7 @@ const productDetail = async (req,res)=>{
 
         const product = await productSchema.findById(id);
         const categories = await categorySchema.find();
+        const wishlist = await wishlistSchema.findOne({ userID: userId });
 
         if(!product){
             
@@ -29,14 +30,15 @@ const productDetail = async (req,res)=>{
                 productCategory:product.productCategory,
                 isActive:true
             })
-
+            
             return res.render('user/productDetail',{
                         title: product.productName,
                         user:req.session.user,
                         search,
                         categories,
                         product,
-                        similarProduct
+                        similarProduct,
+                        wishlist
                     })
         } else {
             req.flash('error','Product is not available');

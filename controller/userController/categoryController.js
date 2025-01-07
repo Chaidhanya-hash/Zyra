@@ -2,7 +2,9 @@ const userSchema = require('../../model/userSchema');
 const categorySchema = require('../../model/categorySchema');
 const productSchema = require('../../model/productSchema');
 const wishlistSchema = require('../../model/wishlistSchema');
+
 const mongoose = require('mongoose');
+const brandSchema = require('../../model/brandSchema');
 
 //-----------------products of particular category---------------
 
@@ -60,6 +62,8 @@ const category = async (req, res) => {
         const count = await productSchema.countDocuments({productCategory: categoryName.categoryName , productName: { $regex: search, $options: 'i' },isActive: true});
   
         const wishlist = await wishlistSchema.findOne({ userID: userId });
+
+        const categories = await categorySchema.find();
   
       res.render('user/category-product', {
         title: categoryName.categoryName,
@@ -70,7 +74,8 @@ const category = async (req, res) => {
         currentPage: page,
         search,
         limit,page,
-        wishlist
+        wishlist,
+        categories
       })
     } catch (error) {
       console.log(`Error in Category-wise product rendering: ${error.message}`)
@@ -81,8 +86,8 @@ const category = async (req, res) => {
 
 //---------------all products page rendering--------------------------
 
-const allProduct = async(req,res)=>{
-    try{
+const allProduct = async(req,res) => {
+    try {
         const minPrice = parseInt(req.query.minPrice) || 0;
         const maxPrice = parseInt(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
         const sortBy = req.query.sortBy || 'newArrivals';
@@ -91,78 +96,83 @@ const allProduct = async(req,res)=>{
         const limit = parseInt(req.query.limit) || 12;
         const userId = req.session.user;
 
-        const category = await categorySchema.find({isActive:true});
+        // Get active brands and categories
+        const [activeBrands, category, categories, wishlist] = await Promise.all([
+            brandSchema.find({ isActive: true }),
+            categorySchema.find({ isActive: true }),
+            categorySchema.find(),
+            userId ? wishlistSchema.findOne({ userID: userId }) : null
+        ]);
 
-        const categories = await categorySchema.find();
-
-        const wishlist = await wishlistSchema.findOne({ userID: userId });
-        
+        const activeBrandIds = activeBrands.map(brand => brand._id);
 
         let selectedCategories = req.query.productCategory
-            ? (Array.isArray(req.query.productCategory) ? req.query.productCategory: [req.query.productCategory])
+            ? (Array.isArray(req.query.productCategory) ? req.query.productCategory : [req.query.productCategory])
             : category.map(cat => cat.categoryName);
 
         let categoryIds = [];
-
-        if(selectedCategories.length > 0){
-            const categoryDocs = await categorySchema.find({ categoryName: {$in: selectedCategories } } );
+        if(selectedCategories.length > 0) {
+            const categoryDocs = await categorySchema.find({ categoryName: { $in: selectedCategories } });
             categoryIds = categoryDocs.map(cat => cat.categoryName);
         }
 
+        // Update product query to include active brands
         const productQuery = {
-            productName : { $regex: search, $options: 'i'},
-            productCategory : { $in: categoryIds},
+            productName: { $regex: search, $options: 'i' },
+            productCategory: { $in: categoryIds },
+            productBrand: { $in: activeBrandIds }, // Add this line
             isActive: true,
-            productPrice: {$gte: minPrice, $lte: maxPrice}
+            productPrice: { $gte: minPrice, $lte: maxPrice }
         };
 
         let sortOption = {};
         switch (sortBy) {
-        case 'priceLowToHigh':
-            sortOption = { productPrice: 1 };
-            break;
-        case 'priceHighToLow':
-            sortOption = { productPrice: -1 };
-            break;
-        case 'nameAsc':
-            sortOption = { productName: 1 };
-            break;
-        case 'nameDesc':
-            sortOption = { productName: -1 };
-            break;
-        default:
-            sortOption = { createdAt: -1 };
+            case 'priceLowToHigh':
+                sortOption = { productPrice: 1 };
+                break;
+            case 'priceHighToLow':
+                sortOption = { productPrice: -1 };
+                break;
+            case 'nameAsc':
+                sortOption = { productName: 1 };
+                break;
+            case 'nameDesc':
+                sortOption = { productName: -1 };
+                break;
+            default:
+                sortOption = { createdAt: -1 };
         }
 
-        const product = await productSchema.find(productQuery).populate('productCategory')
-            .sort(sortOption)
-            .limit(limit)
-            .skip((page - 1) * limit);
+        // Get products and count concurrently
+        const [product, count] = await Promise.all([
+            productSchema.find(productQuery)
+                .populate('productCategory')
+                .populate('productBrand') // Optionally populate brand info
+                .sort(sortOption)
+                .limit(limit)
+                .skip((page - 1) * limit),
+            productSchema.countDocuments(productQuery)
+        ]);
 
-        
-        
-        
-        const count = await productSchema.countDocuments(productQuery)
-        
-        res.render('user/allproduct',{
-            title:"All products",
-            user:req.session.user,
+        res.render('user/allproduct', {
+            title: "All products",
+            user: req.session.user,
             product,
             category,
             categories,
             query: req.query,
             search,
             totalPages: Math.ceil(count / limit),
-            currentPage:page,
+            currentPage: page,
             wishlist,
             page,
             limit
-        })
-    }
-    catch(error){
+        });
+    } catch(error) {
         console.log(`error in all products rendering ${error}`);
+        res.status(500).send('Internal Server Error');
     }
-}
+};
 
 module.exports = {
     allProduct,

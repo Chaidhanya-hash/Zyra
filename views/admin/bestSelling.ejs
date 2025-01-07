@@ -50,5 +50,32 @@
                 <% } %>
             </ul>
         </section>
+
+        <!-- Detailed Brand Analytics -->
+<div class="mt-8">
+    <h3 class="text-lg font-semibold mb-4">Brand Performance Analytics</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr>
+                    <th class="px-6 py-3 border-b">Brand</th>
+                    <th class="px-6 py-3 border-b">Total Sales Price</th>
+                    <th class="px-6 py-3 border-b">Units Sold</th>
+                    <th class="px-6 py-3 border-b">Avg. Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% brandAnalytics.forEach(brand => { %>
+                    <tr>
+                        <td class="px-6 py-4 border-b"><%= brand.brandName %></td>
+                        <td class="px-6 py-4 border-b">₹<%= brand.totalSales.toFixed(2) %></td>
+                        <td class="px-6 py-4 border-b"><%= brand.totalQuantity %></td>
+                        <td class="px-6 py-4 border-b">₹<%= brand.averagePrice.toFixed(2) %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
     </div>
 </div>

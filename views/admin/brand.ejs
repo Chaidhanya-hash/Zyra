@@ -1,9 +1,3 @@
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
-</style>
-
 <div class="bg-[#D6B8AE] min-h-screen flex flex-col">
 
     <!-- Header -->
@@ -39,12 +33,12 @@
         </a>
 
         <!-- Category -->
-        <a href="/admin/category" class="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white text-[#4A148C] shadow-md hover:bg-gray-200 transition">
+        <a href="/admin/category" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
             <span class="text-sm font-medium">Category</span>
         </a>
 
         <!-- Brands -->
-        <a href="/admin/brand" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
+        <a href="/admin/brand" class="flex items-center space-x-4 py-3 px-4 rounded-lg bg-white text-[#4A148C] shadow-md hover:bg-gray-200 transition">
             <span class="text-sm font-medium">Brands</span>
         </a>
         <!-- Customers -->
@@ -80,8 +74,8 @@
                 <!-- Header Section -->
                 <div class="search-container flex flex-col lg:flex-row justify-between items-center p-4 gap-4">
                     <div class="flex items-center gap-4">
-                        <h2 class="text-black text-2xl font-semibold">Category</h2>
-                        <form action="/admin/category" method="get" class="flex items-center gap-2">
+                        <h2 class="text-black text-2xl font-semibold">Brands</h2>
+                        <form action="/admin/brand" method="get" class="flex items-center gap-2">
                             <input type="text" name="search" placeholder="Search"
                                 class="border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-orange-500">
                             <input type="submit" value="Search"
@@ -89,7 +83,7 @@
                         </form>
                     </div>
                     <button type="button" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg shadow-md hover:opacity-90" id="openModal">
-                        Add Category
+                        Add Brand
                     </button>
                 </div>
             </div>
@@ -107,13 +101,13 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white">
-                        <% category.forEach((category, index) => { %>
+                        <% brand.forEach((brand, index) => { %>
                         <tr class="border-b hover:bg-gray-100 transition duration-200">
                             <td class="px-6 py-4 text-center"><%= index + 1 + ((page - 1) * 8) %></td>
-                            <td class="px-6 py-4"><%= category.categoryName %></td>
-                            <td class="px-6 py-4 text-center"><%= category.createdAt.toLocaleDateString() %></td>
+                            <td class="px-6 py-4"><%= brand.brandName %></td>
+                            <td class="px-6 py-4 text-center"><%= brand.createdAt.toLocaleDateString() %></td>
                             <td class="px-6 py-4 text-center">
-                                <% if (category.isActive) { %>
+                                <% if (brand.isActive) { %>
                                 <span class="px-4 py-1 text-sm font-medium text-green-600 bg-green-100 rounded-full">Active</span>
                                 <% } else { %>
                                 <span class="px-4 py-1 text-sm font-medium text-red-600 bg-red-100 rounded-full">Blocked</span>
@@ -121,8 +115,8 @@
                             </td>
                             <td class="px-6 py-4 text-center flex items-center justify-center gap-4">
                                 <a href="#" id="edit-collection-modal" class="text-blue-500 hover:underline"
-                                    data-name="<%= category.categoryName %>" data-id="<%= category.id %>" onclick="editcat()">✏️</a>
-                                <a href="/admin/categorystatus?id=<%= category.id %>&status=<%= category.isActive %>"
+                                    data-name="<%= brand.brandName %>" data-id="<%= brand.id %>" onclick="editcat()">✏️</a>
+                                <a href="/admin/brandstatus?id=<%= brand.id %>&status=<%= brand.isActive %>"
                                     class="text-yellow-500 hover:underline">⚫</a>
                             </td>
                         </tr>
@@ -135,7 +129,7 @@
                     <ul class="flex items-center space-x-2">
                         <% for (let i = 1; i <= totalPages; i++) { %>
                         <li>
-                            <a href="/admin/category?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
+                            <a href="/admin/brand?page=<%= i %>&limit=<%= limit %>&search=<%= search %>"
                                 class="px-5 py-3 text-lg border border-gray-300 rounded-md transition
                                        <%= currentPage == i ? 'bg-orange-500 text-white' : 'text-gray-700 bg-gray-200 hover:bg-gray-300' %>">
                                 <%= i %>
@@ -156,25 +150,24 @@
     <div class="bg-white w-1/3 rounded-lg shadow-lg">
         <!-- Modal Header -->
         <div class="flex justify-between items-center p-4 border-b">
-            <h3 class="text-lg font-semibold">Add New Category</h3>
+            <h3 class="text-lg font-semibold">Add New Brand</h3>
             <button id="closeModal" class="text-gray-500 hover:text-black">&times;</button>
         </div>
 
         <!-- Modal Body -->
         <div class="p-4" id="addCollection">
-            <form action="/admin/addcategory" method="post">
+            <form action="/admin/addbrand" method="post">
                 <div class="mb-4">
-                    <label for="categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
+                    <label for="brandName" class="block text-sm font-medium text-gray-700">Brand Name</label>
                     <input
                         type="text"
-                        name="categoryName"
-                        id="categoryName"
+                        name="brandName"
+                        id="brandName"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-[#A1547E] focus:border-[#A1547E]"
-                        placeholder="Enter category name"
-                    
+                        placeholder="Enter Brand name"
                     >
                 </div>
-                <button type="submit" name="collectionName" class="bg-[#A1547E] text-white px-4 py-2 rounded-lg">Submit</button>
+                <button type="submit"  class="bg-[#A1547E] text-white px-4 py-2 rounded-lg">Submit</button>
             </form>
         </div>
     </div>
@@ -186,26 +179,26 @@
     <div class="bg-white w-1/3 rounded-lg shadow-lg">
         <!-- Modal Header -->
         <div class="flex justify-between items-center p-4 border-b">
-            <h3 class="text-lg font-semibold">Edit Category</h3>
+            <h3 class="text-lg font-semibold">Edit Brand</h3>
             <button id="editcloseModal" class="text-gray-500 hover:text-black">&times;</button>
         </div>
 
         <!-- Modal Body -->
         <div class="p-4" id="editCollection">
-            <form action="/admin/editcategory" method="post">
+            <form action="/admin/editbrand" method="post">
                 <div class="mb-4">
-                    <label for="categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
-                    <input type="hidden" name="categoryId" id="editCollectionId">
+                    <label for="brandName" class="block text-sm font-medium text-gray-700">Brand Name</label>
+                    <input type="hidden" name="brandId" id="editCollectionId">
                     <input
                         type="text"
-                        name="categoryName"
+                        name="brandName"
                         id="editCollectionName"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-[#A1547E] focus:border-[#A1547E]"
-                        placeholder="Enter category name"
+                        placeholder="Enter Brand name"
                         required
                     >
                 </div>
-                <button type="submit" name="collectionName" class="bg-[#A1547E] text-white px-4 py-2 rounded-lg">Submit</button>
+                <button type="submit" class="bg-[#A1547E] text-white px-4 py-2 rounded-lg">Submit</button>
             </form>
         </div>
     </div>
@@ -240,8 +233,8 @@
         document.addEventListener('DOMContentLoaded',()=>{
             const addCollectionForm = document.querySelector('#addCollection form');
             const editCollectionForm = document.querySelector('#editCollection form');
-            const addCollectionNameInput = addCollectionForm.querySelector("input[name='categoryName']");
-            const editCollectionNameInput = editCollectionForm.querySelector("input[name='categoryName']");
+            const addCollectionNameInput = addCollectionForm.querySelector("input[name='brandName']");
+            const editCollectionNameInput = editCollectionForm.querySelector("input[name='brandName']");
 
             const validateCollectionName = (name)=>{
                 const trimmedName = name.trim();
@@ -250,7 +243,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text:'Category name is required',
+                        text:'Brand name is required',
                     })
                     return false;
                 }
@@ -259,16 +252,16 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Collection Name can only contain letters.',
+                        text: 'Brand Name can only contain letters.',
                     });
                     return false;
                 }
 
-                if (trimmedName.length < 6) {
+                if (trimmedName.length < 4) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
-                        text: 'Collection Name must be at least 6 letters long.',
+                        text: 'Brand Name must be at least 4 letters long.',
                     });
                     return false;
                 }

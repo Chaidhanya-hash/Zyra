@@ -36,7 +36,7 @@
               <div class="flex items-center space-x-4">
                 <!-- Cart Icon -->
                 <a
-                    onclick="addToCart('<%= product.id %>', '<%= product.productPrice %>','<%= user %>')"
+                    onclick="addToCart('<%= similarProduct[i].id %>', '<%= similarProduct[i].productPrice %>','<%= user %>')"
                 >
                     <img
                         src="https://cdn-icons-png.flaticon.com/512/34/34568.png"
@@ -49,7 +49,7 @@
                 <% if (user && wishlist && Array.isArray(wishlist.products) && wishlist.products.some(wishlistProduct => 
                     wishlistProduct.productID.toString() === product._id.toString())) { %>
                     <a
-                        onclick="addwishlist('<%= product._id %>', '<%= product.productPrice %>', '<%= user %>')"
+                        onclick="addwishlist('<%= similarProduct[i]._id %>', '<%= similarProduct[i].productPrice %>', '<%= user %>')"
                         class="text-red-500"
                     >
                         <svg
@@ -65,7 +65,7 @@
                     </a>
                 <% } else { %>
                     <a
-                        onclick="addwishlist('<%= product._id %>', '<%= product.productPrice %>', '<%= user %>')"
+                        onclick="addwishlist('<%= similarProduct[i]._id %>', '<%= similarProduct[i].productPrice %>', '<%= user %>')"
                         class="text-gray-500 hover:text-red-500"
                     >
                         <svg

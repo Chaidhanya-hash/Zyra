@@ -9,6 +9,7 @@ const auth = require('../../services/auth');
 const productSchema = require('../../model/productSchema');
 const wishlistSchema = require('../../model/wishlistSchema');
 const categorySchema = require('../../model/categorySchema');
+const brandSchema = require('../../model/brandSchema');
 
 
 
@@ -229,33 +230,103 @@ const otpResend = (req,res)=>{
     }
 }
 
+//-----------rendering home page--------------------
 
-
-const home = async (req,res)=>{
+const home = async (req, res) => {
     try {
         const userId = req.session.user;
         const search = req.query.search || '';
-        const product = await productSchema.find({isActive: true})
-            .limit(8)
-            .sort({createdAt: -1})
 
-        const categories = await categorySchema.find();
+        // Get active brands and categories
+        const [activeBrands, activeCategories] = await Promise.all([
+            brandSchema.find({ isActive: true }),
+            categorySchema.find({ isActive: true })
+        ]);
 
+        // Get IDs of active brands and category names
+        const activeBrandIds = activeBrands.map(brand => brand._id);
+        const activeCategoryNames = activeCategories.map(cat => cat.categoryName);
+
+        // Get products that are active AND belong to active brands AND active categories
+        const product = await productSchema.find({
+            isActive: true,
+            productBrand: { $in: activeBrandIds },
+            productCategory: { $in: activeCategoryNames }
+        })
+        .limit(8)
+        .sort({ createdAt: -1 });
+
+        // Get wishlist if user is logged in
         const wishlist = await wishlistSchema.findOne({ userID: userId });
-        res.render('user/homepage',{
+
+        res.render('user/homepage', {
             title: 'Home Page',
             search,
             product,
+            brand: activeBrands,
             wishlist,
-            categories,
-            user:req.session.user
+            categories: activeCategories, // Only passing active categories
+            user: req.session.user
         });
-    } 
-    catch (error) {
+    } catch (error) {
         console.log(`error in rendering home page ${error}`);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Something went wrong',
+            error: process.env.NODE_ENV === 'development' ? error : {}
+        });
     }
-    
-}
+};
+
+//----------------rendering brand products page--------------
+
+const getBrandProducts = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const brandId = req.params.id;
+
+        // Check if brand exists and is active
+        const brand = await brandSchema.findOne({ 
+            _id: brandId,
+            isActive: true 
+        });
+
+        if (!brand) {
+            req.flash('error', 'Brand not found or inactive');
+            return res.redirect('/home');
+        }
+
+        // Get active categories
+        const activeCategories = await categorySchema.find({ isActive: true });
+        const activeCategoryNames = activeCategories.map(cat => cat.categoryName);
+
+        // Get products that are active AND belong to active categories
+        const products = await productSchema.find({
+            productBrand: brand._id,
+            isActive: true,
+            productCategory: { $in: activeCategoryNames }
+        });
+
+        // if (!products || products.length === 0) {
+        //     req.flash('error', 'No products found for this brand');
+        //     return res.redirect('/home');
+        // }
+
+        const wishlist = await wishlistSchema.findOne({ userID: userId });
+
+        res.render('user/brand-products', {
+            title: brand.brandName,
+            products,
+            user: req.session.user,
+            search: '',
+            wishlist
+        });
+    } catch (error) {
+        console.log(`Error in brand products page rendering: ${error}`);
+        req.flash('error', 'Something went wrong');
+        res.redirect('/home');
+    }
+};
 
 //---------------------logout-----------------------
 
@@ -284,5 +355,6 @@ module.exports ={
     otpResend,
     loginPost,
     home,
+    getBrandProducts,
     logout
 }

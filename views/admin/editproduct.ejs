@@ -55,6 +55,17 @@
                             <textarea class="form-control text-black form-input w-full p-2 border rounded focus:outline-none mt-1"
                                 name="productDescription" id="productDescription"
                                 ><%= product.productDescription %></textarea>
+
+                                <label class="form-label block text-sm font-medium text-gray-700"
+                                for="productBrand">Brand</label>
+                                
+                            <select name="productbrand" id="productBrand"
+                                class="form-control bg-[#FFFFFF] text-black form-input w-full p-2 border rounded  focus:outline-none edit-product-disable"
+                                 required>
+                                 <% brand.forEach((brand) => { %>
+                                    <option value="<%= brand._id %>" <% if (brand.brandName === product.productBrand) { %> selected <% } %>><%= brand.brandName %></option>
+                                  <% }) %>
+                            </select>
                         </div>
                         
                         <div class="col-span-full flex justify-center mt-3">

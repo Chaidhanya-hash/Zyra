@@ -3,10 +3,12 @@ const cartSchema = require('../../model/cartSchema')
 const userSchema = require('../../model/userSchema')
 const orderSchema = require('../../model/orderSchema')
 const couponSchema = require('../../model/couponSchema');
+const walletSchema = require('../../model/walletSchema');
 
 const {ObjectId} = require('mongodb');
 
 const Razorpay = require('razorpay');
+
 
 //----------------------checkout page rendering------------------
 

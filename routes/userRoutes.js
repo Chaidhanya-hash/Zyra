@@ -59,7 +59,9 @@ user.get('/forgotpassword-resendotp',forgotPassword.forgotResend);
 
 //-----------------------------home-----------------------------
 
-user.get('/home',checkUser, userController.home)
+user.get('/home',checkUser, userController.home);
+
+user.get('/brand-product/:id',checkUser, userController.getBrandProducts);
 
 //---------------------------category----------------------------
 

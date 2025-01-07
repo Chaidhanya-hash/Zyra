@@ -8,6 +8,7 @@ const orderController = require('../controller/adminController/orderController')
 const couponController = require('../controller/adminController/couponController');
 const offerController = require('../controller/adminController/offerController');
 const saleController = require('../controller/adminController/saleController');
+const brandController = require('../controller/adminController/brandController');
 
 const {upload} = require('../uploads/cloudinary');
 const { isAdmin } = require('../middleware/adminSession');
@@ -55,6 +56,16 @@ admin.post('/addcategory',isAdmin,categoryController.addCategoryPost);
 admin.get('/categorystatus',isAdmin,categoryController.status);
 
 admin.post('/editcategory',isAdmin,categoryController.editCategory);
+
+//-------------------brand-------------------------
+
+admin.get('/brand', isAdmin, brandController.brand);
+
+admin.post('/addbrand',isAdmin, brandController.addBrandPost);
+
+admin.get('/brandstatus',isAdmin,brandController.status);
+
+admin.post('/editbrand',isAdmin, brandController.editBrand);
 
 //------------------------orders-------------------------
 

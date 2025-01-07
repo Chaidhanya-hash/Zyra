@@ -42,6 +42,11 @@
             <span class="text-sm font-medium">Category</span>
         </a>
 
+        <!-- Brands -->
+        <a href="/admin/brand" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
+            <span class="text-sm font-medium">Brands</span>
+        </a>
+
         <!-- Customers -->
         <a href="/admin/customers" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
             <span class="text-sm font-medium">Customers</span>
@@ -62,10 +67,6 @@
             <span class="text-sm font-medium">Offers</span>
         </a>
 
-        <!-- Banner -->
-        <a href="#" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
-            <span class="text-sm font-medium">Banner</span>
-        </a>
 
         <!-- Logout -->
         <a href="/admin/logout" class="flex items-center space-x-4 py-3 px-4 rounded-lg hover:bg-white hover:text-[#4A148C] transition">
@@ -104,6 +105,7 @@
                             <th class="py-4 px-5 text-center">Price</th>
                             <th class="py-4 px-5 text-center">Stock</th>
                             <th class="py-4 px-5 text-center">Category</th>
+                            <th class="py-4 px-5 text-center">Brand</th>
                             <th class="py-4 px-5 text-center">Status</th>
                             <th class="py-4 px-5 text-center">Action</th>
                         </tr>
@@ -119,6 +121,16 @@
                                 <td class="py-4 px-5 text-center text-gray-700">₹<%= product.productPrice %></td>
                                 <td class="py-4 px-5 text-center text-gray-700"><%= product.productQuantity %></td>
                                 <td class="py-4 px-5 text-center text-gray-700"><%= product.productCategory %></td>
+                                <td class="py-4 px-5 text-center text-gray-700">
+                                    <% if (product.productBrand) { %>
+                                        <% const matchingBrand = brand.find(b => b._id.toString() === product.productBrand.toString()) %>
+                                        <%= matchingBrand ? matchingBrand.brandName : 'No Brand' %>
+                                    <% } else { %>
+                                        No Brand
+                                    <% } %>
+                                </td>
+                                
+                                
                                 <td class="py-4 px-5 text-center">
                                     <% if (product.isActive) { %>
                                         <span class="px-3 py-1 text-sm font-medium text-green-700 bg-green-100 rounded-full">Listed</span>

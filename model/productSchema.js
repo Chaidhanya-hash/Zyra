@@ -31,8 +31,12 @@ const schema = new mongoose.Schema({
     isActive:{
         type:Boolean,
         default:true
+    },
+    productBrand:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Brand',
+        required: true
     }
-
 },{timestamps:true});
 
 module.exports = mongoose.model('product',schema);

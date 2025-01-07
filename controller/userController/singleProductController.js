@@ -3,6 +3,7 @@ const productSchema = require('../../model/productSchema');
 const orderSchema = require('../../model/orderSchema');
 const couponSchema = require('../../model/couponSchema');
 const categorySchema = require('../../model/categorySchema');
+const walletSchema = require('../../model/walletSchema');
 
 
 const checkOut = async (req,res) =>{
@@ -142,6 +143,21 @@ const singleOrder = async (req,res) =>{
         });
 
         await newOrder.save();
+
+        if (paymentDetails[paymentMode] === 'Wallet') {
+            const wallet = await walletSchema.findOne({ userID: userId });
+            if (!wallet || wallet.balance < product.productPrice) {
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+            }
+            wallet.balance -= product.productPrice;
+            wallet.transaction.push({
+                wallet_amount: product.productPrice,
+                transactionType: 'Debited',
+                transaction_date: new Date(),
+                order_id: newOrder.order_id,
+            });
+            await wallet.save();
+        }
 
         if (payment_status !== "Failed") {
             product.productQuantity -= 1;

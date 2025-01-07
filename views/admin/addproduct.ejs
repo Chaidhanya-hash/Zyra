@@ -38,6 +38,18 @@
     
                         <label class="block text-sm font-medium text-gray-700 mt-4" for="productDescription">Description</label>
                         <textarea class="block col-span-2 w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500" name="productDescription" id="productDescription" ></textarea>
+
+                        <label class="block text-sm font-medium text-gray-700 mt-4" for="productBrand">Brand</label>
+                        <select name="productBrand" id="productBrand" class="block w-full border border-gray-300 rounded-md p-2 mt-1 focus:ring-blue-500 focus:border-blue-500" >
+                            <option value="" selected disabled>Select a Brand</option>
+                            <% productBrand.forEach((brand) => { %>
+                                <option value="<%= brand.brandName %>">
+                                    <%= brand.brandName %>
+                                </option>
+                            <% }) %>
+                        </select>
+                        
+                        
                     </div>
     
                     <!-- Image Upload -->
@@ -89,6 +101,7 @@ const productQuantity = document.getElementsByName('productQuantity')[0];
 const productDiscount = document.getElementsByName('productDiscount')[0];
 const productDescription = document.getElementsByName('productDescription')[0];
 const productCategory = document.getElementById('productCategory');
+const productBrand = document.getElementById('productBrand');
 const imageUploadInput = document.getElementById('image-upload'); // Image input field
 
 // Validate Images function
@@ -163,6 +176,8 @@ addProductForm.addEventListener('submit', (e) => {
 }
 
 
+
+
     // Validate Description
     if (productDescription.value.trim() === "") {
         Swal.fire({
@@ -179,6 +194,17 @@ addProductForm.addEventListener('submit', (e) => {
             icon: "error",
             title: "Category Required",
             text: "Please select a product category.",
+        });
+        isValid = false;
+    }
+
+  //-----validate brand-----
+
+    if (productBrand.value.trim() === "") {
+        Swal.fire({
+            icon: "error",
+            title: "Brand Required",
+            text: "Please select a product brand.",
         });
         isValid = false;
     }

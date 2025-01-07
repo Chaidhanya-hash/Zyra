@@ -110,18 +110,25 @@
   
     
 
-    <!-- Brands Section -->
-    <section class="px-8 py-10 mx-auto">
-      <h2 class="kurale-regular text-2xl text-center mb-6">Brands</h2>
-      <div class="flex flex-wrap justify-center gap-16">
-        <img src="styles/images/aqualogica_logo.jpeg" alt="Brand Logo 1" class="w-20">
-        <img src="styles/images/plum_logo.webp" alt="Brand Logo 2" class="w-20">
-        <img src="styles/images/Mamaearth_logo.jpeg" alt="Brand Logo 3" class="w-20">
-        <img src="styles/images/ponds_logo.png" alt="Brand Logo 4" class="w-20">
-        <img src="styles/images/Biotique_logo.jpeg" alt="Brand Logo 4" class="w-20">
-        <img src="styles/images/Lotus_logo.webp" alt="Brand Logo 4" class="w-20">
-      </div>
-    </section>
+
+    
+<!-- Brands Section -->
+<section class="px-8 py-10 mx-auto bg-gray-50">
+  <h2 class="kurale-regular text-3xl text-center mb-8">Our Brands</h2>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-6xl mx-auto">
+      <% brand.forEach(brand => { %>
+          <a href="/brand-product/<%= brand._id %>" class="brand-logo-container transform hover:scale-105 transition-transform duration-300 cursor-pointer">
+              <div class="brand-circle flex items-center justify-center h-24 w-24 mx-auto rounded-full bg-gradient-to-r from-pink-100 to-violet-100 shadow-lg hover:shadow-xl transition-shadow">
+                  <div class="brand-inner w-20 h-20 rounded-full bg-white flex items-center justify-center p-2">
+                      <span class="text-center font-semibold text-gray-800 text-sm leading-tight">
+                          <%= brand.brandName %>
+                      </span>
+                  </div>
+              </div>
+          </a>
+      <% }) %>
+  </div>
+</section>
     <!-- Responsive Card Section -->
     <div class="bg-black p-6 rounded-lg max-w-3xl mx-auto mb-8">
       <div class="text-center">

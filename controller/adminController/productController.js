@@ -1,8 +1,9 @@
 const productSchema = require('../../model/productSchema');
 const categorySchema = require('../../model/categorySchema');
-
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
+const brandSchema = require('../../model/brandSchema');
+
 //-------------------------products page rendering------------------------
 
 const product = async (req,res) =>{
@@ -10,6 +11,8 @@ const product = async (req,res) =>{
         const search = req.query.search || "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
+
+        const brand = await brandSchema.find();
 
         const products = await productSchema.find({productName: {$regex: search, $options: 'i'}})
             .limit(limit)
@@ -21,6 +24,7 @@ const product = async (req,res) =>{
         res.render('admin/products',{
             title:'Products',
             products,
+            brand,
             totalPages: Math.ceil(count/limit),
             currentPage: page,
             search,
@@ -38,10 +42,11 @@ const product = async (req,res) =>{
 const addProduct = async (req,res) =>{
     try {
         const productCollection = await categorySchema.find()
-        
+        const productBrand = await brandSchema.find();
         res.render('admin/addproduct',{
             title:'Products',
-            productCollection
+            productCollection,
+            productBrand
         })
     }
     catch(error){
@@ -69,12 +74,23 @@ const uploadBase64ImageToCloudinary = async (base64Data)=>{
 
 const addProductPost = async (req,res)=>{
     try {
+
+        const brand = await brandSchema.findOne({ 
+            brandName: req.body.productBrand,
+            isActive: true 
+        });
+
+        if (!brand) {
+            req.flash('error', 'Selected brand does not exist or is inactive');
+            return res.redirect('/admin/addproduct');
+        }
         const imgArray = [];
 
         for(const img of req.files){
             const imgaeUrl = await uploadBase64ImageToCloudinary(img.path);
             imgArray.push(imgaeUrl);
         }
+
 
         const product ={
             productName : req.body.productName,
@@ -83,6 +99,7 @@ const addProductPost = async (req,res)=>{
             productQuantity : req.body.productQuantity,
             productDiscount : req.body.productDiscount,
             productDescription : req.body.productDescription,
+            productBrand: brand._id,
             productImage : imgArray
         }
 
@@ -111,12 +128,14 @@ const editProduct = async (req,res) =>{
         const id = req.params.id;
         const product = await productSchema.findById(id)
         const category = await categorySchema.find();
+        const brand = await brandSchema.find();
         
         if(product) {
             res.render('admin/editproduct',{
                 title:'Edit Product',
                 product,
-                category
+                category,
+                brand
             })
         } else {
             req.flash('error','Unable to edit product')
@@ -165,6 +184,7 @@ const editProductPost = async (req,res) =>{
         }
 
         const product = await productSchema.findById(id);
+        
 
         const newImages = [...product.productImage,...savedCroppedImages];
 
@@ -174,6 +194,7 @@ const editProductPost = async (req,res) =>{
             productCategory:req.body.productCategory,
             productDiscount: req.body.productDiscount,
             productDescription: req.body.productDescription,
+            productBrand: req.body.productbrand,
             productImage: newImages
         });
 

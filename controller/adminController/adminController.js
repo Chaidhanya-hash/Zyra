@@ -100,6 +100,38 @@ const dashboard = async (req, res) => {
             }
         });
 
+        const brandAnalytics = await orderSchema.aggregate([
+            { $unwind: "$products" },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'products.product_id',
+                    foreignField: '_id',
+                    as: 'productInfo'
+                }
+            },
+            { $unwind: "$productInfo" },
+            {
+                $lookup: {
+                    from: 'brands',
+                    localField: 'productInfo.productBrand',
+                    foreignField: '_id',
+                    as: 'brandInfo'
+                }
+            },
+            { $unwind: "$brandInfo" },
+            {
+                $group: {
+                    _id: '$brandInfo._id',
+                    brandName: { $first: '$brandInfo.brandName' },
+                    totalSales: { $sum: "$products.product_price" },
+                    totalQuantity: { $sum: "$products.product_quantity" },
+                    averagePrice: { $avg: "$products.product_price" }
+                }
+            },
+            { $sort: { totalSales: -1 } }
+        ]);
+
         res.render('admin/dashboard', {
             title: "Dashboard",
             orderCount,
@@ -107,7 +139,8 @@ const dashboard = async (req, res) => {
             Revenue,
             productCount,
             bestProducts,
-            bestCategory
+            bestCategory,
+            brandAnalytics
         });
     } catch (error) {
         console.log(`error from home ${error}`);
