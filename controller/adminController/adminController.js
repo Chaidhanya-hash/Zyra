@@ -74,31 +74,69 @@ const dashboard = async (req, res) => {
         // const productCount = await orderSchema.find({
         //     orderStatus: { $in: ['Pending', 'Shipped', 'Delivered'] }
         // }).count();
-        
 
-        // Find the best seller
-        const productSale = await orderSchema.aggregate([
+        // Find the best selling products with complete information in one aggregation
+        const bestSellingProducts = await orderSchema.aggregate([
+            // Unwind products array
             { $unwind: "$products" },
-            { $group: { _id: '$products.product_id', totalQuantity: { $sum: "$products.product_quantity" } } },
-            { $sort: { totalQuantity: -1 } }
-        ]);
-
-        const productId = productSale.map(sale => sale._id);
-
-        const products = await productSchema.find({ _id: { $in: productId } });
-
-        const bestProducts = productId.map(id => products.find(product => product._id.toString() === id.toString()));
-
-        const bestCategory = new Map();
-        bestProducts.forEach(element => {
-            if (element && element.productCategory) {
-                if (bestCategory.has(element.productCategory)) {
-                    bestCategory.set(element.productCategory, bestCategory.get(element.productCategory) + 1);
-                } else {
-                    bestCategory.set(element.productCategory, 1);
+            // Only include completed orders
+            {
+                $match: {
+                    orderStatus: { $in: ['Confirmed','Shipped', 'Delivered'] }
+                }
+            },
+            // Group by product ID and calculate total quantities and revenue
+            {
+                $group: {
+                    _id: '$products.product_id',
+                    totalQuantity: { $sum: "$products.product_quantity" },
+                    totalRevenue: { $sum: { $multiply: ["$products.product_quantity", "$products.product_price"] } },
+                    productName: { $first: "$products.product_name" }
+                }
+            },
+            // Sort by quantity sold
+            { $sort: { totalQuantity: -1 } },
+            // Limit to top 10 products
+            { $limit: 10 },
+            // Lookup product details
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            { $unwind: "$productDetails" },
+            // Project final fields
+            {
+                $project: {
+                    _id: 1,
+                    productName: "$productDetails.productName",
+                    productImage: { $first: "$productDetails.productImage" },
+                    productCategory: "$productDetails.productCategory",
+                    productBrand: "$productDetails.productBrand",
+                    totalQuantity: 1,
+                    totalRevenue: 1,
+                    averagePrice: { $divide: ["$totalRevenue", "$totalQuantity"] }
                 }
             }
+        ]);
+
+        // Calculate best categories from the best selling products
+        const bestCategory = new Map();
+        bestSellingProducts.forEach(product => {
+            if (product.productCategory) {
+                bestCategory.set(
+                    product.productCategory,
+                    (bestCategory.get(product.productCategory) || 0) + product.totalQuantity
+                );
+            }
         });
+
+        // Sort categories by total quantity sold
+        const sortedCategories = Array.from(bestCategory.entries())
+            .sort((a, b) => b[1] - a[1]);
 
         const brandAnalytics = await orderSchema.aggregate([
             { $unwind: "$products" },
@@ -138,8 +176,8 @@ const dashboard = async (req, res) => {
             userCount,
             Revenue,
             productCount,
-            bestProducts,
-            bestCategory,
+            bestSellingProducts,
+            bestCategory: sortedCategories,
             brandAnalytics
         });
     } catch (error) {

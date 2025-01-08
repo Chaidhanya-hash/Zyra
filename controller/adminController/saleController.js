@@ -5,32 +5,80 @@ const PDFdocs = require('pdfkit-table')
 
 //---------------rendering sales page--------------------
 
-const salePage =async (req,res)=>{
-    try{
-        const orderCount = await orderSchema.countDocuments()
+const salePage = async (req, res) => {
+    try {
+        // Only count confirmed, shipped, and delivered orders
+        const orderCount = await orderSchema.countDocuments({
+            orderStatus: { $in: ['Confirmed', 'Shipped', 'Delivered'] }
+        });
+
+        // Calculate revenue only from shipped and delivered orders
         const revenueResult = await orderSchema.aggregate([
-            {$match: {orderStatus: { $in: ['Shipped', 'Delivered'] }}},
-            {$group: {_id: null,total: { $sum: "$totalPrice" }}}]);
+            {
+                $match: {
+                    orderStatus: { $in: ['Shipped', 'Delivered'] }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$totalPrice" }
+                }
+            }
+        ]);
+
+        // Calculate products sold from valid orders
+        const product = await orderSchema.aggregate([
+            {
+                $match: {
+                    orderStatus: { $in: ['Confirmed', 'Shipped', 'Delivered'] }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$totalQuantity" }
+                }
+            }
+        ]);
 
         const Revenue = revenueResult.length > 0 ? revenueResult[0].total : 0;
-        const product = await orderSchema.aggregate([
-            {$group: {_id: null,total: { $sum: "$totalQuantity" }}}]);
-
         const productCount = product.length > 0 ? product[0].total : 0;
-        res.render('admin/salesreport',{title:"Sales Report" , Revenue , productCount , orderCount })
-    }catch(error){
-        console.log(`error while render sale report ${error}`)
+        const averageOrderValue = orderCount > 0 ? Revenue / orderCount : 0;
+
+        res.render('admin/salesreport', {
+            title: "Sales Report",
+            Revenue,
+            productCount,
+            orderCount,
+            averageOrderValue
+        });
+    } catch (error) {
+        console.log(`error while render sale report ${error}`);
+        res.status(500).send("Internal Server Error");
     }
-}
+};
 
 const getSalesByMonth = async (req, res) => {
     try {
         const sales = await orderSchema.aggregate([
-            { $match: { orderStatus: { $in: ['Confirmed', 'Delivered', 'Shipped', 'Pending'] } } },
+            { 
+                $match: { 
+                    orderStatus: { $in: ['Confirmed', 'Delivered', 'Shipped'] } 
+                } 
+            },
             {
                 $group: {
                     _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
-                    totalSales: { $sum: "$totalPrice" },
+                    totalSales: { 
+                        $sum: {
+                            $cond: [
+                                { $in: ["$orderStatus", ["Shipped", "Delivered"]] },
+                                "$totalPrice",
+                                0
+                            ]
+                        }
+                    },
                     count: { $sum: 1 }
                 }
             },
@@ -41,7 +89,7 @@ const getSalesByMonth = async (req, res) => {
         res.json(sales);
     } catch (error) {
         console.log(`error in get sales by month ${error}`);
-        res.json(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
 
@@ -51,76 +99,81 @@ const getOrderDetails = async (req, res) => {
     limit = parseInt(limit);
     let skip = (page - 1) * limit;
 
-    let orderDetails;
-    let match = {};
-    
     try {
+        let match = {
+            orderStatus: { $in: ['Confirmed', 'Shipped', 'Delivered'] }
+        };
+
         const now = new Date();
         if (salesreportType === 'custom') {
             const start = new Date(startDate);
             start.setHours(0, 0, 0, 0);
-        
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
-        
-            match = {
-                createdAt: { $gte: start, $lte: end }
-            };
+            match.createdAt = { $gte: start, $lte: end };
         } else if (salesreportType === 'monthly') {
-            endDate = new Date();
-            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-            match = { createdAt: { $gte: startDate, $lte: endDate} };
+            match.createdAt = { 
+                $gte: new Date(now.getFullYear(), now.getMonth(), 1),
+                $lte: now 
+            };
         } else if (salesreportType === 'yearly') {
-            endDate = new Date();
-            startDate = new Date(now.getFullYear(), 0, 1);
-            match = { createdAt: { $gte: startDate, $lte: endDate } };
+            match.createdAt = { 
+                $gte: new Date(now.getFullYear(), 0, 1),
+                $lte: now 
+            };
         } else if (salesreportType === 'weekly') {
-            endDate = new Date();
-            const currentDate = new Date();
-            const diff = currentDate.getDate() - currentDate.getDay();
-            startDate = new Date(currentDate.setDate(diff));
-            match = { createdAt: { $gte: startDate, $lte: endDate } };
+            const diff = now.getDate() - now.getDay();
+            match.createdAt = { 
+                $gte: new Date(now.setDate(diff)),
+                $lte: new Date() 
+            };
         }
 
-        orderDetails = await orderSchema.aggregate([
-            { $match: match },
-            {
-                $lookup: {
-                    from: 'coupons',
-                    localField: 'coupen_id',
-                    foreignField: '_id',
-                    as: 'coupen_data'
-                }
-            },
-            {
-                $sort: { createdAt: -1 }
-            },
-            {
-                $skip: skip
-            },
-            {
-                $limit: limit
-            }
+        const [orderDetails, totalRecords] = await Promise.all([
+            orderSchema.aggregate([
+                { $match: match },
+                {
+                    $lookup: {
+                        from: 'coupons',
+                        localField: 'coupen_id',
+                        foreignField: '_id',
+                        as: 'coupen_data'
+                    }
+                },
+                { $sort: { createdAt: -1 } },
+                { $skip: skip },
+                { $limit: limit }
+            ]),
+            orderSchema.countDocuments(match)
         ]);
 
-        const totalRecords = await orderSchema.countDocuments(match);
         const totalPages = Math.ceil(totalRecords / limit);
-        res.status(200);
-        res.json({ orderDetails, totalPages, currentPage: page });
+        
+        res.status(200).json({ 
+            orderDetails, 
+            totalPages, 
+            currentPage: page,
+            totalRecords
+        });
     } catch (error) {
         console.log(`error while render the order details ${error}`);
-        res.status(400).json(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
 
 //---------------------pdf-------------------------------------
 
 const downloadPDF = async (req, res) => {
-    const { salesreportType, startDate, endDate ,reportType } = req.body;
-    let match = {};
+    const { salesreportType, startDate, endDate, reportType } = req.body;
+    let match = {
+        // Add status filter to exclude cancelled and returned orders
+        orderStatus: { $in: ['Confirmed', 'Shipped', 'Delivered'] }
+    };
+
     if (salesreportType !== "") {
-        match = {
-            createdAt: { $lte: new Date(endDate), $gte: new Date(startDate) },
+        match.createdAt = { 
+            $lte: new Date(endDate), 
+            $gte: new Date(startDate) 
         };
     }
 
@@ -137,12 +190,11 @@ const downloadPDF = async (req, res) => {
             },
             { $sort: { createdAt: -1 } }
         ]);
+
         if (orderDetails.length > 0) {
-            console.log(reportType,"reportType")
-            if(reportType === 'PDF')
-            await generatePdf(orderDetails, res);
-            else if(reportType === 'EXCEL')
-            {
+            if(reportType === 'PDF') {
+                await generatePdf(orderDetails, res);
+            } else if(reportType === 'EXCEL') {
                 await generateExcel(orderDetails, res);
             }
         } else {
@@ -155,9 +207,10 @@ const downloadPDF = async (req, res) => {
 }
 
 async function generatePdf(orders, res) {
+    // Calculate totals only from valid orders
     const totalOrders = orders.length;
     const totalRevenue = orders
-        .filter(order => order.status !== 'Confirmed' && order.status !== 'Cancelled' && order.status !== 'Returned')
+        .filter(order => ['Shipped', 'Delivered'].includes(order.orderStatus))
         .reduce((acc, curr) => acc + curr.totalPrice, 0);
 
     const doc = new PDFdocs();
@@ -218,12 +271,13 @@ async function generatePdf(orders, res) {
     doc.end();
 }
 
-//-------------------------- Excel ----------------------------
+//------------------------------Excel---------------------------
 
 async function generateExcel(orders, res) {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Sheet 1');
+    const worksheet = workbook.addWorksheet('Sales Report');
 
+    // Set column headers and widths
     worksheet.columns = [
         { header: "Order ID", key: "orderId", width: 15 },
         { header: "Address", key: "address", width: 30 },
@@ -233,50 +287,42 @@ async function generateExcel(orders, res) {
         { header: "Total", key: "total", width: 15 },
     ];
 
+    // Calculate totals only from shipped and delivered orders
     let totalSale = orders
-    .filter(order => order.status !== 'pending' && order.status !== 'cancelled' && order.status !== 'returned')
-    .reduce((acc, curr) => acc + curr.totalPrice, 0);
-    let totalOrders = 0;
+        .filter(order => ['Shipped', 'Delivered'].includes(order.orderStatus))
+        .reduce((acc, curr) => acc + curr.totalPrice, 0);
+    let totalOrders = orders.length;
 
+    // Add data rows
     for (const order of orders) {
-        const orderId = order.order_id;
-        const orderDate = order.createdAt;
-        const address = order.address.building + '\n' + order.address.street + ' ' + order.address.city;
-        const pin = order.address.pincode;
-        const status = order.orderStatus;
-        const total = order.totalPrice;
-
         worksheet.addRow({
-            orderId,
-            orderDate,
-            address,
-            pin,
-            status,
-            total
+            orderId: order.order_id,
+            address: `${order.address.building}, ${order.address.street}, ${order.address.city}`,
+            pin: order.address.pincode,
+            status: order.orderStatus,
+            orderDate: new Date(order.createdAt).toLocaleDateString(),
+            total: order.totalPrice.toFixed(2)
         });
-        totalOrders++;
     }
 
+    // Add summary row
+    worksheet.addRow({});  // Empty row for spacing
     worksheet.addRow({
-        orderId: "Total",
-        productName: "",
-        price: "",
-        quantity: "",
-        status: "",
+        orderId: "Summary",
         address: "",
         pin: "",
-        orderDate: ""
+        status: `Total Orders: ${totalOrders}`,
+        orderDate: "Total Revenue:",
+        total: `Rs ${totalSale.toFixed(2)}`
     });
 
-    worksheet.mergeCells(`A${worksheet.rowCount}:D${worksheet.rowCount}`);
-    worksheet.getCell(`A${worksheet.rowCount}`).alignment = { vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell(`A${worksheet.rowCount}`).font = { bold: true };
-    worksheet.getCell(`A${worksheet.rowCount}`).value = `Total Orders: ${totalOrders}`;
+    // Style the summary row
+    const summaryRow = worksheet.lastRow;
+    summaryRow.eachCell((cell) => {
+        cell.font = { bold: true };
+    });
 
-    worksheet.getCell(`E${worksheet.rowCount}`).alignment = { vertical: 'middle', horizontal: 'center' };
-    worksheet.getCell(`E${worksheet.rowCount}`).font = { bold: true };
-    worksheet.getCell(`E${worksheet.rowCount}`).value = `Total Revenue: ${totalSale.toFixed(2)}`;
-
+    // Generate and send the Excel file
     const buffer = await workbook.xlsx.writeBuffer();
     const excelBuffer = Buffer.from(buffer);
 
