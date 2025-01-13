@@ -91,7 +91,7 @@ const allProduct = async(req,res) => {
         const minPrice = parseInt(req.query.minPrice) || 0;
         const maxPrice = parseInt(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
         const sortBy = req.query.sortBy || 'newArrivals';
-        const search = req.query.search || "";
+        const search = req.query.search ? req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 12;
         const userId = req.session.user;

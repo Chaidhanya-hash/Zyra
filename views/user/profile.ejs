@@ -28,12 +28,15 @@
                                 <span>Wallet</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="/ressetprofile-password" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
-                                
-                                <span>Reset Password</span>
-                            </a>
-                        </li>
+                        <% if(!userDetail.googleID) { %>
+                            <li>
+                                <a href="/ressetprofile-password" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
+                                    
+                                    <span>Reset Password</span>
+                                </a>
+                            </li>
+                        <% }  %>
+
                         <li>
                             <a href="/logout" class="flex items-center space-x-2 px-4 py-2 bg-white rounded hover:underline">
                                 

@@ -96,7 +96,10 @@
     }
     function validatePhone(mobileNumber) {
       const phoneRe = /^\d{10}$/;
-      return phoneRe.test(mobileNumber);
+      if(mobileNumber != "0000000000"){
+        return phoneRe.test(mobileNumber);
+      }
+      
     }
 
     registerForm.addEventListener('submit', (e) => {

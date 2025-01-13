@@ -34,7 +34,13 @@ const loginPost = async (req,res)=>{
             if(!test.isActive){
                 req.flash('error','User is blocked by admin');
                 res.redirect('/login');
-            } else {
+            } 
+
+            else if(test.googleID){
+                req.flash('error','You are logged in by using google. Please use Google to login again');
+                res.redirect('/login');
+            }
+            else {
                 const password = await bcrypt.compare(req.body.password,test.password);
                 if(password){
                     req.session.user = test.id

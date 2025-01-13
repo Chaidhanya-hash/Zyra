@@ -4,12 +4,34 @@ const orderSchema = require('../../model/orderSchema');
 const couponSchema = require('../../model/couponSchema');
 const categorySchema = require('../../model/categorySchema');
 const walletSchema = require('../../model/walletSchema');
+const { remove } = require('../../model/addressSchema');
 
 
 const checkOut = async (req,res) =>{
     try{
         const categories = await categorySchema.find();
         const productId = req.params.id;
+         
+        const product = await productSchema.findById(productId);
+        const total = product.productPrice - (product.productPrice * (product.productDiscount / 100));
+        
+        let discountedTotal = total;
+        
+        if(req.session.coupon){
+            const coupon = await couponSchema.findOne({ code: req.session.coupon });
+            if (total < coupon.minimumOrderAmount) {
+                return res.status(400).json({ error: "Minimum purchase limit not reached." });
+            };
+    
+            const couponDiscount = coupon.discountValue;
+    
+            if (coupon.discountType === "Fixed") {
+                discountedTotal = total - couponDiscount;
+            } else if (coupon.discountType === "Percentage") {
+                const discountAmount = (couponDiscount / 100) * total;
+                discountedTotal = total - discountAmount;
+            };
+        }
         if(!req.session.user){
             req.flash('error','User is not found, Please login again');
             res.redirect('/login');
@@ -22,7 +44,7 @@ const checkOut = async (req,res) =>{
             return res.status(404).send('User not found');
         }
 
-        const product = await productSchema.findById(productId);
+        
         if(product.productQuantity <= 0){
             req.flash('error','Product is Out of Stock');
             res.redirect('/home');
@@ -37,7 +59,9 @@ const checkOut = async (req,res) =>{
             search:'',
             categories,
             product,
-            userDetails: user
+            discountedTotal,
+            userDetails: user,
+            coupon: req.session.coupon
         })
     }
     catch(error){
@@ -82,7 +106,7 @@ const singleOrder = async (req,res) =>{
         }
 
         const product = await productSchema.findById(productId);
-        if(!product){
+        if(!product || !product.isActive){
             console.log(`Product not found for ID: ${productId}`);
             return res.status(400).json({ success: false, message: 'Your product is empty or could not be found.'})
         }
@@ -185,7 +209,7 @@ const singleOrder = async (req,res) =>{
 const coupon = async (req, res) => {
     try {
         const couponName = req.body.couponCode;
-        
+        req.session.coupon = req.body.couponCode;
         const total = req.body.totalAmount;
         const userId = req.session.user;
 
@@ -202,6 +226,11 @@ const coupon = async (req, res) => {
         if (!coupon.isActive || coupon.expiryDate < new Date()) {
             return res.status(400).json({ error: "Coupon expired" });
         };
+
+        const Used  = await orderSchema.findOne({customer_id:userId,couponCode:couponName,orderStatus: { $in: ['Delivered', 'Shipped', 'Confirmed'] }})
+        if(Used){
+            return res.status(404).json({ error: "Coupon Already Used" });
+        }
 
         let discountedTotal = total;
 
@@ -225,9 +254,41 @@ const coupon = async (req, res) => {
     }
 };
 
+const removeCoupon = async (req, res) => {
+    try {
+        // Clear coupon from session
+        req.session.coupon = null;
+        const productId = req.body.productId;
+        const product = await productSchema.findById(productId);
+        
+        if (!product) {
+            return res.status(404).json({ 
+                success: false, 
+                error: "Product not found" 
+            });
+        }
+
+        // Calculate original total without coupon
+        const originalTotal = product.productPrice - (product.productPrice * (product.productDiscount / 100));
+
+        return res.status(200).json({
+            success: true,
+            total: originalTotal,
+            message: "Coupon removed successfully"
+        });
+    } catch (error) {
+        console.log(`Error in remove coupon: ${error}`);
+        return res.status(500).json({ 
+            success: false, 
+            error: "An error occurred while removing the coupon" 
+        });
+    }
+};
+
 module.exports = {
     checkOut,
     editAddress,
     singleOrder,
-    coupon
+    coupon,
+    removeCoupon
 }

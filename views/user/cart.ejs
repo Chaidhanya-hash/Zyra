@@ -21,14 +21,22 @@
                                 <div class="w-2/5 px-4">
                                     <div class="text-lg font-semibold text-gray-800"><%= item.productId.productName %></div>
                                     <div class="text-sm text-gray-500">Category: <%= item.productId.productCategory %></div>
+                                    <% if (!item.productId.isActive || item.productId.productQuantity <= 0) { %>
+                                        <div class="text-red-500 text-sm mt-1 font-semibold">
+                                            Unavailable
+                                        </div>
+                                    <% } %>
                                 </div>
                                 <div class="w-1/5 flex items-center space-x-2">
                                     <button class="px-3 py-1 border rounded bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="decrement('<%= item.productId._id %>')">-</button>
                                     <input type="text" class="w-12 text-center border rounded" value="<%= item.productCount %>" readonly>
                                     <button class="px-3 py-1 border rounded bg-gray-200 text-gray-700 hover:bg-gray-300" onclick="increment('<%= item.productId._id %>')">+</button>
                                 </div>
-                                <div class="w-1/5 text-right text-gray-700">
-                                    <i class="fa-solid fa-indian-rupee-sign"></i> <%= item.productPrice.toFixed(2) %>
+                                <div class="w-1/5 text-right">
+                                    <div class="text-gray-700">
+                                        <i class="fa-solid fa-indian-rupee-sign"></i> <%= item.productPrice.toFixed(2) %>
+                                    </div>
+                                    
                                 </div>
                                 <div class="w-1/6 text-right">
                                     <a href="#" class="text-red-500 hover:text-red-700 delete-link" data-id="<%= item.productId._id %>">
@@ -37,7 +45,9 @@
                                         </svg>
                                     </a>
                                 </div>
+                                
                             </div>
+                            
                         </div>
                     <% }) %>
                     <div class="mt-6">

@@ -28,7 +28,7 @@ const orderPage = async (req,res) =>{
             .limit(limit)
             .skip((page - 1) * limit)
         const count = await orderSchema.countDocuments(orderDetails);
-
+        console.log(orderDetails);
         res.render('user/orders',{
             title:"Orders",
             categories,

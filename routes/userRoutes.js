@@ -125,9 +125,11 @@ user.post('/place-order/:address/:payment',activeUser,checkoutController.placeOr
 
 user.get('/conform-order',activeUser,checkoutController.orderPage);
 
-user.post('/payment-render/:amount',activeUser,checkoutController.paymentRender);
+user.post('/payment-render/:amount/:id?',activeUser,checkoutController.paymentRender);
 
 user.post('/applycoupon', activeUser, checkoutController.coupon);
+
+user.post('/remove-cart-coupon', activeUser, checkoutController.removeCoupon);
 
 user.get('/failed-order', activeUser , checkoutController.failedOrder);
 
@@ -140,6 +142,8 @@ user.get('/edit-Address-singlecheckout/:index',activeUser,singleProductControlle
 user.post('/singleOrder/:id/:address/:payment',activeUser,singleProductController.singleOrder);
 
 user.post('/singleCoupon', activeUser , singleProductController.coupon);
+
+user.post('/remove-coupon', activeUser, singleProductController.removeCoupon);
 
 //-----------address in checkout--------------
 

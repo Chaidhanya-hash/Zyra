@@ -230,17 +230,43 @@
                         🎀🎁
                         <h3 class="text-lg font-semibold">Apply Coupon</h3>
                     </div>
-                    <div class="flex gap-2 m-2 items-center">
-                        <input type="text" id="couponCode" class="input-coupon border border-gray-300 p-2 rounded flex-1"
-                            name="couponCode" placeholder="Enter coupon code">
-                        <button type="button" id="applyCouponBtn" onclick="applyCoupon()"
-                            class="btn bg-[#FFF82E] text-white px-4 py-2 rounded hover:text-black">Apply</button>
-                    </div>
-                    <div id="couponBadge" class="pb-3" style="display: none;">
-                        <span class="text-green-500">Coupon Applied: <span id="appliedCouponCode"></span></span>
-                        <button type="button" class="btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ms-2"
-                            onclick="removeCoupon()">Remove</button>
-                    </div>
+                    <% if(coupon) { %>
+                        <div class="flex gap-2 m-2 items-center">
+                            <input type="text" id="couponCode" class="input-coupon border border-gray-300 p-2 rounded flex-1"
+                                name="couponCode" placeholder="Enter coupon code" value="<%= coupon %>">
+                            <button type="button" id="applyCouponBtn" onclick="applyCoupon()"
+                                class="btn bg-[#FFF82E] text-white px-4 py-2 rounded hover:text-black">Apply</button>
+                        </div>
+                        <div id="couponBadge" class="pb-3" style="display: none;">
+                            <span class="text-green-500">Coupon Applied: <span id="appliedCouponCode"></span></span>
+                            <button type="button" class="btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ms-2"
+                                onclick="removeCoupon()">Remove</button>
+                        </div>
+                        <script>
+                            const couponCode = document.getElementById('couponCode').value.trim();
+                            showCouponBadge(couponCode);
+
+                            function showCouponBadge(couponCode) {
+                                const couponBadge = document.getElementById('couponBadge');
+                                const appliedCouponCode = document.getElementById('appliedCouponCode');
+                                couponBadge.style.display = 'block';
+                                appliedCouponCode.innerText = couponCode;
+                            }
+                        </script>
+                    <% } else { %>
+                        <div class="flex gap-2 m-2 items-center">
+                            <input type="text" id="couponCode" class="input-coupon border border-gray-300 p-2 rounded flex-1"
+                                name="couponCode" placeholder="Enter coupon code">
+                            <button type="button" id="applyCouponBtn" onclick="applyCoupon()"
+                                class="btn bg-[#FFF82E] text-white px-4 py-2 rounded hover:text-black">Apply</button>
+                        </div>
+                        <div id="couponBadge" class="pb-3" style="display: none;">
+                            <span class="text-green-500">Coupon Applied: <span id="appliedCouponCode"></span></span>
+                            <button type="button" class="btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ms-2"
+                                onclick="removeCoupon()">Remove</button>
+                        </div>
+                    <% } %>
+                    
                 </div>
                 <div class="card bg-white p-6 rounded-lg shadow-md">
                     <div class="card-header bg-[#DB4444] text-white p-4 rounded-t-lg">
@@ -297,20 +323,29 @@
                                     </tr>
                                     
                                     
-                                    <tr class="coupon-row border-t" style="display: none;">
-                                        <th class="py-2">Coupon</th>
-                                        <th></th>
-                                        <th></th>
-                                        <th class="coupon-discount"></th>
-                                    </tr>
+                                    <% if(coupon) { %>
+                                        <tr class="coupon-row">
+                                            <th>Coupon</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="coupon-discount">
+                                                ₹ <%= Math.round(cartDetails.payableAmount - discountedTotal) %>
+                                            </th>
+                                        </tr>
+                                    <% } else { %>
+                                        <tr class="coupon-row" style="display: none;">
+                                            <th>Coupon</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th class="coupon-discount"></th>
+                                        </tr>
+                                    <% } %>
                                     <tr >
                                         <th class="py-2">Total</th>
                                         <th></th>
                                         <th></th>
                                         <th class="total-payable-amount">
-                                                <%= cartDetails.payableAmount %>
-                                             
-                                            
+                                            ₹ <%= coupon ? Math.round(discountedTotal) : Math.round(cartDetails.payableAmount) %>
                                         </th>
                                     </tr>
                                 </thead>
@@ -393,10 +428,10 @@
                 <!-- Phone and Pincode Inputs -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="phonenumber" class="block text-sm font-medium text-gray-700">
+                        <label for="phonenumber2" class="block text-sm font-medium text-gray-700">
                             Phone Number
                         </label>
-                        <input type="text" name="phonenumber" id="phonenumber" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500" placeholder="Contact Number" >
+                        <input type="number" id="phonenumber2" name="phonenumber2" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"  placeholder="Contact number" >
                     </div>
                     <div>
                         <label for="pincode" class="block text-sm font-medium text-gray-700">
@@ -516,13 +551,26 @@
                     "Content-Type": "application/json"
                 }
             })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error("Cannot render the payment page");
-                    }
-                    return res.json();
-                })
+                .then(res => res.json())
                 .then(data => {
+                    if (!data.success) {
+                        // Handle error response
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: data.error || "Failed to initialize payment"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/cart';
+                            }
+                        });
+                        
+                        // Optionally redirect if product is unavailable
+                        // if (data.error === 'Product is currently unavailable') {
+                        //     window.location.href = data.redirectUrl || `/product-checkout/${productId}`;
+                        // }
+                        return;
+                    }
                     if (data.orderID) {
                         const options = {
                             key: "rzp_test_KDYrLJHnu3O9Ip",
@@ -666,6 +714,10 @@
                             icon: "error",
                             title: "Order Placement Failed",
                             text: data.message,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/cart';
+                            }
                         });
                     }
                 })
@@ -676,6 +728,7 @@
                         title: 'Order Placement Failed',
                         text: error.message,
                     });
+                    
                 });
         }
     
@@ -704,7 +757,7 @@
                     const error = await res.json();
                     Swal.fire({
                         icon: 'error',
-                        title: 'An error occurred while applying the coupon.',
+                        title: 'Sorry we cannot apply the coupon.',
                         text: error.error
                     });
                     return;
@@ -726,15 +779,60 @@
         }
 
         function removeCoupon() {
-            
-            
-            // Reset the order summary to the original amount
-            updateOrderSummary(originalTotalAmount, 0);
-
-            // Hide the coupon badge and clear the coupon code input
-            const couponBadge = document.getElementById('couponBadge');
-            couponBadge.style.display = 'none';
-            document.getElementById('couponCode').value = '';
+            fetch('/remove-cart-coupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear coupon input
+                    document.getElementById('couponCode').value = '';
+                    
+                    // Hide coupon badge
+                    document.getElementById('couponBadge').style.display = 'none';
+                    
+                    // Update the coupon row to hide it
+                    const couponRow = document.querySelector('.coupon-row');
+                    if (couponRow) {
+                        couponRow.style.display = 'none';
+                    }
+                    
+                    // Update total amount
+                    const payableAmountElement = document.querySelector('.total-payable-amount');
+                    if (payableAmountElement) {
+                        payableAmountElement.innerText = `₹ ${Math.round(data.total)}`;
+                    }
+                    
+                    // Update the total amount for future calculations
+                    totalAmount = data.total;
+                    
+                    // Optional: Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Coupon Removed',
+                        text: 'The coupon has been removed successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.error || 'Failed to remove coupon'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while removing the coupon'
+                });
+            });
         }
 
         function updateOrderSummary(newPayableAmount, couponDiscount) {
@@ -804,7 +902,7 @@
             const building = document.getElementsByName('building')[0];
             const street = document.getElementsByName('street')[0];
             const city = document.getElementsByName('city')[0];
-            const phone = document.getElementsByName('phonenumber')[0];
+            const phoneNumber = document.getElementsByName('phonenumber2')[0];
             const pincode = document.getElementsByName('pincode')[0];
             const landmark = document.getElementsByName('landmark')[0];
             const state = document.getElementsByName('state')[0];
@@ -812,9 +910,12 @@
 
             function validatePhone(phone) {
                 const phoneRe = /^\d{10}$/;
-                return phoneRe.test(phone);
+                if(phone !== "0000000000"){
+                    return phoneRe.test(phone);
+                }
             }
             function validatePincode(pincode) {
+                console.log(pincode);
                 const pincodeRe = /^\d{6}$/;
                 return pincodeRe.test(pincode);
             }
@@ -856,14 +957,15 @@
                         text: "City field must be Greater than 4 Words and less than 25 Words.",
                         icon: "error"
                     });
-                } 
-                else if (!validatePhone(phone.value)) {
+                } else if (!validatePhone(phoneNumber.value)) {
+                    console.log('This is working');
                     Swal.fire({
                         title: "Error",
                         text: "Phone number must be 10 digits.",
                         icon: "error"
                     });
-                } 
+                }
+                 
                 else if (!validatePincode(pincode.value)) {
                     Swal.fire({
                         title: "Error",

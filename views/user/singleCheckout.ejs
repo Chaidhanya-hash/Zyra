@@ -139,6 +139,8 @@
                     </svg>
                     <h3 class="text-lg font-semibold text-gray-800">Apply Coupon</h3>
                 </div>
+                <% if(coupon) { %> 
+                    
                 <div class="flex gap-2 items-center">
                     <input 
                         type="text" 
@@ -146,6 +148,7 @@
                         class="input-coupon border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring focus:ring-yellow-200 focus:outline-none" 
                         name="couponCode" 
                         placeholder="Enter coupon code"
+                        value="<%=coupon%>"
                     >
                     <button 
                         type="button" 
@@ -156,17 +159,66 @@
                         Apply
                     </button>
                 </div>
+                    <div id="couponBadge" class="pt-4 hidden">
+                        <span class="text-green-600 font-medium">Coupon Applied: <span id="appliedCouponCode"></span></span>
+                        <button 
+                            type="button" 
+                            class="btn bg-red-500 text-white text-sm px-3 py-1 rounded-lg hover:bg-red-600 ml-3"
+                            onclick="removeCoupon()"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                    <script>
+                        
+                        const couponCode = document.getElementById('couponCode').value.trim();
+                        console.log(couponCode);
+                        
+                        showCouponBadge(couponCode);
+                        function showCouponBadge(couponCode) {
+                            
+                            const couponBadge = document.getElementById('couponBadge');
+                            const appliedCouponCode = document.getElementById('appliedCouponCode');
+                            couponBadge.style.display = 'block';
+                            appliedCouponCode.innerText = couponCode;
+                        }
+
+                        
+                    </script>
+                
+                <% } else { %>
+                    <div class="flex gap-2 items-center">
+                        <input 
+                            type="text" 
+                            id="couponCode" 
+                            class="input-coupon border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring focus:ring-yellow-200 focus:outline-none" 
+                            name="couponCode" 
+                            placeholder="Enter coupon code"
+                        >
+                        <button 
+                            type="button" 
+                            id="applyCouponBtn" 
+                            onclick="applyCoupon()" 
+                            class="btn bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
+                        >
+                            Apply
+                        </button>
+                    </div>
+                    <div id="couponBadge" class="pt-4 hidden">
+                        <span class="text-green-600 font-medium">Coupon Applied: <span id="appliedCouponCode"></span></span>
+                        <button 
+                            type="button" 
+                            class="btn bg-red-500 text-white text-sm px-3 py-1 rounded-lg hover:bg-red-600 ml-3"
+                            onclick="removeCoupon()"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                <% } %>
+
+                
             </form>
-            <div id="couponBadge" class="pt-4 hidden">
-                <span class="text-green-600 font-medium">Coupon Applied: <span id="appliedCouponCode"></span></span>
-                <button 
-                    type="button" 
-                    class="btn bg-red-500 text-white text-sm px-3 py-1 rounded-lg hover:bg-red-600 ml-3"
-                    onclick="removeCoupon()"
-                >
-                    Remove
-                </button>
-            </div>
+            
         </div>
     
         <!-- Order Summary -->
@@ -212,20 +264,31 @@
                                 ₹ <%= Math.round(totalAmount) %>
                             </td>
                         </tr>
-                        <tr class="coupon-row" style="display: none;">
-                            <th>Coupon</th>
-                            <th></th>
-                            <th></th>
-                            <th class="coupon-discount">
-                            </th>
-                        </tr>
+
+                        <% if(coupon) { %>
+                            <tr class="coupon-row">
+                                <th>Coupon</th>
+                                <th></th>
+                                <th></th>
+                                <th class="coupon-discount">
+                                    ₹ <%= Math.round(totalAmount - discountedTotal) %>
+                                </th>
+                            </tr>
+                        <% } else { %>
+                            <tr class="coupon-row" style="display: none;">
+                                <th>Coupon</th>
+                                <th></th>
+                                <th></th>
+                                <th class="coupon-discount"></th>
+                            </tr>
+                        <% } %>
                         <tr>
                             <th class="py-2 font-bold">Total</th>
                             <td></td>
                             <td></td>
                             <td class="py-2 font-bold text-lg total-payable-amount">
                                 
-                            ₹ <%= totalAmount  %>
+                            ₹ <%= coupon ? Math.round(discountedTotal) : Math.round(totalAmount) %>
                                 
                             </td>
                         </tr>
@@ -299,8 +362,8 @@
                 </div>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="mb-4">
-                        <label for="phonenumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <input type="text" name="phonenumber" id="phonenumber" placeholder="Contact Number" 
+                        <label for="phonenumber2" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="text" name="phonenumber2" id="phonenumber2" placeholder="Contact Number" 
                             class="block w-full px-3 py-2 mt-1 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     </div>
                     <div class="mb-4">
@@ -398,20 +461,29 @@
     });
 
         function openRazorpayPayment() {
-            const URL = `/payment-render/${totalAmount}`;
+            const URL = `/payment-render/${totalAmount}/${productId}`;
             fetch(URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
-                .then(res => {
-                    if (!res.ok) {
-                        throw new Error("Cannot render the payment page");
-                    }
-                    return res.json();
-                })
+                .then(res => res.json())
                 .then(data => {
+                    if (!data.success) {
+                        // Handle error response
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: data.error || "Failed to initialize payment"
+                        });
+                        
+                        // Optionally redirect if product is unavailable
+                        // if (data.error === 'Product is currently unavailable') {
+                        //     window.location.href = data.redirectUrl || `/product-checkout/${productId}`;
+                        // }
+                        return;
+                    }
                     if (data.orderID) {
                         const options = {
                             key: "rzp_test_KDYrLJHnu3O9Ip",
@@ -517,7 +589,7 @@
                     Swal.fire({
                         icon: "error",
                         title: "Error on loading payment method",
-                        text: error.message
+                        text: "Failed to initialize payment"
                     });
                     console.error("Error during payment initiation:", error);
                 });
@@ -566,7 +638,7 @@
             const building = document.getElementsByName('building')[0];
             const street = document.getElementsByName('street')[0];
             const city = document.getElementsByName('city')[0];
-            const phone = document.getElementsByName('phonenumber')[0];
+            const phone = document.getElementsByName('phonenumber2')[0];
             const pincode = document.getElementsByName('pincode')[0];
             const landmark = document.getElementsByName('landmark')[0];
             const state = document.getElementsByName('state')[0];
@@ -574,8 +646,11 @@
 
             function validatePhone(phone) {
                 const phoneRe = /^\d{10}$/;
-                return phoneRe.test(phone);
+                if(phone !== "0000000000"){
+                    return phoneRe.test(phone);
+                }
             }
+
             function validatePincode(pincode) {
                 const pincodeRe = /^\d{6}$/;
                 return pincodeRe.test(pincode);
@@ -622,7 +697,7 @@
                 else if (!validatePhone(phone.value)) {
                     Swal.fire({
                         title: "Error",
-                        text: "Phone number must be 10 digits.",
+                        text: "Phone number must be 10 digits and not only zeros.",
                         icon: "error"
                     });
                 } 
@@ -685,7 +760,11 @@
 
                 if (!res.ok) {
                     const error = await res.json();
-                    showError(error.error || "An error occurred while applying the coupon.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Sorry we cannot apply the coupon.',
+                        text: error.error
+                    });
                     return;
                 }
 
@@ -726,9 +805,59 @@
         }
 
         function removeCoupon() {
-            document.getElementById('couponCode').value = '';
-            document.getElementById('couponBadge').style.display = 'none';
-            location.reload();
+            const productId = document.getElementById('place-order-btn').getAttribute('data-id');
+            
+            fetch('/remove-coupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear coupon input
+                    document.getElementById('couponCode').value = '';
+                    
+                    // Hide coupon badge
+                    document.getElementById('couponBadge').style.display = 'none';
+                    
+                    // Update the coupon row to hide it
+                    const couponRow = document.querySelector('.coupon-row');
+                    couponRow.style.display = 'none';
+                    
+                    // Update total amount
+                    const payableAmountElement = document.querySelector('.total-payable-amount');
+                    payableAmountElement.innerText = `₹ ${Math.round(data.total)}`;
+                    
+                    // Update the total amount for future calculations
+                    totalAmount = data.total;
+                    
+                    // Optional: Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Coupon Removed',
+                        text: 'The coupon has been removed successfully',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.error || 'Failed to remove coupon'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while removing the coupon'
+                });
+            });
         }
 
         function showError(message) {

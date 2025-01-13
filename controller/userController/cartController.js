@@ -144,6 +144,9 @@ const increment = async (req,res) =>{
         if(!product){
             return res.status(404).send('Product not found');
         }
+        if(!product.isActive){
+            return res.status(400).send("This product is currently unavailable");
+        }
 
         const cart = await cartSchema.findOne({userId});
         if(!cart){
@@ -159,6 +162,8 @@ const increment = async (req,res) =>{
             if (total > product.productQuantity) {
                 return res.status(400).send(`Quantity of this product is ${product.productQuantity}`);
             }
+            
+            
             productInCart.productCount = total;
             await cart.save();
             res.status(200).json(cart);
@@ -182,6 +187,11 @@ const decrement = async (req, res) => {
         if (!userId || !productId) {
             return res.status(400).send('Invalid request');
         }
+        const product = await productSchema.findById(productId);
+        if(!product.isActive){
+            return res.status(400).send("This product is currently unavailable");
+        }
+
         const cart = await cartSchema.findOne({ userId });
         if (!cart) {
             return res.status(404).send('Cart not found');
