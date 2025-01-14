@@ -48,7 +48,7 @@ const checkout = async (req,res) =>{
                     if (coupon.discountType === "Fixed") {
                         discountedTotal = cartDetails.payableAmount - couponDiscount;
                     } else if (coupon.discountType === "Percentage") {
-                        const discountAmount = (couponDiscount / 100) * total;
+                        const discountAmount = (couponDiscount / 100) * cartDetails.payableAmount;
                         discountedTotal = cartDetails.payableAmount - discountAmount;
                     };
                 }
