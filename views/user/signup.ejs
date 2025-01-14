@@ -120,7 +120,7 @@
         } else if (!validatePhone(mobileNumber.value)) {
             Swal.fire({
               title: "Error",
-              text: "Phone number must be 10 digits",
+              text: "Phone number must be 10 digits and should not be only zeros",
               icon: "error"
             });
         } else if (checkEmail(email.value)) {

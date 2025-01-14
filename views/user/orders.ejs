@@ -156,40 +156,37 @@
 </div>
 
 <!-- -------------------------Pagination------------------------- -->
-<% if(orderDetails.length > 0) { %>
+<% if(orderDetails.length > 0 && totalPages > 1) { %>
     <div class="pagination-controls flex justify-center mt-3 mb-8">
         <ul class="flex space-x-2">
-          <% if (currentPage > 1) { %>
-            <li>
-              <a 
-                class="px-4 py-2  text-gray-800  hover:text-blue-600"
-                href="/orders/?page=<%= currentPage - 1 %>&limit=<%= limit %>">
-                Previous
-              </a>
-            </li>
-          <% } %>
-      
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <li>
-              <a 
-                class="px-4 py-2 <%= currentPage == i ? 'bg-black text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' %> rounded-md"
-                href="/orders/?page=<%= i %>&limit=<%= limit %>">
-                <%= i %>
-              </a>
-            </li>
-          <% } %>
-      
-          <% if (currentPage < totalPages) { %>
-            <li>
-              <a 
-                class="px-4 py-2  text-gray-800  hover:text-blue-600"
-                href="/orders/?page=<%= currentPage + 1 %>&limit=<%= limit %>">
-                Next
-              </a>
-            </li>
-          <% } %>
+            <% if (currentPage > 1) { %>
+                <li>
+                    <a class="px-4 py-2 text-gray-800 hover:text-blue-600"
+                        href="/orders?page=<%= currentPage - 1 %>&limit=<%= limit %>">
+                        Previous
+                    </a>
+                </li>
+            <% } %>
+        
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li>
+                    <a class="px-4 py-2 <%= currentPage == i ? 'bg-black text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' %> rounded-md"
+                        href="/orders?page=<%= i %>&limit=<%= limit %>">
+                        <%= i %>
+                    </a>
+                </li>
+            <% } %>
+        
+            <% if (currentPage < totalPages) { %>
+                <li>
+                    <a class="px-4 py-2 text-gray-800 hover:text-blue-600"
+                        href="/orders?page=<%= currentPage + 1 %>&limit=<%= limit %>">
+                        Next
+                    </a>
+                </li>
+            <% } %>
         </ul>
-      </div>
+    </div>
 <% } %>
 
 
@@ -350,7 +347,7 @@
                         });
                         const result = await response.json();
                         if (result.status === 'success') {
-                            Swal.fire('Success', 'Order return request submitted successfully', 'success').then(() => {
+                            Swal.fire('Success', 'Order successfully returned', 'success').then(() => {
                                 console.log('This is working');
                                 window.location.reload();
                             });

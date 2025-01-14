@@ -20,21 +20,28 @@ const orderPage = async (req,res) =>{
             return res.redirect('/login');
         }
 
-        
+        const count = await orderSchema.countDocuments({ customer_id: user });
+
+        // Calculate total pages
+        const totalPages = Math.ceil(count / limit);
+
+        // If requested page is greater than total pages, redirect to last page
+        if (page > totalPages && totalPages > 0) {
+            return res.redirect(`/orders?page=${totalPages}&limit=${limit}`);
+        }
 
         const orderDetails = await orderSchema.find({ customer_id: user})
             .populate("products.product_id")
             .sort({updatedAt: -1 })
             .limit(limit)
             .skip((page - 1) * limit)
-        const count = await orderSchema.countDocuments(orderDetails);
-        console.log(orderDetails);
+        
         res.render('user/orders',{
             title:"Orders",
             categories,
             search:'',
             currentPage: page,
-            totalPages: Math.ceil(count/limit),
+            totalPages,
             limit,
             user,
             orderDetails
@@ -157,6 +164,31 @@ const returnOrder = async (req,res) => {
         order.returnReason = returnReason;
         await order.save();
 
+        if (order.paymentMethod === 'razorpay' || order.paymentMethod === 'Wallet' || order.paymentMethod === 'Cash on delivery' ) {
+            const userWallet = await walletSchema.findOne({ userID: order.customer_id });
+            if (userWallet) {
+                userWallet.balance = (userWallet.balance || 0) + order.totalPrice;
+                userWallet.transaction.push({
+                    wallet_amount: order.totalPrice,
+                    order_id: order.order_id,
+                    transactionType: 'Credited',
+                    transaction_date: new Date()
+                });
+                await userWallet.save();
+            } else {
+                await walletSchema.create({
+                    userID: order.customer_id,
+                    balance: order.totalPrice,
+                    transaction: [{
+                        wallet_amount: order.totalPrice,
+                        order_id: order.order_id,
+                        transactionType: 'Credited',
+                        transaction_date: new Date()
+                    }]
+                });
+            }
+        }
+
         for (let product of order.products) {
             if (product.product_id && product.product_quantity !== undefined) {
                 await productSchema.findByIdAndUpdate(product.product_id, { $inc: { productQuantity: product.product_quantity } });
@@ -259,10 +291,12 @@ const Invoice = async (req, res) => {
                 const productName = product.product_name || "N/A";
                 const quantity = product.product_quantity || 0;
                 const price = product.product_price || 0;
-                const discount = product.productDiscount || 0;
+                const discount = product.product_id ? 
+                    product.product_id.productDiscount || 0 : 
+                    product.productDiscount || 0;
                 const coupondiscount = orderDetails.couponDiscount || 0
 
-                const total = Math.round((price * (1 - discount / 100) * quantity) - (coupondiscount).toFixed(2));
+                const total = Math.round((price * (1 - (discount / 100)) * quantity) - (coupondiscount).toFixed(2));
 
                 return [
                     productName,

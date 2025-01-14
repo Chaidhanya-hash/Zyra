@@ -12,7 +12,9 @@
 <header class="bg-black py-1">
     <div class="container mx-auto flex items-center">
         <!-- Logo -->
-        <div class=" italianno-regular ">Zyra</div>
+        <div class=" italianno-regular ">
+            <a href="/home">Zyra</a>
+        </div>
 
         <!-- Navigation Menu -->
         <nav class="ml-8 flex space-x-6">
@@ -43,30 +45,13 @@
                     </div>
                 </div>
             </div>
-            <a href="#" class="text-white hover:underline">About Us</a>
+            
         </nav>
 
         <!-- Search Bar, Heart, and Cart -->
         <div class="flex items-center space-x-6 ml-auto mr-4">
             <!-- Search Bar -->
-            <form action="">
-                <div class="flex items-center bg-white rounded-full px-3 py-2 shadow-sm">
-                    <input 
-                        type="text" 
-                        placeholder="Search"
-                        name="search" 
-                        value="<%= search %>"
-                        class="outline-none text-gray-500 text-sm w-full"
-                    />
-                    <button type="submit">
-                        <img 
-                            src="/styles/images/search lens_logo.webp" 
-                            alt="Search Icon" 
-                            class="h-5 w-5 text-gray-500 cursor-pointer"
-                        />
-                    </button>
-                </div>
-            </form>
+            
             
             <!-- Heart Icon -->
              <% if(user) { %>
