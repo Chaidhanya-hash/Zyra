@@ -323,12 +323,12 @@
                                     </tr>
                                     
                                     
-                                    <% if(coupon) { %>
+                                    <% if(coupon) { %> 
                                         <tr class="coupon-row">
                                             <th>Coupon</th>
                                             <th></th>
                                             <th></th>
-                                            <th class="coupon-discount">
+                                            <th class="coupon-discount"> 
                                                 ₹ <%= Math.round(cartDetails.payableAmount - discountedTotal) %>
                                             </th>
                                         </tr>
@@ -345,7 +345,7 @@
                                         <th></th>
                                         <th></th>
                                         <th class="total-payable-amount">
-                                            ₹ <%= coupon ? Math.round(discountedTotal) : Math.round(cartDetails.payableAmount) %>
+                                            ₹<%= coupon ? Math.round(discountedTotal) : Math.round(cartDetails.payableAmount) %>
                                         </th>
                                     </tr>
                                 </thead>
@@ -915,9 +915,10 @@
                 }
             }
             function validatePincode(pincode) {
-                console.log(pincode);
                 const pincodeRe = /^\d{6}$/;
-                return pincodeRe.test(pincode);
+                if(pincode !== "000000"){
+                    return pincodeRe.test(pincode);
+                }  
             }
             checkAddress.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -969,7 +970,7 @@
                 else if (!validatePincode(pincode.value)) {
                     Swal.fire({
                         title: "Error",
-                        text: "Pincode must be 6 digits.",
+                        text: "Pincode must be 6 digits and should be a  valid one.",
                         icon: "error"
                     });
                 } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {

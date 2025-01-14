@@ -85,12 +85,16 @@
 
                 function validatePhone(phone) {
                     const phoneRe = /^\d{10}$/;
-                    return phoneRe.test(phone);
+                    if(phone !== "0000000000"){
+                        return phoneRe.test(phone);
+                    }
                 }
 
                 function validatePincode(pincode) {
                     const pincodeRe = /^\d{6}$/;
-                    return pincodeRe.test(pincode);
+                    if(pincode !== "000000"){
+                        return pincodeRe.test(pincode);
+                    }  
                 }
                 
                 editaddress.addEventListener('submit', (e) => {
@@ -134,13 +138,13 @@
                     }else if (!validatePhone(phone.value)) {
                         Swal.fire({
                             title: "Error",
-                            text: "Phone number must be 10 digits.",
+                            text: "Phone number must be 10 digits and should not only contain zeros.",
                             icon: "error"
                         });
                     } else if (!validatePincode(pincode.value)) {
                         Swal.fire({
                             title: "Error",
-                            text: "Pincode must be 6 digits.",
+                            text: "Pincode must be 6 digits and should be a valid one.",
                             icon: "error"
                         });
                     } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {

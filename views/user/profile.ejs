@@ -269,6 +269,12 @@ function closeModal() {
 
                 // Regular expressions for validation
                 const namePattern = /^[a-zA-Z\s]+$/;
+                function validatePhone(phone) {
+                    const phoneRe = /^\d{10}$/;
+                    if(phone !== "0000000000"){
+                        return phoneRe.test(phone);
+                    }
+                }
                 const phonePattern = /^\d{10}$/;
 
                 // Validate name
@@ -283,11 +289,11 @@ function closeModal() {
                 }
 
                 // Validate phone number
-                if (!phonePattern.test(phoneNumber)) {
+                if (!validatePhone(phoneNumber)) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Invalid Phone Number',
-                        text: 'Please enter a valid phone number. It should be 10 digits.'
+                        text: 'Please enter a valid phone number. It should not be only zeros.'
                     });
                     event.preventDefault();
                     return;
@@ -309,11 +315,15 @@ function closeModal() {
 
                 function validatePhone(phone) {
                     const phoneRe = /^\d{10}$/;
-                    return phoneRe.test(phone);
+                    if(phone !== "0000000000"){
+                        return phoneRe.test(phone);
+                    }
                 }
                 function validatePincode(pincode) {
                     const pincodeRe = /^\d{6}$/;
-                    return pincodeRe.test(pincode);
+                    if(pincode !== "000000"){
+                        return pincodeRe.test(pincode);
+                    }  
                 }
                 addressForm.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -356,13 +366,13 @@ function closeModal() {
                     } else if (!validatePhone(phone.value)) {
                         Swal.fire({
                             title: "Error",
-                            text: "Phone number must be 10 digits.",
+                            text: "Phone number must be 10 digits should not be only zeros.",
                             icon: "error"
                         });
                     } else if (!validatePincode(pincode.value)) {
                         Swal.fire({
                             title: "Error",
-                            text: "Pincode must be 6 digits.",
+                            text: "Pincode must be 6 digits and should not be only zeros.",
                             icon: "error"
                         });
                     } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {

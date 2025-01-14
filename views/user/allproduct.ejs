@@ -75,9 +75,25 @@
               <!-- Product Price and Actions -->
               <div class="flex justify-between items-center">
                 <!-- Price -->
-                <span class="text-lg font-bold text-gray-900">
-                  ₹<%= product.productPrice %>
-                </span>
+                <div>
+                  <% if (product.productDiscount) { %>
+                    <div class="detail-price flex items-center gap-4">
+                      <p class="text-sm text-gray-500 line-through">
+                        Rs. <%= product.productPrice %>
+                      </p>
+                      <h4 class="text-lg text-red-500 font-semibold">
+                        <%= product.productDiscount %>% Off
+                      </h4>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800">
+                      Rs. <%= product.productPrice - product.productPrice * (product.productDiscount / 100) %>
+                    </h3>
+                  <% } else { %>
+                    <h3 class="text-xl font-semibold text-gray-800">
+                      Rs. <%= product.productPrice.toFixed(2) %>
+                    </h3>
+                  <% } %>
+                </div>
   
                 <!-- Actions -->
                 <div class="flex items-center space-x-4">

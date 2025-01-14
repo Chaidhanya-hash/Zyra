@@ -14,7 +14,7 @@
                             <input
                                 class="form-control bg-[#FFFFFF] text-black form-input edit-product-disable w-full p-2 border rounded  focus:outline-none"
                                 type="text" name="productName" id="productName" value="<%= product.productName %>"
-                                disabled required>
+                                 required>
 
                             <label class="form-label block text-sm font-medium text-gray-700 mt-4"
                                 for="productPrice">Price</label>
@@ -238,6 +238,7 @@
             //---------------form validation-----------------------
 
             const editProductForm = document.getElementById('edit-product-form')
+            const productName = document.getElementsByName('productName')[0];
             const productPrice = document.getElementsByName('productPrice')[0];
             const productQuantity = document.getElementsByName('productQuantity')[0];
             const productDiscount = document.getElementsByName('productDiscount')[0];
@@ -246,12 +247,17 @@
                 e.preventDefault()
                 let isValid = true
                 let errorMessage = ""
-                if (isNaN(productPrice.value) || parseFloat(productPrice.value) <= 0 || productPrice.value === "") {
-                    errorMessage = 'Product Price must be greater than zero and it should not contain any alphabets'
+
+                if(productName.value.length <4 || productName.value.length > 80 || productName.value.trim === "") {
+                    errorMessage = 'Product name must be between 4 to 80 word '
+                    isValid = false
+                }
+                if (isNaN(productPrice.value) || parseFloat(productPrice.value) <= 0 || productPrice.value === "" || parseFloat(productPrice.value) > 999999) {
+                    errorMessage = 'Product Price must be greater than zero and it should not contain any alphabets and should be less than 7 digits'
                     isValid = false;
                 }
-                if (isNaN(productQuantity.value) || parseInt(productQuantity.value) < 0 || productQuantity.value === "") {
-                    errorMessage = 'Product quantity should be a number and it must be greater than zero'
+                if (isNaN(productQuantity.value) || parseInt(productQuantity.value) < 0 || productQuantity.value === "" || parseInt(productQuantity.value) > 99999999) {
+                    errorMessage = 'Product quantity should be a number and it must be greater than zero and should not be above 8 digits'
                     isValid = false;
                 }
                 if (isNaN(productDiscount.value) || parseInt(productDiscount.value) < 0 || parseInt(productDiscount.value) > 100) {

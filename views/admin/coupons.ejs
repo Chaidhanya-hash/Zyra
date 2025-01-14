@@ -175,30 +175,46 @@
             <form id="addCouponForm">
                 <div class="mb-4">
                     <label for="code" class="block text-sm font-medium text-gray-700">Coupon Code</label>
-                    <input type="text" id="code" name="code" class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                    <input type="text" id="code" name="code" 
+                        class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        minlength="3" 
+                        >
                 </div>
                 <div class="mb-4">
                     <label for="discountType" class="block text-sm font-medium text-gray-700">Discount Type</label>
-                    <select id="discountType" name="discountType" class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                    <select id="discountType" name="discountType" 
+                        class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         <option value="Percentage">Percentage</option>
                         <option value="Fixed">Fixed</option>
                     </select>
                 </div>
                 <div class="mb-4">
                     <label for="discountValue" class="block text-sm font-medium text-gray-700">Discount Value</label>
-                    <input type="number" id="discountValue" name="discountValue" class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
-                </div>
-                <div class="mb-4">
-                    <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
-                    <input type="date" id="startDate" name="startDate" class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
-                </div>
-                <div class="mb-4">
-                    <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
-                    <input type="date" id="endDate" name="endDate" class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                    <input type="number" id="discountValue" name="discountValue" 
+                        class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        min="1" 
+                        step="any" 
+                        >
                 </div>
                 <div class="mb-4">
                     <label for="minimumOrderAmount" class="block text-sm font-medium text-gray-700">Minimum Order Amount</label>
-                    <input type="number" id="minimumOrderAmount" name="minimumOrderAmount" class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" >
+                    <input type="number" id="minimumOrderAmount" name="minimumOrderAmount" 
+                        class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        min="1" 
+                        step="any" 
+                        >
+                </div>
+                <div class="mb-4">
+                    <label for="startDate" class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" 
+                        class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
+                </div>
+                <div class="mb-4">
+                    <label for="endDate" class="block text-sm font-medium text-gray-700">End Date</label>
+                    <input type="date" id="endDate" name="endDate" 
+                        class="mt-2 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
                 </div>
                 <button type="submit" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none transition duration-150 ease-in-out">
                     Add Coupon
@@ -295,10 +311,60 @@
     }
     //-----------------------------------Add Coupon-------------------------------------
 
+    function validateCouponForm(formData) {
+    const errors = [];
+    
+    // Coupon code validation
+    if (!formData.code || formData.code.trim().length < 3 || formData.code.trim().length > 7) {
+        errors.push('Coupon code must be at least 3 characters long and below 8 charachters');
+    }
+
+    // Discount value validation
+    const discountValue = parseFloat(formData.discountValue);
+    if (isNaN(discountValue) || discountValue <= 0 || discountValue > 501) {
+        errors.push('Discount value must be greater than 0 and less than 500');
+    }
+    if (formData.discountType === 'Percentage' && discountValue >= 98) {
+        errors.push('Percentage discount cannot be more than 98%');
+    }
+
+    // Minimum order amount validation
+    const minAmount = parseFloat(formData.minimumOrderAmount);
+    if (isNaN(minAmount) || minAmount <= 0) {
+        errors.push('Minimum order amount must be greater than 0');
+    }
+
+    // Date validation
+    const startDate = new Date(formData.startDate);
+    const endDate = new Date(formData.endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!formData.startDate || startDate < today) {
+        errors.push('Start date must be today or a future date');
+    }
+    if (!formData.endDate || endDate <= startDate) {
+        errors.push('End date must be after start date');
+    }
+
+    return errors;
+}
+
     document.getElementById('addCouponForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
+
+                // Validate form data
+                const validationErrors = validateCouponForm(data);
+                if (validationErrors.length > 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        html: validationErrors.join('<br>'),
+                    });
+                    return;
+                }
                 try {
                     const response = await fetch('/admin/addcoupon', {
                         method: 'POST',
@@ -374,6 +440,18 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         const formData = new FormData(event.target);
         const data = Object.fromEntries(formData.entries());
+
+        // Validate form data
+        const validationErrors = validateCouponForm(data);
+        if (validationErrors.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: validationErrors.join('<br>'),
+            });
+            return;
+        }
+
         
         // Log the data being sent
         console.log('Submitting data:', data);

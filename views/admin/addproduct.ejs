@@ -159,11 +159,11 @@ addProductForm.addEventListener('submit', (e) => {
             text: "Please provide a product name.",
         });
         isValid = false;
-    } else if (productName.value.length < 4) {
+    } else if (productName.value.length < 4 || productName.value.length > 80) {
         Swal.fire({
             icon: "error",
             title: "Invalid Product Name",
-            text: "Product name must be at least 4 characters long.",
+            text: "Product name must be at least 4 characters long and should be less than 80 characters.",
         });
         isValid = false;
     } else if (!/^[A-Za-z0-9\s\+&]+$/.test(productName.value)) {
@@ -184,6 +184,16 @@ addProductForm.addEventListener('submit', (e) => {
             icon: "error",
             title: "Description Required",
             text: "Please provide a description for the product.",
+        });
+        isValid = false;
+    }
+
+    //Validate Discount
+    if(productDiscount.value.trim() > 98 || productDiscount.value.trim() < 0){
+        Swal.fire({
+            icon: "error",
+            title: "Discount is not valid",
+            text: "Discount for the product cannot be greater than 98.",
         });
         isValid = false;
     }
@@ -218,11 +228,11 @@ addProductForm.addEventListener('submit', (e) => {
             text: "Please provide the stock quantity.",
         });
         isValid = false;
-    } else if (parseInt(stock) <= 0 || !Number.isInteger(+stock)) {
+    } else if (parseInt(stock) <= 0 || !Number.isInteger(+stock) || parseInt(stock) > 99999999 ) {
         Swal.fire({
             icon: "error",
             title: "Invalid Stock",
-            text: "Stock must be a positive integer.",
+            text: "Stock must be a positive integer and should not be more than 8 digits.",
         });
         isValid = false;
     }
@@ -236,11 +246,11 @@ addProductForm.addEventListener('submit', (e) => {
             text: "Please provide the price of the product.",
         });
         isValid = false;
-    } else if (parseFloat(price) <= 0 || isNaN(price)) {
+    } else if (parseFloat(price) <= 0 || isNaN(price) || parseFloat(price) > 999999) {
         Swal.fire({
             icon: "error",
             title: "Invalid Price",
-            text: "Price must be a positive number.",
+            text: "Price must be a positive number and should not be more than 6 digits.",
         });
         isValid = false;
     }

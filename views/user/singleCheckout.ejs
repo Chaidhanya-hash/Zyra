@@ -653,7 +653,9 @@
 
             function validatePincode(pincode) {
                 const pincodeRe = /^\d{6}$/;
-                return pincodeRe.test(pincode);
+                if(pincode !== "000000"){
+                    return pincodeRe.test(pincode);
+                }  
             }
             checkAddress.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -704,7 +706,7 @@
                 else if (!validatePincode(pincode.value)) {
                     Swal.fire({
                         title: "Error",
-                        text: "Pincode must be 6 digits.",
+                        text: "Pincode must be 6 digits and should be a valid one.",
                         icon: "error"
                     });
                 } else if (landmark.value.trim() === "" || !isNaN(landmark.value)) {

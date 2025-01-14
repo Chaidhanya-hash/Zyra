@@ -136,14 +136,19 @@ const editOffer = async (req, res) => {
     try {
         const { offerId, offerType, referenceId, discountPercent } = req.body;
 
+        // Validation checks
         if (!offerId || !referenceId || !discountPercent) {
-            req.flash('success', 'All fields are required');
-            return res.redirect('/admin/offer');
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
         }
 
-        if (discountPercent > 98) {
-            req.flash('success', 'Discount amount cannot exceed 98%');
-            return res.redirect('/admin/offer');
+        if (discountPercent > 98 || discountPercent <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Discount amount cannot exceed 98% and should be greater than 0'
+            });
         }
 
         let alertMessage = '';
@@ -152,15 +157,22 @@ const editOffer = async (req, res) => {
             const category = await categorySchema.findOne({ categoryName: referenceId });
 
             if (!category) {
-                req.flash('success', 'Category not found');
-                return res.redirect('/admin/offer');
+                return res.status(404).json({
+                    success: false,
+                    message: 'Category not found'
+                });
             }
 
-            const offer = await offerSchema.findByIdAndUpdate(offerId, { referenceId: category._id, discountPercent });
-            if (offer) {
-                alertMessage = "Offer successfully edited";
-            } else {
-                alertMessage = 'Offer not found';
+            const offer = await offerSchema.findByIdAndUpdate(offerId, { 
+                referenceId: category._id, 
+                discountPercent 
+            });
+            
+            if (!offer) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Offer not found'
+                });
             }
 
             // Update all products under this category
@@ -178,35 +190,47 @@ const editOffer = async (req, res) => {
                 await productSchema.bulkWrite(bulkOperations);
             }
 
-            alertMessage = `Offer added for the products under ${category.categoryName}`;
+            alertMessage = `Offer updated for the products under ${category.categoryName}`;
 
         } else if (offerType === 'product') {
             const product = await productSchema.findById(referenceId);
             if (!product) {
-                req.flash('success', 'Product not found');
-                return res.redirect('/admin/offer');
+                return res.status(404).json({
+                    success: false,
+                    message: 'Product not found'
+                });
             }
 
-            const offer = await offerSchema.findByIdAndUpdate(offerId, { referenceId, discountPercent });
-            if (offer) {
-                alertMessage = "Offer successfully edited";
-            } else {
-                alertMessage = 'Offer not found';
+            const offer = await offerSchema.findByIdAndUpdate(offerId, { 
+                referenceId, 
+                discountPercent 
+            });
+            
+            if (!offer) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Offer not found'
+                });
             }
 
-            // Update product discount and discount price
+            // Update product discount
             product.productDiscount = discountPercent;
             await product.save();
 
-            alertMessage = `Offer added for the product ${product.productName}`;
+            alertMessage = `Offer updated for the product ${product.productName}`;
         }
+        
+        return res.status(200).json({
+            success: true,
+            message: alertMessage
+        });
 
-        req.flash('success', alertMessage);
-        res.redirect('/admin/offer');
     } catch (error) {
         console.log(`Error from editOffer: ${error}`);
-        req.flash('success', 'An error occurred while editing the offer');
-        res.redirect('/admin/offer');
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while editing the offer'
+        });
     }
 }
 

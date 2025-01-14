@@ -106,7 +106,7 @@ const singleOrder = async (req,res) =>{
         }
 
         const product = await productSchema.findById(productId);
-        if(!product || !product.isActive){
+        if(!product || !product.isActive || product.productQuantity === 0){
             console.log(`Product not found for ID: ${productId}`);
             return res.status(400).json({ success: false, message: 'Your product is empty or could not be found.'})
         }
@@ -131,6 +131,20 @@ const singleOrder = async (req,res) =>{
             couponDiscount = 0;
         }
         
+        if (paymentDetails[paymentMode] === 'Wallet') {
+            const wallet = await walletSchema.findOne({ userID: userId });
+            if (!wallet || wallet.balance < product.productPrice) {
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+            }
+            wallet.balance -= product.productPrice;
+            wallet.transaction.push({
+                wallet_amount: product.productPrice,
+                transactionType: 'Debited',
+                transaction_date: new Date(),
+                order_id: newOrder.order_id,
+            });
+            await wallet.save();
+        }
 
         const newOrder = new orderSchema({
             customer_id: userId,
@@ -168,20 +182,7 @@ const singleOrder = async (req,res) =>{
 
         await newOrder.save();
 
-        if (paymentDetails[paymentMode] === 'Wallet') {
-            const wallet = await walletSchema.findOne({ userID: userId });
-            if (!wallet || wallet.balance < product.productPrice) {
-                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
-            }
-            wallet.balance -= product.productPrice;
-            wallet.transaction.push({
-                wallet_amount: product.productPrice,
-                transactionType: 'Debited',
-                transaction_date: new Date(),
-                order_id: newOrder.order_id,
-            });
-            await wallet.save();
-        }
+        
 
         if (payment_status !== "Failed") {
             product.productQuantity -= 1;
@@ -190,6 +191,7 @@ const singleOrder = async (req,res) =>{
             }
             await product.save();
         }
+        req.session.coupon = '';
         return res.status(200).json({
             success: payment_status !== "Failed",
             message: payment_status === "Failed" ? 'Payment failed but order recorded' : 'Order Placed Successfully'
@@ -239,6 +241,9 @@ const coupon = async (req, res) => {
         };
 
         const couponDiscount = coupon.discountValue;
+        if(total <= couponDiscount){
+            return res.status(400).json({error: "Sorry Coupon cannot be applied. Total amount is less than coupon value "});
+        }
 
         if (coupon.discountType === "Fixed") {
             discountedTotal = total - couponDiscount;
@@ -246,6 +251,8 @@ const coupon = async (req, res) => {
             const discountAmount = (couponDiscount / 100) * total;
             discountedTotal = total - discountAmount;
         };
+
+
 
         res.status(200).json({ total: discountedTotal, couponDiscount });
     } catch (err) {

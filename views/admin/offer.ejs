@@ -342,7 +342,31 @@
             // Event listener for the "Offer Type" dropdown in Add Offer modal
             document.getElementById('offerType').addEventListener('change', function () {
                 populateOfferForDropdown(this.value, document.getElementById('offerFor'));
+
             });
+
+            document.getElementById('addCoupon-form').addEventListener('submit',(event)=>{
+                event.preventDefault();
+
+                const offerDiscount = document.getElementsByName('discountPercent')[0];
+                let isValid = true;
+
+                if( offerDiscount.value.trim() <=0 || offerDiscount.value.trim() > 98){
+                    Swal.fire({
+                        title: "Invalid discount",
+                        text: "offer discount should be greater than 0 and less than 98",
+                        icon: "error"
+                    })
+                    isValid = false;
+                    
+                } 
+                
+                if(isValid){
+                    document.getElementById('addCoupon-form').submit();
+                }
+                
+                console.log(isValid);
+            })
 
     function editOffer(offerData) {
         console.log('Edit Offer Data:', offerData); // Debug log
@@ -375,39 +399,48 @@
     });
 
     // Add form submission handler
-    document.getElementById('editCoupon-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            offerId: document.getElementById('editCouponId').value,
-            offerType: document.getElementById('editOfferType').value,
-            referenceId: document.getElementById('editOfferFor').value,
-            discountPercent: document.getElementById('editDiscount').value
-        };
+    document.getElementById('editCoupon-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        offerId: document.getElementById('editCouponId').value,
+        offerType: document.getElementById('editOfferType').value,
+        referenceId: document.getElementById('editOfferFor').value,
+        discountPercent: document.getElementById('editDiscount').value
+    };
 
-        // Submit the form using fetch
-        fetch('/admin/editOffer', {
+    try {
+        const response = await fetch('/admin/editOffer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                closeEditModal();
-                // Reload the page or update the table
-                window.location.reload();
-            } else {
-                alert(data.message || 'Error updating offer');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Offer updated');
-            closeEditModal();
-            window.location.reload();
         });
-    });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message,
+                confirmButtonColor: '#28a745'
+            }).then(() => {
+                closeEditModal();
+                window.location.reload();
+            });
+        } else {
+            throw new Error(data.message || 'Error updating offer');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Error updating offer',
+            confirmButtonColor: '#DB4444'
+        });
+    }
+});
 </script>

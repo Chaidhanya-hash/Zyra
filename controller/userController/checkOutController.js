@@ -29,7 +29,7 @@ const checkout = async (req,res) =>{
         if(!cartDetails){
             return res.status(404).send('Cart not found');
         }
-
+        
         const items = cartDetails.items;
         if(items.length === 0){
             return res.redirect('/cart');
@@ -37,14 +37,14 @@ const checkout = async (req,res) =>{
 
         let discountedTotal = cartDetails.payableAmount;
                 
-                if(req.session.coupon){
-                    const coupon = await couponSchema.findOne({ code: req.session.coupon });
+                if(req.session.coupon2){
+                    const coupon = await couponSchema.findOne({ code: req.session.coupon2 });
                     if (cartDetails.payableAmount < coupon.minimumOrderAmount) {
                         return res.status(400).json({ error: "Minimum purchase limit not reached." });
                     };
             
                     const couponDiscount = coupon.discountValue;
-            
+                    
                     if (coupon.discountType === "Fixed") {
                         discountedTotal = cartDetails.payableAmount - couponDiscount;
                     } else if (coupon.discountType === "Percentage") {
@@ -54,7 +54,7 @@ const checkout = async (req,res) =>{
                 }
 
         cartDetails.items.forEach((item) =>{
-            if(item.productId.isActive != true){
+            if(item.productId.isActive != true || item.productId.productQuantity === 0){
                 req.flash('error','Product is not available, remove product from cart');
                 res.redirect('/cart');
             }
@@ -224,7 +224,10 @@ const placeOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Your cart is empty or could not be found.' });
         }
 
-        const inactiveProducts = cartItems.items.filter(item => !item.productId.isActive);
+        const inactiveProducts = cartItems.items.filter(item => {
+            return !item.productId.isActive || item.productId.productQuantity === 0;
+        });
+        
 
         if (inactiveProducts.length > 0) {
             // Get names of inactive products
@@ -263,13 +266,27 @@ const placeOrder = async (req, res) => {
         if (!userDetails || !userDetails.address || !userDetails.address[addressIndex]) {
             return res.status(400).json({ success: false, message: 'Selected address is not valid.' });
         }
-
+        console.log(couponDiscount);
+        if(paymentDetails[paymentMode] === 'Wallet'){
+            const wallet = await walletSchema.findOne({ userID: userId });
+            if (!wallet || wallet.balance < cartItems.payableAmount) {
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+            }
+            wallet.balance -= cartItems.payableAmount;
+            wallet.transaction.push({
+                wallet_amount: cartItems.payableAmount,
+                transactionType: 'Debited',
+                transaction_date: new Date(),
+                order_id: newOrder.order_id,
+            });
+        await wallet.save();
+        }
         const newOrder = new orderSchema({
             customer_id: req.session.user,
             order_id: Math.floor(Math.random() * 1000000),
             products: products,
             totalQuantity: totalQuantity,
-            totalPrice: cartItems.payableAmount,
+            totalPrice: (cartItems.payableAmount - couponDiscount),
             couponCode : couponCode,
             couponDiscount: couponDiscount,
             address: {
@@ -291,20 +308,7 @@ const placeOrder = async (req, res) => {
         });
         await newOrder.save();
 
-        if(paymentDetails[paymentMode] === 'Wallet'){
-            const wallet = await walletSchema.findOne({ userID: userId });
-            if (!wallet || wallet.balance < cartItems.payableAmount) {
-                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
-            }
-            wallet.balance -= cartItems.payableAmount;
-            wallet.transaction.push({
-                wallet_amount: cartItems.payableAmount,
-                transactionType: 'Debited',
-                transaction_date: new Date(),
-                order_id: newOrder.order_id,
-            });
-        await wallet.save();
-        }
+        
 
         for (const element of cartItems.items) {
             const product = await productSchema.findById(element.productId._id);
@@ -316,7 +320,7 @@ const placeOrder = async (req, res) => {
                 await product.save();
             }
         }
-
+        req.session.coupon2 = "";
         await cartSchema.deleteOne({ userId: req.session.user });
         return res.status(200).json({ success: true, message: 'Order placed successfully!' });
     } catch (err) {
@@ -360,7 +364,7 @@ const paymentRender = async (req,res) => {
     
             const product = await productSchema.findById(productId);
             
-            if(!product || !product.isActive){
+            if(!product || !product.isActive || product.productQuantity === 0){
                 return res.status(400).json({
                     success: false,
                     error: 'Product is currently unavailable',
@@ -376,7 +380,9 @@ const paymentRender = async (req,res) => {
                 return res.status(400).json({ success: false, message: 'Your cart is empty or could not be found.' });
             }
 
-            const inactiveProducts = cartItems.items.filter(item => !item.productId.isActive);
+            const inactiveProducts = cartItems.items.filter(item =>{
+                return !item.productId.isActive || item.productId.productQuantity === 0;
+            } );
 
             if (inactiveProducts.length > 0) {
                 // Get names of inactive products
@@ -468,7 +474,13 @@ const coupon = async (req, res) => {
             return res.status(400).json({ error: "Minimum purchase limit not reached. Please add more items to your cart." });
         }
 
+
         const couponDiscount = coupon.discountValue;
+
+        if(total <= couponDiscount){
+            return res.status(400).json({ error: "This Coupon is not aplicable for lesser amount"});
+        }
+
         if (coupon.discountType === "Fixed") {
             discountedTotal = total - couponDiscount;
         } else if (coupon.discountType === "Percentage") {
