@@ -167,7 +167,6 @@ const otp =(req,res)=>{
     try{
         res.render('user/otppage',{
             title: 'OTP verify',
-            search : '',
             user:req.session.user,
             email: req.session.email,
             otpTime: req.session.otptime,
@@ -232,7 +231,9 @@ const otpResend = (req,res)=>{
 
     }
     catch (error){
-
+        console.log(`Error in OTP resend: ${error}`);
+        req.flash('error', 'Failed to resend OTP');
+        res.redirect('/otp');
     }
 }
 

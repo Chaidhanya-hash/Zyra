@@ -33,9 +33,16 @@
         Submit
       </button>
     </form>
-    <p class="text-center text-gray-700 mt-4">
-      Didn’t get the OTP? <a href="/resendotp" class="text-pink-700 hover:underline" id="resend-btn">Resend</a>
-    </p>
+    <div id="resend-section" class="text-center text-gray-700 mt-4 hidden">
+      <p>
+          Didn't get the OTP? 
+          <a href="/resendotp" 
+             class="text-pink-700 hover:underline" 
+             id="resend-btn">
+              Resend
+          </a>
+      </p>
+  </div>
   </div>
 </main>
 
@@ -50,8 +57,9 @@
   const hiddenOtpInput = document.getElementById('otp');
   const otpTimer = document.getElementById('otpTimer');
   const otpTime = parseInt(document.getElementById('otpTime').value);
-  const duration = 60 * 2 * 1000;
+  const duration = 60 * 1 * 1000;
   const verifybtn = document.getElementById('verify-btn');
+  const resendSection = document.getElementById('resend-section');
   const resendbtn = document.getElementById('resend-btn');
 
 
@@ -98,23 +106,36 @@
 
   // -------------------Timer for OTP--------------------
 
-  function countDown(){
-    const interval = setInterval(()=>{
-      const now = Date.now();
-      let remain = duration - (now - otpTime);
+  function countDown() {
+        const interval = setInterval(() => {
+            const now = Date.now();
+            let remain = duration - (now - otpTime);
 
-      if(remain <=0){
-        otpTimer.remove();
-        verifybtn.disabled = true;
-        clearInterval(interval);
-
-      } else {
-        const min = Math.floor((remain % (1000 * 60 * 60)) / (1000 * 60));
-        const sec = Math.floor((remain % (1000 * 60)) / 1000);
-        otpTimer.innerHTML = `Time remaining: ${min}:${sec < 10 ? '0' : ''}${sec}`;
-      }
-    }, 1000);
-  }
+            if (remain <= 0) {
+                // Timer ended
+                otpTimer.innerHTML = 'OTP expired';
+                otpTimer.classList.add('text-red-600', 'font-medium');
+                
+                // Disable verify button
+                verifybtn.disabled = true;
+                verifybtn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-400');
+                verifybtn.classList.remove('bg-black', 'hover:bg-gray-800');
+                
+                // Show resend section with animation
+                resendSection.classList.remove('hidden');
+                resendSection.classList.add('animate-fade-in');
+                
+                clearInterval(interval);
+            } else {
+                const min = Math.floor((remain % (1000 * 60 * 60)) / (1000 * 60));
+                const sec = Math.floor((remain % (1000 * 60)) / 1000);
+                otpTimer.innerHTML = `Time remaining: ${min}:${sec < 10 ? '0' : ''}${sec}`;
+                
+                // Keep resend section hidden while timer is active
+                resendSection.classList.add('hidden');
+            }
+        }, 1000);
+    }
 
   countDown();
 

@@ -266,21 +266,8 @@ const placeOrder = async (req, res) => {
         if (!userDetails || !userDetails.address || !userDetails.address[addressIndex]) {
             return res.status(400).json({ success: false, message: 'Selected address is not valid.' });
         }
-        console.log(couponDiscount);
-        if(paymentDetails[paymentMode] === 'Wallet'){
-            const wallet = await walletSchema.findOne({ userID: userId });
-            if (!wallet || wallet.balance < cartItems.payableAmount) {
-                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
-            }
-            wallet.balance -= cartItems.payableAmount;
-            wallet.transaction.push({
-                wallet_amount: cartItems.payableAmount,
-                transactionType: 'Debited',
-                transaction_date: new Date(),
-                order_id: newOrder.order_id,
-            });
-        await wallet.save();
-        }
+        
+        
         const newOrder = new orderSchema({
             customer_id: req.session.user,
             order_id: Math.floor(Math.random() * 1000000),
@@ -306,6 +293,22 @@ const placeOrder = async (req, res) => {
             paymentStatus: payment_status,
             isCancelled: false
         });
+
+        if(paymentDetails[paymentMode] === 'Wallet'){
+            const wallet = await walletSchema.findOne({ userID: userId });
+            if (!wallet || wallet.balance < cartItems.payableAmount) {
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+            }
+            wallet.balance -= cartItems.payableAmount;
+            wallet.transaction.push({
+                wallet_amount: cartItems.payableAmount,
+                transactionType: 'Debited',
+                transaction_date: new Date(),
+                order_id: newOrder.order_id,
+            });
+        await wallet.save();
+        }
+        
         await newOrder.save();
 
         

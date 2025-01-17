@@ -131,20 +131,7 @@ const singleOrder = async (req,res) =>{
             couponDiscount = 0;
         }
         
-        if (paymentDetails[paymentMode] === 'Wallet') {
-            const wallet = await walletSchema.findOne({ userID: userId });
-            if (!wallet || wallet.balance < product.productPrice) {
-                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
-            }
-            wallet.balance -= product.productPrice;
-            wallet.transaction.push({
-                wallet_amount: product.productPrice,
-                transactionType: 'Debited',
-                transaction_date: new Date(),
-                order_id: newOrder.order_id,
-            });
-            await wallet.save();
-        }
+        
 
         const newOrder = new orderSchema({
             customer_id: userId,
@@ -180,6 +167,22 @@ const singleOrder = async (req,res) =>{
             isCancelled: payment_status === "Failed" 
         });
 
+
+        if (paymentDetails[paymentMode] === 'Wallet') {
+            const wallet = await walletSchema.findOne({ userID: userId });
+            if (!wallet || wallet.balance < product.productPrice) {
+                return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+            }
+            wallet.balance -= product.productPrice;
+            wallet.transaction.push({
+                wallet_amount: product.productPrice,
+                transactionType: 'Debited',
+                transaction_date: new Date(),
+                order_id: newOrder.order_id,
+            });
+            await wallet.save();
+        }
+        
         await newOrder.save();
 
         
