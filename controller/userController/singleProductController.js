@@ -148,6 +148,7 @@ const singleOrder = async (req,res) =>{
             }],
             totalQuantity: 1,
             totalPrice: product.productPrice - couponDiscount - product.productPrice * (product.productDiscount /100),
+            couponCode: couponCode,
             couponDiscount: couponDiscount,
             address:{
                 customer_name: userDetails.name,

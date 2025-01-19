@@ -85,7 +85,7 @@
                             <div class="flex-1">
                                 <h5 class="text-lg font-semibold mb-2 text-gray-800"><%= product.product_name %></h5>
                                 <p class="text-sm text-gray-700">Quantity: <b><%= product.product_quantity %></b></p>
-                                <p class="text-sm text-gray-700">Price: <b>&#8377; <%= product.product_price.toLocaleString() %></b></p>
+                                <p class="text-sm text-gray-700">Price: <b>&#8377; <%= (product.product_price - (product.product_price * product.product_discount / 100)).toFixed(2) %></b></p>
                             </div>
                         </div>
                         <hr class="border-gray-300 my-4">

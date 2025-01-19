@@ -71,7 +71,7 @@
                     <div class="text-center">
                       <h5 class="font-semibold text-lg text-gray-800 mb-2"><%= item.product_name %></h5>
                       <p class="text-sm text-gray-600"><strong>Qty:</strong> <%= item.product_quantity %></p>
-                      <p class="text-sm text-gray-600"><strong>Total:</strong> ₹<%= item.product_price * item.product_quantity %></p>
+                      <p class="text-sm text-gray-600"><strong>Total:</strong> ₹<%= (item.product_price - (item.product_price * item.product_discount / 100)).toFixed(2) %></p>
                       <p class="text-sm mt-2">
                         <strong>Status:</strong>
                         <% if (orderDetails.orderStatus === 'Pending') { %>
