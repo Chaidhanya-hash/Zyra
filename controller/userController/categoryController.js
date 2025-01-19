@@ -88,12 +88,19 @@ const category = async (req, res) => {
 
 const allProduct = async(req,res) => {
     try {
-        const minPrice = parseInt(req.query.minPrice) || 0;
-        const maxPrice = parseInt(req.query.maxPrice) || Number.MAX_SAFE_INTEGER;
-        const sortBy = req.query.sortBy || 'newArrivals';
-        const search = req.query.search ? req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : "";
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 12;
+        const sanitizedQuery = {
+            page: parseInt(req.query.page) || 1,
+            limit: parseInt(req.query.limit) || 12,
+            minPrice: parseInt(req.query.minPrice) || 0,
+            maxPrice: parseInt(req.query.maxPrice) || Number.MAX_SAFE_INTEGER,
+            sortBy: req.query.sortBy || 'newArrivals',
+            search: req.query.search ? req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : "",
+            productCategory: req.query.productCategory ? 
+                (Array.isArray(req.query.productCategory) ? 
+                    req.query.productCategory : [req.query.productCategory]) 
+                : []
+        };
+
         const userId = req.session.user;
 
         // Get active brands and categories
@@ -106,8 +113,8 @@ const allProduct = async(req,res) => {
 
         const activeBrandIds = activeBrands.map(brand => brand._id);
 
-        let selectedCategories = req.query.productCategory
-            ? (Array.isArray(req.query.productCategory) ? req.query.productCategory : [req.query.productCategory])
+        let selectedCategories = sanitizedQuery.productCategory.length > 0 
+            ? sanitizedQuery.productCategory 
             : category.map(cat => cat.categoryName);
 
         let categoryIds = [];
@@ -118,20 +125,25 @@ const allProduct = async(req,res) => {
 
         // Update product query to include active brands
         const productQuery = {
-            productName: { $regex: search, $options: 'i' },
+            productName: { $regex: sanitizedQuery.search, $options: 'i' },
             productCategory: { $in: categoryIds },
-            productBrand: { $in: activeBrandIds }, // Add this line
+            productBrand: { $in: activeBrandIds },
             isActive: true,
-            productPrice: { $gte: minPrice, $lte: maxPrice }
+            productPrice: { 
+                $gte: sanitizedQuery.minPrice, 
+                $lte: sanitizedQuery.maxPrice 
+            }
         };
-
+        
+        
         let sortOption = {};
-        switch (sortBy) {
+        
+        switch (sanitizedQuery.sortBy) {
             case 'priceLowToHigh':
-                sortOption = { productPrice: 1 };
+                sortOption = { sellingPrice: 1 };
                 break;
             case 'priceHighToLow':
-                sortOption = { productPrice: -1 };
+                sortOption = { sellingPrice: -1 };
                 break;
             case 'nameAsc':
                 sortOption = { productName: 1 };
@@ -149,8 +161,8 @@ const allProduct = async(req,res) => {
                 .populate('productCategory')
                 .populate('productBrand') // Optionally populate brand info
                 .sort(sortOption)
-                .limit(limit)
-                .skip((page - 1) * limit),
+                .limit(sanitizedQuery.limit)
+                .skip((sanitizedQuery.page - 1) * sanitizedQuery.limit),
             productSchema.countDocuments(productQuery)
         ]);
 
@@ -160,13 +172,13 @@ const allProduct = async(req,res) => {
             product,
             category,
             categories,
-            query: req.query,
-            search,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
+            query: sanitizedQuery, // Pass sanitized query to view
+            search: sanitizedQuery.search,
+            totalPages: Math.ceil(count / sanitizedQuery.limit),
+            currentPage: sanitizedQuery.page,
             wishlist,
-            page,
-            limit
+            page: sanitizedQuery.page,
+            limit: sanitizedQuery.limit
         });
     } catch(error) {
         console.log(`error in all products rendering ${error}`);

@@ -26,16 +26,16 @@ const forgotPassword = (req,res)=>{
 
 const forgotPasswordPost = async (req,res) =>{
     try {
-        const checkEmail = await userSchema.find({email:req.body.email});
+        const checkEmail = await userSchema.findOne({email:req.body.email});
 
         if(!checkEmail){
-            req.flash('Sorry we cannot find you please Signup');
-            res.redirect('/user/signup');
+            req.flash('error','Sorry we cannot find you please Signup');
+            return res.redirect('/signup');
         }
 
-        if(checkEmail.isActive == 'false'){
+        if(!checkEmail.isActive){
             req.flash('error','Access to this account is denied by Admin');
-            res.redirect('/user/login');
+            return res.redirect('/login');
         }
 
         const OTP = generateOTP();
@@ -46,12 +46,13 @@ const forgotPasswordPost = async (req,res) =>{
         req.session.otp = OTP;
         req.session.otptimer = Date.now();
         
-
-        res.redirect('/forgotPasswordOtp');
+        req.flash('success', `OTP sent to ${req.body.email}`);
+        return res.redirect('/forgotPasswordOtp');
 
     }
     catch(error){
         console.log(`error in forget password post method ${error}`);
+        
     }
 }
 

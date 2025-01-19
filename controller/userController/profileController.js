@@ -208,15 +208,33 @@ const ressetPasswordPost = async (req,res) =>{
             res.redirect('/login');
         }
 
-        const password = await bcrypt.hash(req.body.newpassword,10);
-        const update = await userSchema.updateOne({_id:userId},{password:password});
+        const user = await userSchema.findById(userId); // Remove the object wrapper
+        if (!user) {
+            req.flash('error', 'User not found');
+            return res.redirect('/login');
+        }
+
+        const isPasswordMatch = await bcrypt.compare(req.body.oldpassword, user.password);
+        if (!isPasswordMatch) {
+            req.flash('error', 'Old password is incorrect, Please give a valid password');
+            return res.redirect('/ressetprofile-password');
+        }
+
+        const newHashedPassword = await bcrypt.hash(req.body.newpassword, 10);
         
-        if(update) {
-            req.flash('success','Password updated Successfully');
-            res.redirect('/profile');
+        // Update password
+        const update = await userSchema.findByIdAndUpdate(
+            userId,
+            { password: newHashedPassword },
+            { new: true }
+        );
+
+        if (update) {
+            req.flash('success', 'Password updated Successfully');
+            return res.redirect('/profile');
         } else {
-            req.flash('error','Error in changing Password');
-            res.redirect('/profile');
+            req.flash('error', 'Error in changing Password');
+            return res.redirect('/profile');
         }
 
     } 

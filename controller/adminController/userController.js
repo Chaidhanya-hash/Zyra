@@ -4,7 +4,7 @@ const userSchema = require('../../model/userSchema');
 
 const customers = async (req,res)=>{
     try {
-        const search = req.query.search || '';
+        const search = req.query.search ? req.query.search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : "";
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 8;
 

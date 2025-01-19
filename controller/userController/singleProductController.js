@@ -158,7 +158,8 @@ const singleOrder = async (req,res) =>{
                 country: userDetails.address[addressIndex].country,
                 pincode: userDetails.address[addressIndex].pincode,
                 phonenumber: userDetails.address[addressIndex].phoneNumber,
-                landMark: userDetails.address[addressIndex].landmark
+                landMark: userDetails.address[addressIndex].landmark,
+                state: userDetails.address[addressIndex].state
             },
             paymentMethod: paymentDetails[paymentMode],
             orderStatus: payment_status === "Failed" ? "Failed" :(payment_status === "Pending" ? "Pending" : "Confirmed"),

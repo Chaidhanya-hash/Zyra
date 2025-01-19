@@ -1,3 +1,4 @@
+const { type } = require('express/lib/response');
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
@@ -36,6 +37,10 @@ const schema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Brand',
         required: true
+    },
+    sellingPrice: {
+        type: Number,
+        default: null
     }
 },{timestamps:true});
 

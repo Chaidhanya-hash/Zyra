@@ -128,16 +128,48 @@
 
         // Handle form submission
         filterForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(filterForm);
-            const searchParams = new URLSearchParams(formData);
-            window.location.href =` /allproduct?${searchParams.toString()}`;
-        });
+        e.preventDefault();
+        
+        // Get current URL parameters
+        const currentParams = new URLSearchParams(window.location.search);
+        const formData = new FormData(filterForm);
+        
+        // Create new URLSearchParams object
+        const newParams = new URLSearchParams();
+        
+        // Add form data
+        for (let [key, value] of formData.entries()) {
+            if (value) { // Only add if value exists
+                newParams.append(key, value);
+            }
+        }
+        
+        // Preserve search parameter if it exists
+        if (currentParams.has('search')) {
+            newParams.set('search', currentParams.get('search'));
+        }
+        
+        // Reset to page 1 when filtering
+        newParams.set('page', '1');
+        
+        window.location.href = `/allproduct?${newParams.toString()}`;
+    });
 
         // Handle reset button click
-        resetButton.addEventListener('click', function () {
-            filterForm.reset();
-            window.location.href = '/allproduct';
-        });
+        
+    resetButton.addEventListener('click', function (e) {
+        e.preventDefault();
+        filterForm.reset();
+        
+        // Keep only search parameter if it exists
+        const currentParams = new URLSearchParams(window.location.search);
+        const newParams = new URLSearchParams();
+        
+        if (currentParams.has('search')) {
+            newParams.set('search', currentParams.get('search'));
+        }
+        
+        window.location.href = `/allproduct?${newParams.toString()}`;
+    });
     });
 </script>

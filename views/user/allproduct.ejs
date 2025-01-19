@@ -189,39 +189,38 @@
 
   <!-- -------------------------------Pagination---------------------------- -->
 
-  <div class="pagination-controls flex justify-center mt-3 mb-8">
-    <ul class="flex space-x-2">
-      <% if (currentPage > 1) { %>
-        <li>
-          <a 
-            class="px-4 py-2  text-gray-800  hover:text-blue-600"
-            href="/allproduct/?page=<%= currentPage - 1 %>&limit=<%= limit %>&search=<%= search %>">
-            Previous
-          </a>
-        </li>
-      <% } %>
-  
-      <% for (let i = 1; i <= totalPages; i++) { %>
-        <li>
-          <a 
-            class="px-4 py-2 <%= currentPage == i ? 'bg-black text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' %> rounded-md"
-            href="/allproduct/?page=<%= i %>&limit=<%= limit %>&search=<%= search %>">
-            <%= i %>
-          </a>
-        </li>
-      <% } %>
-  
-      <% if (currentPage < totalPages) { %>
-        <li>
-          <a 
-            class="px-4 py-2  text-gray-800  hover:text-blue-600"
-            href="/allproduct/?page=<%= currentPage + 1 %>&limit=<%= limit %>&search=<%= search %>">
-            Next
-          </a>
-        </li>
-      <% } %>
-    </ul>
-  </div>
+  <div class="pagination flex justify-center gap-2 mt-4">
+    <% if (totalPages > 1) { %>
+        <% 
+        // Create URL params object
+        const urlParams = new URLSearchParams(query);
+        %>
+        
+        <% if (currentPage > 1) { %>
+            <% urlParams.set('page', (currentPage - 1).toString()); %>
+            <a href="/allproduct?<%= urlParams.toString() %>" 
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                Previous
+            </a>
+        <% } %>
+        
+        <% for(let i = 1; i <= totalPages; i++) { %>
+            <% urlParams.set('page', i.toString()); %>
+            <a href="/allproduct?<%= urlParams.toString() %>"
+               class="px-3 py-1 rounded <%= currentPage === i ? 'bg-red-500 text-white' : 'bg-gray-200 hover:bg-gray-300' %>">
+                <%= i %>
+            </a>
+        <% } %>
+        
+        <% if (currentPage < totalPages) { %>
+            <% urlParams.set('page', (currentPage + 1).toString()); %>
+            <a href="/allproduct?<%= urlParams.toString() %>"
+               class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                Next
+            </a>
+        <% } %>
+    <% } %>
+</div>
   <%- include('footer') %>
 
   

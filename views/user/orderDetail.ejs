@@ -26,7 +26,10 @@
                             <span><strong>Street:</strong> <%= orderDetails.address.street %></span><br>
                             <span><strong>City:</strong> <%= orderDetails.address.city %></span><br>
                             <span><strong>Pincode:</strong> <%= orderDetails.address.pincode %></span><br>
-                            <span><strong>Phone Number:</strong> <%= orderDetails.address.phonenumber %></span>
+                            <span><strong>Phone Number:</strong> <%= orderDetails.address.phonenumber %></span><br>
+                            <span><strong>Landmark:</strong> <%= orderDetails.address.landMark %></span><br>
+                            <span><strong>State:</strong> <%= orderDetails.address.state %></span><br>
+                            <span><strong>Country:</strong> <%= orderDetails.address.country %></span>
                         </p>
                     <% } else { %>
                         <p class="text-red-500">Address Not Available</p>
@@ -40,6 +43,11 @@
                 <div class="text-gray-600">
                     <p class="space-y-2">
                         <span><strong>Method:</strong> <span class="text-green-500"><%= orderDetails.paymentMethod %></span></span><br>
+                        <% if(orderDetails.couponCode != ""){ %>
+                          <span><strong>Coupon Code:</strong> <span class="text-blue-500"><%= orderDetails.couponCode %></span></span><br>
+                          <span><strong>Coupon Amount:</strong> <span class="text-blue-500">₹<%= orderDetails.couponDiscount %></span></span><br>
+                        <% } %>
+                        
                         <span><strong>Total Amount:</strong> <span class="text-blue-500">₹<%= orderDetails.totalPrice %></span></span><br>
                         <span><strong>Status:</strong> <span class="font-semibold"><%= orderDetails.orderStatus %></span></span>
                     </p>

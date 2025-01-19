@@ -51,7 +51,8 @@ const schema = new mongoose.Schema({
         country: String,
         pincode: Number,
         phonenumber:Number,
-        landMark:String
+        landMark:String,
+        state: String
     },
     paymentMethod: {
         type: String,

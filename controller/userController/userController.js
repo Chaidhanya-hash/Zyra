@@ -224,7 +224,7 @@ const otpResend = (req,res)=>{
         sendOTP(email,OTP);
 
         req.session.otp = OTP;
-        req.session.otpTime = Date.now();
+        req.session.otptime = Date.now();
 
         req.flash('success','OTP resend successfully');
         res.redirect('/otp');

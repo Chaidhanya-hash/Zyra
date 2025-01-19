@@ -254,6 +254,19 @@
 
             async function getOrderData(page = 1) {
                 const startDate = document.getElementById('startDate').value;
+                const endDateInput = document.getElementById('endDate');
+                if (startDate) {
+                    
+                    // Set minimum date for end date input
+                    endDateInput.min = startDate;
+                    // If end date is before start date, reset it
+                    if (endDateInput.value && endDateInput.value < startDate) {
+                        endDateInput.value = '';
+                    }
+                } else {
+                    
+                    endDateInput.value = '';
+                }
                 const endDate = document.getElementById('endDate').value;
                 const salesreportType = document.getElementById('salesreportType').value;
                 const limit = 5;
