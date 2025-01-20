@@ -24,9 +24,14 @@
                         <p class="text-gray-600 leading-relaxed">
                             <strong>Name:</strong> <%= orderDetails.address.customer_email %><br>
                             <strong>Address:</strong> <%= orderDetails.address.building %><br>
-                            <strong>District:</strong> <%= orderDetails.address.street %><br>
-                            <strong>State:</strong> <%= orderDetails.address.city %><br>
-                            <strong>Pincode:</strong> <%= orderDetails.address.pincode %>
+                            <strong>Street:</strong> <%= orderDetails.address.street %><br>
+                            <strong>City:</strong> <%= orderDetails.address.city %><br>
+                            <strong>Pincode:</strong> <%= orderDetails.address.pincode %><br>
+                            <strong>Phone Number:</strong> <%= orderDetails.address.phonenumber %><br>
+                            <strong>Landmark:</strong> <%= orderDetails.address.landMark %><br>
+                            <strong>State:</strong> <%= orderDetails.address.state %><br>
+                            <strong>Country:</strong> <%= orderDetails.address.country %><br>
+
                         </p>
                     <% } else { %>
                         <p class="text-gray-600">Address Not Available</p>
@@ -43,6 +48,12 @@
                     <p class="text-gray-600 leading-relaxed">
                         <strong>Method:</strong> 
                         <span class="text-green-600 font-medium"><%= orderDetails.paymentMethod %></span><br>
+                        <% if(orderDetails.couponCode != ""){ %>
+                            <span><strong>Coupon Code:</strong> <span class="text-blue-500"><%= orderDetails.couponCode %></span></span><br>
+                            <span><strong>Coupon Amount:</strong> <span class="text-blue-500">₹<%= orderDetails.couponDiscount %></span></span><br>
+                          <% } %>
+                          
+                          <span><strong>Total Amount:</strong> <span class="text-blue-500">₹<%= orderDetails.totalPrice %></span></span><br>
                         <strong>Status:</strong> 
                         <span class="text-gray-800 font-medium"><%= orderDetails.orderStatus %></span>
                     </p>
@@ -67,10 +78,10 @@
                         <div class="mt-4">
                             <h5 class="text-lg font-semibold text-gray-700 mb-2"><%= item.product_name %></h5>
                             <p class="text-gray-600 text-sm mb-1"><strong>Qty:</strong> <%= item.product_quantity %></p>
-                            <p class="text-gray-600 text-sm mb-3"><strong>Total:</strong> ₹<%= item.product_price * item.product_quantity %></p>
+                            <p class="text-gray-600 text-sm mb-3"><strong>Total:</strong> ₹<%= (item.product_price - (item.product_price * item.product_discount / 100)).toFixed(2) %></p>
                             <p class="text-sm">
                                 <strong>Status:</strong>
-                                <% if(orderDetails.orderStatus === 'Pending') { %>
+                                <% if(orderDetails.orderStatus === 'Failed') { %>
                                     <span class="inline-block bg-blue-500 text-white text-sm rounded px-2 py-1">Pending</span>
                                 <% } else if(orderDetails.orderStatus === 'Confirmed') { %>
                                     <span class="inline-block bg-blue-600 text-white text-sm rounded px-2 py-1">Confirmed</span>

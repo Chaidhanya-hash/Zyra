@@ -74,7 +74,7 @@
                       <p class="text-sm text-gray-600"><strong>Total:</strong> ₹<%= (item.product_price - (item.product_price * item.product_discount / 100)).toFixed(2) %></p>
                       <p class="text-sm mt-2">
                         <strong>Status:</strong>
-                        <% if (orderDetails.orderStatus === 'Pending') { %>
+                        <% if (orderDetails.orderStatus === 'Failed') { %>
                           <span class="bg-blue-500 text-white px-3 py-1 rounded-full">Pending</span>
                         <% } else if (orderDetails.orderStatus === 'Confirmed') { %>
                           <span class="bg-green-500 text-white px-3 py-1 rounded-full">Confirmed</span>

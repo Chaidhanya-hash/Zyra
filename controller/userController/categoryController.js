@@ -111,6 +111,8 @@ const allProduct = async(req,res) => {
             userId ? wishlistSchema.findOne({ userID: userId }) : null
         ]);
 
+        
+
         const activeBrandIds = activeBrands.map(brand => brand._id);
 
         let selectedCategories = sanitizedQuery.productCategory.length > 0 
@@ -129,7 +131,7 @@ const allProduct = async(req,res) => {
             productCategory: { $in: categoryIds },
             productBrand: { $in: activeBrandIds },
             isActive: true,
-            productPrice: { 
+            sellingPrice: { 
                 $gte: sanitizedQuery.minPrice, 
                 $lte: sanitizedQuery.maxPrice 
             }

@@ -48,7 +48,7 @@
                 id="maxPrice" 
                 name="maxPrice" 
                 min="0" 
-                value="<%= query.maxPrice || '' %>"
+                value="<%= query.maxPrice === Number.MAX_SAFE_INTEGER ? '' : (query.maxPrice || '')%>"
             >
         </div>
 
